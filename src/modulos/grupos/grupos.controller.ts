@@ -1,8 +1,12 @@
-import { Controller, Get, HttpException, HttpStatus, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Post, Body, Put, Param, Delete, UseGuards, SetMetadata } from '@nestjs/common';
 import { GruposService } from './grupos.service';
 import { Grupo } from './../../dto/grupo.dto';
+import { AuthGuard } from './../../global/auth/auth.guard';
+import { Permissions } from '../../global/auth/permission.list';
+import { RequirePermission } from '../../global/auth/require-permission.decorator';
 
 @Controller('grupos')
+@UseGuards(AuthGuard)
 export class GruposController {
 
     constructor(
@@ -10,6 +14,7 @@ export class GruposController {
     ){ }
 
     @Get()
+    @RequirePermission(Permissions.GRUPOS.CONSULTAR)
     async findAll(): Promise<Grupo[]> {
         try{
             return await this.gruposSrv.findAll()
@@ -19,6 +24,7 @@ export class GruposController {
     }
 
     @Post()
+    @RequirePermission(Permissions.GRUPOS.REGISTRAR)
     async create(@Body() grupo: Grupo){
         try{
             await this.gruposSrv.create(grupo)
@@ -29,6 +35,7 @@ export class GruposController {
     }
 
     @Put(':id')
+    @RequirePermission(Permissions.GRUPOS.EDITAR)
     async update(@Body() grupo: Grupo, @Param('id') idviejo: string){
         var cantEditada = 0
         try{
@@ -43,6 +50,7 @@ export class GruposController {
     }
 
     @Delete(':id')
+    @RequirePermission(Permissions.GRUPOS.ELIMINAR)
     async delete(@Param('id') id: string){
         var cantEliminada = 0
         try{
