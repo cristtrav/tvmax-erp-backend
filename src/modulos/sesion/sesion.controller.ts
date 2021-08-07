@@ -29,7 +29,7 @@ export class SesionController {
         return sesToken
     }
 
-    @Delete('logout')
+    @Post('logout')
     async logout(@Body() token: {refreshToken: string}){
         await this.sesionSrv.logout(token.refreshToken)
     }

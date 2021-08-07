@@ -5,12 +5,33 @@ import { DatabaseService } from './../../global/database/database.service';
 @Injectable()
 export class GruposService {
 
-    constructor(private dbsrv: DatabaseService){
+    constructor(private dbsrv: DatabaseService) {
     }
 
-    async findAll(): Promise<Grupo[]>{
-        const query = `SELECT * FROM public.grupo`
-        return (await this.dbsrv.execute(query)).rows
+    async findAll(reqQuery): Promise<Grupo[]> {
+        const { eliminado, sort, offset, limit } = reqQuery
+        var query: string = `SELECT * FROM public.grupo`
+        var queryParams: any[] = [];
+        if(eliminado){
+            query+=` WHERE eliminado=$1`
+            queryParams.push(eliminado);
+        }
+        if(sort){
+            const order: string = sort.substring(0, 1) === '-'?'DESC':'ASC'
+            const column: string = sort.substring(1, sort.length)
+            query+= ` ORDER BY ${column} ${order}`
+        }
+        if(limit && offset){
+            query+=` LIMIT ${limit} OFFSET ${offset}`
+        }
+        
+        return (await this.dbsrv.execute(query, queryParams)).rows
+    }
+
+    async findById(id: number): Promise<Grupo> {
+        const query = `SELECT * FROM public.grupo WHERE id = $1`
+        const params = [id]
+        return (await this.dbsrv.execute(query, params)).rows[0];
     }
 
     async create(g: Grupo) {
@@ -25,7 +46,7 @@ export class GruposService {
         return (await this.dbsrv.execute(query, params)).rowCount
     }
 
-    async delete(id: string): Promise<number>{
+    async delete(id: string): Promise<number> {
         const query = `UPDATE public.grupo SET eliminado = true WHERE id = $1`
         const params = [id]
         return (await this.dbsrv.execute(query, params)).rowCount
