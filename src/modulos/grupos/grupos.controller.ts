@@ -34,6 +34,20 @@ export class GruposController {
             )
         }
     }
+
+    @Get('total')
+    @RequirePermission(Permissions.GRUPOS.CONSULTAR)
+    async getTotal(
+        @Query('eliminado') eliminado: boolean
+    ): Promise<number>{
+        try{
+            return await this.gruposSrv.count({ eliminado })
+        }catch(e){
+            console.log('Error al contar')
+            console.log(e)
+            throw new HttpException({}, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
     
     @Get(':id')
     @RequirePermission(Permissions.GRUPOS.CONSULTAR)

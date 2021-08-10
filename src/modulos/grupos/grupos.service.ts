@@ -28,6 +28,17 @@ export class GruposService {
         return (await this.dbsrv.execute(query, queryParams)).rows
     }
 
+    async count(reqQuery): Promise<number> {
+        const { eliminado } = reqQuery
+        var queryParams: any[] = []
+        var query: string = "SELECT COUNT(*) FROM public.grupo"
+        if(eliminado){
+            query+=` WHERE eliminado = $1`
+            queryParams.push(eliminado)
+        }
+        return (await this.dbsrv.execute(query, queryParams)).rows[0].count
+    }
+
     async findById(id: number): Promise<Grupo> {
         const query = `SELECT * FROM public.grupo WHERE id = $1`
         const params = [id]
