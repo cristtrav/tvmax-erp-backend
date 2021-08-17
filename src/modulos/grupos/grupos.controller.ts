@@ -4,7 +4,6 @@ import { Grupo } from './../../dto/grupo.dto';
 import { AuthGuard } from './../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
-import { Request } from 'express';
 
 @Controller('grupos')
 @UseGuards(AuthGuard)

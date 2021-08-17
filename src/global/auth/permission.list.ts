@@ -5,4 +5,11 @@ export class Permissions {
         EDITAR: 3,
         ELIMINAR: 4
     }
+
+    static readonly SERVICIOS = {
+        CONSULTAR: 5,
+        REGISTRAR: 6,
+        EDITAR: 7,
+        ELIMINAR: 8
+    }
 }
