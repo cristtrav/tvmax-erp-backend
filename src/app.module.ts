@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseService } from './global/database/database.service';
 import { SesionModule } from './modulos/sesion/sesion.module';
 import { ServiciosModule } from './modulos/servicios/servicios.module';
+import { DepartamentosModule } from './modulos/departamentos/departamentos.module';
 
 
 @Module({
@@ -13,7 +14,8 @@ import { ServiciosModule } from './modulos/servicios/servicios.module';
     ConfigModule.forRoot({isGlobal: true}),
     GruposModule,
     SesionModule,
-    ServiciosModule
+    ServiciosModule,
+    DepartamentosModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],
