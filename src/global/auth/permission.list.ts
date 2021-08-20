@@ -19,4 +19,11 @@ export class Permissions {
         EDITAR: 11, 
         ELIMINAR: 12
     }
+
+    static readonly DISTRITOS = {
+        CONSULTAR: 13,
+        REGISTRAR: 14,
+        EDITAR: 15,
+        ELIMINAR: 16
+    }
 }

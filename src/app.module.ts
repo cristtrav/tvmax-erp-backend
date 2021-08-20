@@ -7,6 +7,7 @@ import { DatabaseService } from './global/database/database.service';
 import { SesionModule } from './modulos/sesion/sesion.module';
 import { ServiciosModule } from './modulos/servicios/servicios.module';
 import { DepartamentosModule } from './modulos/departamentos/departamentos.module';
+import { DistritosModule } from './modulos/distritos/distritos.module';
 
 
 @Module({
@@ -15,7 +16,8 @@ import { DepartamentosModule } from './modulos/departamentos/departamentos.modul
     GruposModule,
     SesionModule,
     ServiciosModule,
-    DepartamentosModule
+    DepartamentosModule,
+    DistritosModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],
