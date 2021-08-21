@@ -8,6 +8,7 @@ import { SesionModule } from './modulos/sesion/sesion.module';
 import { ServiciosModule } from './modulos/servicios/servicios.module';
 import { DepartamentosModule } from './modulos/departamentos/departamentos.module';
 import { DistritosModule } from './modulos/distritos/distritos.module';
+import { BarriosModule } from './modulos/barrios/barrios.module';
 
 
 @Module({
@@ -17,7 +18,8 @@ import { DistritosModule } from './modulos/distritos/distritos.module';
     SesionModule,
     ServiciosModule,
     DepartamentosModule,
-    DistritosModule
+    DistritosModule,
+    BarriosModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

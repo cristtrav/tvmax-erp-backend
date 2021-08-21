@@ -26,4 +26,11 @@ export class Permissions {
         EDITAR: 15,
         ELIMINAR: 16
     }
+
+    static readonly BARRIOS = {
+        CONSULTAR: 17,
+        REGISTRAR: 18,
+        EDITAR: 19,
+        ELIMINAR: 20
+    }
 }
