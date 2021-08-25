@@ -33,4 +33,11 @@ export class Permissions {
         EDITAR: 19,
         ELIMINAR: 20
     }
+
+    static readonly TIPOSDOMICILIOS = {
+        CONSULTAR: 21,
+        REGISTRAR: 22,
+        EDITAR: 23,
+        ELIMINAR: 24
+    }
 }
