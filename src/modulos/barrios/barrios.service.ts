@@ -10,7 +10,7 @@ export class BarriosService {
         private dbsrv: DatabaseService
     ){}
 
-    async findAll(queryParams): Promise<Barrio>{
+    async findAll(queryParams): Promise<Barrio[]>{
         const { eliminado, sort, offset, limit } = queryParams;
         var query: string = `SELECT * FROM public.vw_barrios`;
         const params: any[] = [];

@@ -4,6 +4,7 @@ import { Grupo } from './../../dto/grupo.dto';
 import { AuthGuard } from './../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
+import { ServerResponseList } from '../../dto/server-response-list.dto';
 
 @Controller('grupos')
 @UseGuards(AuthGuard)
@@ -20,9 +21,11 @@ export class GruposController {
         @Query('sort') sort: string,
         @Query('limit') limit: number,
         @Query('offset') offset: number
-    ): Promise<Grupo[]> {
+    ): Promise<ServerResponseList<Grupo>> {
         try{
-            return await this.gruposSrv.findAll({eliminado, sort, limit, offset})
+            const data: Grupo[] = await this.gruposSrv.findAll({eliminado, sort, limit, offset});
+            const rowCount: number = await this.gruposSrv.count({eliminado});
+            return new ServerResponseList<Grupo>(data, rowCount);
         }catch(e){
             throw new HttpException(
                 {

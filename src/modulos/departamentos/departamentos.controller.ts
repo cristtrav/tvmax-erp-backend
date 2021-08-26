@@ -4,6 +4,7 @@ import { AuthGuard } from '../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { DepartamentosService } from './departamentos.service';
+import { ServerResponseList } from '../../dto/server-response-list.dto';
 
 @Controller('departamentos')
 @UseGuards(AuthGuard)
@@ -20,9 +21,11 @@ export class DepartamentosController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ) {
+    ): Promise<ServerResponseList<Departamento>> {
         try {
-            return await this.departamentoSrv.findAll({ eliminado, sort, offset, limit });
+            const data: Departamento[] = await this.departamentoSrv.findAll({ eliminado, sort, offset, limit });
+            const rowCount: number = await this.departamentoSrv.count({eliminado});
+            return new ServerResponseList<Departamento>(data, rowCount);
         } catch (e) {
             console.log('Error al consultar departamentos');
             console.log(e);

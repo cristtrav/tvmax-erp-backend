@@ -4,6 +4,7 @@ import { Servicio } from '../../dto/servicio.dto';
 import { ServiciosService } from './servicios.service';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { Permissions } from '../../global/auth/permission.list';
+import { ServerResponseList } from '../../dto/server-response-list.dto';
 
 @Controller('servicios')
 @UseGuards(AuthGuard)
@@ -20,9 +21,11 @@ export class ServiciosController {
         @Query('offset') offset: number,
         @Query('limit') limit: number,
         @Query('sort') sort: string
-    ): Promise<Servicio[]>{
+    ): Promise<ServerResponseList<Servicio>>{
         try{
-            return this.serviciosSrv.findAll({eliminado, offset, limit, sort})
+            const data: Servicio[] = await this.serviciosSrv.findAll({eliminado, offset, limit, sort});
+            const rowCount: number = await this.serviciosSrv.count({eliminado});
+            return new ServerResponseList<Servicio>(data, rowCount);
         }catch(e){
             console.log('Error al consultar Servicios')
             console.log(e)

@@ -29,7 +29,7 @@ export class DepartamentosService {
         return (await this.dbsrv.execute(query, params)).rows;
     }
 
-    async count(queryParams): Promise<Number> {
+    async count(queryParams): Promise<number> {
         const { eliminado } = queryParams;
         let query: string = `SELECT COUNT(*) FROM public.departamento`;
         const params: any[] = [];

@@ -4,6 +4,7 @@ import { RequirePermission } from 'src/global/auth/require-permission.decorator'
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { BarriosService } from './barrios.service';
 import { Barrio } from '../../dto/barrio.dto';
+import { ServerResponseList } from '../../dto/server-response-list.dto';
 
 @Controller('barrios')
 @UseGuards(AuthGuard)
@@ -20,9 +21,11 @@ export class BarriosController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ){
+    ): Promise<ServerResponseList<Barrio>>{
         try{
-            return await this.barriosSrv.findAll({eliminado, sort, limit, offset});
+            const data: Barrio[] = await this.barriosSrv.findAll({eliminado, sort, limit, offset});
+            const rowCount: number = await this.barriosSrv.count({eliminado});
+            return new ServerResponseList<Barrio>(data, rowCount);
         }catch(e){
             console.log('Error al consultar barrios');
             console.log(e);

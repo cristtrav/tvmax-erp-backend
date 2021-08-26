@@ -4,6 +4,7 @@ import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { DistritosService } from './distritos.service';
+import { ServerResponseList } from '../../dto/server-response-list.dto';
 
 @Controller('distritos')
 @UseGuards(AuthGuard)
@@ -20,9 +21,11 @@ export class DistritosController {
         @Query('sort') sort: string,
         @Query('limit') limit: number,
         @Query('offset') offset: number
-    ){
+    ): Promise<ServerResponseList<Distrito>>{
         try{
-            return await this.distritosSrv.findAll({eliminado, sort, limit, offset});
+            const data: Distrito[] = await this.distritosSrv.findAll({eliminado, sort, limit, offset});
+            const rowCount: number = await this.distritosSrv.count({eliminado});
+            return new ServerResponseList<Distrito>(data, rowCount);
         }catch(e){
             console.log('Error al consultar distritos');
             console.log(e);

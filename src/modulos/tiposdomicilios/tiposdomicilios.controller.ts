@@ -4,6 +4,7 @@ import { AuthGuard } from '../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { TiposdomiciliosService } from './tiposdomicilios.service';
+import { ServerResponseList } from '../../dto/server-response-list.dto';
 
 @Controller('tiposdomicilios')
 @UseGuards(AuthGuard)
@@ -20,9 +21,11 @@ export class TiposdomiciliosController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ){
+    ): Promise<ServerResponseList<TipoDomicilio>>{
         try{
-            return await this.tipoServSrv.findAll({eliminado, sort, offset, limit});
+            const data: TipoDomicilio[] = await this.tipoServSrv.findAll({eliminado, sort, offset, limit});
+            const rowCount: number = await this.tipoServSrv.count({eliminado});
+            return new ServerResponseList<TipoDomicilio>(data, rowCount);
         }catch(e){
             console.log('Error al consultar Tipos de Domicilios');
             console.log(e);
