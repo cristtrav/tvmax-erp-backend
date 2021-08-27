@@ -10,6 +10,8 @@ import { DepartamentosModule } from './modulos/departamentos/departamentos.modul
 import { DistritosModule } from './modulos/distritos/distritos.module';
 import { BarriosModule } from './modulos/barrios/barrios.module';
 import { TiposdomiciliosModule } from './modulos/tiposdomicilios/tiposdomicilios.module';
+import { ClientesModule } from './modulos/clientes/clientes.module';
+import { UsuariosModule } from './modulos/usuarios/usuarios.module';
 
 
 @Module({
@@ -21,7 +23,9 @@ import { TiposdomiciliosModule } from './modulos/tiposdomicilios/tiposdomicilios
     DepartamentosModule,
     DistritosModule,
     BarriosModule,
-    TiposdomiciliosModule
+    TiposdomiciliosModule,
+    ClientesModule,
+    UsuariosModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

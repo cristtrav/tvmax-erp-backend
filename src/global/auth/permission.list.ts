@@ -40,4 +40,11 @@ export class Permissions {
         EDITAR: 23,
         ELIMINAR: 24
     }
+
+    static readonly USUARIOS = {
+        CONSULTAR: 25,
+        REGISTRAR: 26,
+        EDITAR: 27,
+        ELIMINAR: 28
+    }
 }
