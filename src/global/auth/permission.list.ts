@@ -47,4 +47,11 @@ export class Permissions {
         EDITAR: 27,
         ELIMINAR: 28
     }
+
+    static readonly COBRADORES = {
+        CONSULTAR: 29,
+        REGISTRAR: 30,
+        EDITAR: 31,
+        ELIMINAR: 32
+    }
 }

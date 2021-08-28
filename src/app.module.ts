@@ -12,6 +12,7 @@ import { BarriosModule } from './modulos/barrios/barrios.module';
 import { TiposdomiciliosModule } from './modulos/tiposdomicilios/tiposdomicilios.module';
 import { ClientesModule } from './modulos/clientes/clientes.module';
 import { UsuariosModule } from './modulos/usuarios/usuarios.module';
+import { CobradoresModule } from './modulos/cobradores/cobradores.module';
 
 
 @Module({
@@ -25,7 +26,8 @@ import { UsuariosModule } from './modulos/usuarios/usuarios.module';
     BarriosModule,
     TiposdomiciliosModule,
     ClientesModule,
-    UsuariosModule
+    UsuariosModule,
+    CobradoresModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],
