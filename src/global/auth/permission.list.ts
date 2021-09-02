@@ -54,4 +54,25 @@ export class Permissions {
         EDITAR: 31,
         ELIMINAR: 32
     }
+
+    static readonly SUSCRIPCIONES = {
+        CONSULTAR: 33,
+        REGISTRAR: 34,
+        EDITAR: 35,
+        ELIMINAR: 36
+    }
+
+    static readonly CLIENTES = {
+        CONSULTAR: 37,
+        REGISTRAR: 38,
+        EDITAR: 39,
+        ELIMINAR: 40
+    }
+
+    static readonly DOMICILIOS = {
+        CONSULTAR: 41,
+        REGISTRAR: 42,
+        EDITAR: 43,
+        ELIMINAR: 44
+    }
 }

@@ -13,6 +13,8 @@ import { TiposdomiciliosModule } from './modulos/tiposdomicilios/tiposdomicilios
 import { ClientesModule } from './modulos/clientes/clientes.module';
 import { UsuariosModule } from './modulos/usuarios/usuarios.module';
 import { CobradoresModule } from './modulos/cobradores/cobradores.module';
+import { SuscripcionesModule } from './modulos/suscripciones/suscripciones.module';
+import { DomiciliosModule } from './modulos/domicilios/domicilios.module';
 
 
 @Module({
@@ -27,7 +29,9 @@ import { CobradoresModule } from './modulos/cobradores/cobradores.module';
     TiposdomiciliosModule,
     ClientesModule,
     UsuariosModule,
-    CobradoresModule
+    CobradoresModule,
+    SuscripcionesModule,
+    DomiciliosModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

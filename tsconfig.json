@@ -10,6 +10,20 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "@database/*": [
+        "./src/global/database/*"
+      ],
+      "@auth/*": [
+        "./src/global/auth/*"
+      ],
+      "@dto/*": [
+        "./src/dto/*"
+      ],
+      "@util/*": [
+        "./src/util/*"
+      ]
+    }
   }
 }

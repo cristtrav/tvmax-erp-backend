@@ -1,0 +1,17 @@
+export class Domicilio {
+    id: number | null = null;
+    direccion: string | null = null;
+    nromedidor: string | null = null;
+    idbarrio: number | null = null;
+    barrio: string | null = null;
+    idtipodomicilio: number | null = null;
+    tipodomicilio: string | null = null;
+    idcliente: number | null = null;
+    cliente: string | null = null;
+    observacion: string | null = null;
+    principal: boolean = false;
+    iddistrito: number | null = null;
+    distrito: string | null = null;
+    iddepartamento: number | null = null;
+    departamento: string| null = null;
+}
