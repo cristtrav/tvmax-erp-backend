@@ -161,4 +161,22 @@ export class TiposdomiciliosController {
         }
     }
 
+    @Get('ultimoid')
+    @RequirePermission(Permissions.TIPOSDOMICILIOS.CONSULTAR)
+    async getLastId(): Promise<number>{
+        try{
+            return await this.tipoServSrv.getLastId();
+        }catch(e){
+            console.log('Error al consultar ultimo ID de tipos de domicilios');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../global/database/database.service';
 import { TipoDomicilio } from '../../dto/tipodomicilio.dto';
-import { Result } from 'pg';
+import { Util } from '../../util/util';
+import { IWhereParam } from '@util/iwhereparam.interface';
 
 @Injectable()
 export class TiposdomiciliosService {
@@ -12,30 +13,16 @@ export class TiposdomiciliosService {
 
     async findAll(queryParams): Promise<TipoDomicilio[]>{
         const { eliminado, sort, offset, limit } = queryParams;
-        var query: string = "SELECT * FROM public.tipo_domicilio";
-        const params: any[] = [];
-        if(eliminado){
-            query += ` WHERE eliminado = $1`;
-            params.push(eliminado);
-        }
-        if(sort){
-            const srtOrder: string = sort.substring(0,1) === '-' ? 'DESC' : 'ASC';
-            const srtColumn: string = sort.substring(1, sort.length);
-            query += ` ORDER BY ${srtColumn} ${srtOrder}`;
-        }
-        if(offset && limit){
-            query += ` OFFSET ${offset} LIMIT ${limit}`;
-        }
-        return (await this.dbsrv.execute(query, params)).rows;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        var query: string = `SELECT * FROM public.tipo_domicilio ${wp.whereStr} ${Util.buildSortOffsetLimitStr(sort, offset, limit)}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number>{
         const { eliminado } = queryParams;
-        var query: string = `SELECT COUNT(*) FROM public.tipo_domicilio`;
-        if(eliminado){
-            query += ` WHERE eliminado = $1`;
-        }
-        return (await this.dbsrv.execute(query, [eliminado])).rows[0].count;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        var query: string = `SELECT COUNT(*) FROM public.tipo_domicilio ${wp.whereStr}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
     async create(td: TipoDomicilio){
@@ -59,6 +46,11 @@ export class TiposdomiciliosService {
     async delete(id: number): Promise<boolean> {
         const query: string = `UPDATE public.tipo_domicilio SET eliminado = true WHERE id = $1`;
         return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+    }
+
+    async getLastId(): Promise<number>{
+        const query: string = `SELECT MAX(id) FROM public.tipo_domicilio`;
+        return (await this.dbsrv.execute(query)).rows[0].count;
     }
 
 }

@@ -12,7 +12,7 @@ export class SuscripcionesController {
 
     constructor(
         private suscripcionesSrv: SuscripcionesService
-    ){}
+    ) { }
 
     @Get()
     @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
@@ -20,13 +20,14 @@ export class SuscripcionesController {
         @Query('eliminado') eliminado: boolean,
         @Query('sort') sort: string,
         @Query('offset') offset: number,
-        @Query('limit') limit: number
-    ): Promise<ServerResponseList<Suscripcion>>{
-        try{
-            const rows: Suscripcion[] = await this.suscripcionesSrv.findAll({eliminado, sort, offset, limit});
-            const rowCount: number = await this.suscripcionesSrv.count({eliminado});
+        @Query('limit') limit: number,
+        @Query('idcliente') idcliente: number
+    ): Promise<ServerResponseList<Suscripcion>> {
+        try {
+            const rows: Suscripcion[] = await this.suscripcionesSrv.findAll({ eliminado, idcliente, sort, offset, limit });
+            const rowCount: number = await this.suscripcionesSrv.count({ eliminado, idcliente });
             return new ServerResponseList<Suscripcion>(rows, rowCount);
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar Suscripciones');
             console.log(e);
             throw new HttpException(
@@ -42,10 +43,10 @@ export class SuscripcionesController {
     @Get('ultimoid')
     @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
     async getLastId(
-    ): Promise<number>{
-        try{
+    ): Promise<number> {
+        try {
             return await this.suscripcionesSrv.getLastId();
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar ultimo id');
             console.log(e);
             throw new HttpException(
@@ -62,10 +63,10 @@ export class SuscripcionesController {
     @RequirePermission(Permissions.SUSCRIPCIONES.REGISTRAR)
     async create(
         @Body() s: Suscripcion
-    ){
-        try{
+    ) {
+        try {
             await this.suscripcionesSrv.create(s);
-        }catch(e){
+        } catch (e) {
             console.log('Error al registrar')
             console.log(e);
             throw new HttpException(
@@ -82,10 +83,10 @@ export class SuscripcionesController {
     @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
     async findById(
         @Param('id') id: number
-    ): Promise<Suscripcion>{
-        try{
+    ): Promise<Suscripcion> {
+        try {
             const s: Suscripcion = await this.suscripcionesSrv.findById(id);
-            if(!s) throw new HttpException(
+            if (!s) throw new HttpException(
                 {
                     request: 'get',
                     description: `No se encontró la suscripción con código ${id}.`
@@ -93,7 +94,7 @@ export class SuscripcionesController {
                 HttpStatus.NOT_FOUND
             );
             return s;
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar suscripcion por ID');
             console.log(e);
             throw new HttpException(
@@ -110,16 +111,16 @@ export class SuscripcionesController {
     @RequirePermission(Permissions.SUSCRIPCIONES.EDITAR)
     async edit(
         @Param('id') oldId: number, @Body() s: Suscripcion
-    ){
-        try{
-            if(!(await this.suscripcionesSrv.edit(oldId, s))) throw new HttpException(
+    ) {
+        try {
+            if (!(await this.suscripcionesSrv.edit(oldId, s))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró la suscripción con código ${oldId}.`
                 },
                 HttpStatus.NOT_FOUND
             );
-        }catch(e){
+        } catch (e) {
             console.log('Error al editar suscripcion');
             console.log(e);
             throw new HttpException(
@@ -136,16 +137,16 @@ export class SuscripcionesController {
     @RequirePermission(Permissions.SUSCRIPCIONES.ELIMINAR)
     async delete(
         @Param('id') id: number
-    ){
-        try{
-            if(!(await this.suscripcionesSrv.delete(id))) throw new HttpException(
+    ) {
+        try {
+            if (!(await this.suscripcionesSrv.delete(id))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró la suscripción con código ${id}.`
                 },
                 HttpStatus.NOT_FOUND
             );
-        }catch(e){
+        } catch (e) {
             console.log('Error al eliminar suscripcion');
             console.log(e);
             throw new HttpException(

@@ -3,13 +3,15 @@ import { SesionService } from './sesion.service';
 import { TokenSesion } from './../../dto/token-sesion.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Usuario } from './../../dto/usuario.dto';
+import { DatabaseService } from '@database/database.service';  
 
 @Controller('sesion')
 export class SesionController {
 
     constructor(
         private sesionSrv: SesionService,
-        private readonly jwtsrv: JwtService
+        private readonly jwtsrv: JwtService,
+        private dbsrv: DatabaseService
     ) { }
 
     @Post('login')
@@ -23,6 +25,13 @@ export class SesionController {
 
     @Post('refresh')
     async refresh(@Body() token: { refreshToken: string }): Promise<TokenSesion> {
+        try{
+            this.jwtsrv.verify(token.refreshToken, {secret: process.env.REFRESH_TOKEN_SECRET});
+        }catch(e){
+            console.log('Error al verificar token de refresh');
+            await this.dbsrv.execute(`DELETE FROM public.refresh_tokens WHERE token = $1`, [token.refreshToken]);
+            throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+        }
         const usr: Usuario = await this.sesionSrv.refresh(token.refreshToken)
         if (!usr) throw new HttpException('Forbidden', HttpStatus.FORBIDDEN)
         var sesToken: TokenSesion = this.generarToken(usr, false)

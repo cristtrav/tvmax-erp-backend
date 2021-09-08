@@ -1,6 +1,8 @@
 import { Suscripcion } from '@dto/suscripcion.dto';
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
+import { Util } from '@util/util';
+import { IWhereParam } from '@util/iwhereparam.interface';
 
 @Injectable()
 export class SuscripcionesService {
@@ -10,33 +12,22 @@ export class SuscripcionesService {
     ){}
 
     async findAll(queryParams){
-        const { eliminado, sort, offset, limit } = queryParams;
-        var query: string = `SELECT * FROM public.vw_suscripciones`;
-        const params: any[] = [];
-        if(eliminado){
-            query += ` WHERE eliminado = $1`;
-            params.push(eliminado);
-        }
-        if(sort){
-            const srtOrder: string = sort.substring(0, 1) === '-' ? 'DESC' : 'ASC';
-            const srtColumn: string = sort.substring(1, sort.length);
-            query += ` ORDER BY ${srtColumn} ${srtOrder}`;
-        }
-        if(offset && limit){
-            query += ` OFFSET ${offset} LIMIT ${limit}`;
-        }
-        return (await this.dbsrv.execute(query, params)).rows;
+        const { eliminado, idcliente, sort, offset, limit } = queryParams;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcliente});
+        var query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${Util.buildSortOffsetLimitStr(sort, offset, limit)}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number>{
-        const { eliminado } = queryParams;
-        var query: string = `SELECT COUNT(*) FROM public.vw_suscripciones`;
-        const params: any[] = [];
+        const { eliminado, idcliente } = queryParams;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcliente});
+        var query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
+        /*const params: any[] = [];
         if(eliminado){
             query += ` WHERE eliminado = $1`;
             params.push(eliminado);
-        }
-        return (await this.dbsrv.execute(query, params)).rows[0].count;
+        }*/
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
     async getLastId(): Promise<number>{
