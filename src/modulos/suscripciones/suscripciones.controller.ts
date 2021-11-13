@@ -5,13 +5,19 @@ import { AuthGuard } from '../../global/auth/auth.guard';
 import { SuscripcionesService } from './suscripciones.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { Suscripcion } from '../../dto/suscripcion.dto';
+import { CuotasService } from '../cuotas/cuotas.service';
+import { Cuota } from '@dto/cuota.dto';
+import { Servicio } from '@dto/servicio.dto';
+import { ServiciosService } from '../servicios/servicios.service';
 
 @Controller('suscripciones')
 @UseGuards(AuthGuard)
 export class SuscripcionesController {
 
     constructor(
-        private suscripcionesSrv: SuscripcionesService
+        private suscripcionesSrv: SuscripcionesService,
+        private cuotasSrv: CuotasService,
+        private serviciosSrv: ServiciosService
     ) { }
 
     @Get()
@@ -152,6 +158,59 @@ export class SuscripcionesController {
             throw new HttpException(
                 {
                     request: 'delete',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get(':id/cuotas')
+    @RequirePermission(Permissions.CUOTAS.CONSULTAR)
+    async getCuotasBySuscripcion(
+        @Param('id') idsusc: number,
+        @Query('eliminado') eliminado: boolean,
+        @Query('sort') sort: string,
+        @Query('offset') offset: number,
+        @Query('limit') limit: number
+    ): Promise<ServerResponseList<Cuota>>{
+        try{
+            const data: Cuota[] = await this.cuotasSrv.getCuotasPorSuscripcion(idsusc, {eliminado, sort, offset, limit});
+            const count: number = await this.cuotasSrv.countCuotasPorSuscripcion(idsusc, {eliminado});
+            const sr: ServerResponseList<Cuota> = new ServerResponseList<Cuota>(data, count);
+            return sr;
+        }catch(e){
+            console.log('Error al consultar cuotas por suscripcion');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get(':id/cuotas/servicios')
+    @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
+    async getServiciosByCuotas(
+        @Param('id') idsusc: number,
+        @Query('eliminado') eliminado: boolean,
+        @Query('sort') sort: string,
+        @Query('offset') offset: number,
+        @Query('limit') limit: number
+    ): Promise<ServerResponseList<Servicio>>{
+        try{
+            const data: Servicio[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, {eliminado, sort, offset, limit});
+            const count: number = await this.serviciosSrv.countServiciosEnCuotas(idsusc, {eliminado});
+            return new ServerResponseList<Servicio>(data, count); 
+        }catch(e){
+            console.log('Error al consultar servicios por cuotas');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
                     description: e.detail ?? e.error ?? e.message
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR

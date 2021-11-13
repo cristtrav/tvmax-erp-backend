@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Servicio } from '../../dto/servicio.dto';
 import { DatabaseService } from '../../global/database/database.service';
 import { Result } from 'pg';
+import { IWhereParam } from '@util/iwhereparam.interface';
+import { Util } from '@util/util';
 
 @Injectable()
 export class ServiciosService {
@@ -64,6 +66,39 @@ export class ServiciosService {
         const query: string = `UPDATE public.servicio SET eliminado = true WHERE id = $1`
         const params = [id]
         return (await this.dbsrv.execute(query, params))
+    }
+
+    async getServiciosEnCuotas(idsusc: number, queryParams): Promise<Servicio[]>{
+        const { eliminado, sort, offset, limit } = queryParams;
+        const params: any[] = [idsusc];
+        var query: string = `SELECT * FROM public.vw_servicios WHERE id IN
+        (SELECT cuota.idservicio AS idcuota FROM public.cuota WHERE cuota.idsuscripcion = $1 ${eliminado?' AND eliminado = $2':''})`;        
+        if(eliminado){
+            params.push(eliminado);
+        }
+        if(sort){
+            const srtOrder = sort.substring(0,1) === '-' ? 'DESC' : 'ASC';
+            const srtColumn = sort.substring(1, sort.length);
+            query += ` ORDER BY ${srtColumn} ${srtOrder}`;
+        }
+        if(offset){
+            query += ` OFFSET ${offset}`;
+        }
+        if(limit){
+            query += ` LIMIT ${limit}`;
+        }
+        return (await this.dbsrv.execute(query, params)).rows;
+    }
+
+    async countServiciosEnCuotas(idsusc, queryParams): Promise<number>{
+        const { eliminado } = queryParams;
+        const params: any[] = [idsusc];
+        var query: string = `SELECT COUNT(*) FROM public.vw_servicios WHERE id IN
+        (SELECT cuota.idservicio AS idcuota FROM public.cuota WHERE cuota.idsuscripcion = $1 ${eliminado?' AND eliminado = $2':''})`;
+        if(eliminado){
+            params.push(eliminado);
+        }
+        return (await this.dbsrv.execute(query, params)).rows[0].count;
     }
 
 }

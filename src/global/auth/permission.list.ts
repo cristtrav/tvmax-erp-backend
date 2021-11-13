@@ -75,4 +75,10 @@ export class Permissions {
         EDITAR: 43,
         ELIMINAR: 44
     }
+    static readonly CUOTAS = {
+        CONSULTAR: 45,
+        REGISTRAR: 46,
+        EDITAR: 47,
+        ELIMINAR: 48
+    }
 }
