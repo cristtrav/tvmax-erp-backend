@@ -16,6 +16,7 @@ import { CobradoresModule } from './modulos/cobradores/cobradores.module';
 import { SuscripcionesModule } from './modulos/suscripciones/suscripciones.module';
 import { DomiciliosModule } from './modulos/domicilios/domicilios.module';
 import { CuotasModule } from './modulos/cuotas/cuotas.module';
+import { TimbradosModule } from './modulos/timbrados/timbrados.module';
 
 
 @Module({
@@ -33,7 +34,8 @@ import { CuotasModule } from './modulos/cuotas/cuotas.module';
     CobradoresModule,
     SuscripcionesModule,
     DomiciliosModule,
-    CuotasModule
+    CuotasModule,
+    TimbradosModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

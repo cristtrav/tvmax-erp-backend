@@ -81,4 +81,10 @@ export class Permissions {
         EDITAR: 47,
         ELIMINAR: 48
     }
+    static readonly TIMBRADOS = {
+        CONSULTAR: 49,
+        REGISTRAR: 50,
+        EDITAR: 51,
+        ELIMINAR: 52
+    }
 }
