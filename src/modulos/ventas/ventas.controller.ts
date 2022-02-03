@@ -3,7 +3,7 @@ import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { FacturaVenta } from '@dto/factura-venta.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { VentasService } from './ventas.service';
 import { Request } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt'; 
@@ -98,6 +98,34 @@ export class VentasController {
             throw new HttpException(
                 {
                     request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Delete(':id')
+    @RequirePermission(Permissions.VENTAS.ELIMINAR)
+    async delete(
+        @Param('id') id: number
+    ){
+        try{
+            if(!await this.ventasSrv.delete(id)){
+                throw new HttpException(
+                    {
+                        request: 'delete',
+                        description: `No se encontró la factura con ćodigo ${id}`
+                    },
+                    HttpStatus.NOT_FOUND
+                );
+            }
+        }catch(e){
+            console.log('Error al eliminar factura venta');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'delete',
                     description: e.detail ?? e.error ?? e.message
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR
