@@ -87,4 +87,13 @@ export class Permissions {
         EDITAR: 51,
         ELIMINAR: 52
     }
+
+    static readonly VENTAS = {
+        CONSULTAR: 53,
+        REGISTRAR: 54,
+        EDITAR: 55,
+        ELIMINAR: 56,
+        ANULAR: 57,
+        REVERTIRANUL:58
+    }
 }

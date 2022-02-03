@@ -18,12 +18,13 @@ export class ServiciosController {
     @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
     async findAll(
         @Query('eliminado') eliminado: boolean,
+        @Query('suscribible') suscribible: boolean,
         @Query('offset') offset: number,
         @Query('limit') limit: number,
         @Query('sort') sort: string
     ): Promise<ServerResponseList<Servicio>>{
         try{
-            const data: Servicio[] = await this.serviciosSrv.findAll({eliminado, offset, limit, sort});
+            const data: Servicio[] = await this.serviciosSrv.findAll({eliminado, suscribible, offset, limit, sort});
             const rowCount: number = await this.serviciosSrv.count({eliminado});
             return new ServerResponseList<Servicio>(data, rowCount);
         }catch(e){

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { Cliente } from '@dto/cliente.dto';
+import { Util } from '@util/util';
+import { IWhereParam } from '@util/iwhereparam.interface';
 
 @Injectable()
 export class ClientesService {
@@ -10,25 +12,17 @@ export class ClientesService {
     ) { }
 
     async findAll(queryParams): Promise<Cliente[]> {
-        const { eliminado, sort, offset, limit } = queryParams;
-        var query: string = `SELECT * FROM public.vw_clientes`;
-        const params: any[] = [];
-        if (eliminado) {
-            query += ` WHERE eliminado = $1`;
-            params.push(eliminado);
+        const { eliminado, search, sort, offset, limit } = queryParams;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
+        var query: string = `SELECT * FROM public.vw_clientes ${wp.whereStr}`;
+        if(search){
+            if(query.indexOf('WHERE') === -1) query += `WHERE`;
+            query += ` OR LOWER(razonsocial) LIKE $${wp.lastParamIndex+1}`
+            wp.whereParams.push(`%${search.toLowerCase()}%`);
         }
-        if (sort) {
-            const srtOrder: string = sort.substring(0, 1) === '-' ? 'DESC' : 'ASC';
-            const srtColumn: string = sort.substring(1, sort.length);
-            query += ` ORDER BY ${srtColumn} ${srtOrder}`;
-        }
-        if (offset) {
-            query += ` OFFSET ${offset}`;
-        }
-        if (limit) {
-            query += ` LIMIT ${limit}`;
-        }
-        return (await this.dbsrv.execute(query, params)).rows;
+        query += ` ${sof}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number> {

@@ -7,9 +7,11 @@ export class Suscripcion{
     fechasuscripcion: string | null = null;
     iddomicilio: number | null = null;
     direccion: string | null = null;
+    idbarrio: number | null = null;
+    barrio: string | null = null;
     idcliente: number | null = null;
     cliente: string | null = null;
     monto: number| null = null;
     cuotaspendientes: number = 0;
-    deuda: number = 0;
+    deuda: number = 0;    
 }

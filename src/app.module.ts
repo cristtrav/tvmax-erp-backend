@@ -17,6 +17,7 @@ import { SuscripcionesModule } from './modulos/suscripciones/suscripciones.modul
 import { DomiciliosModule } from './modulos/domicilios/domicilios.module';
 import { CuotasModule } from './modulos/cuotas/cuotas.module';
 import { TimbradosModule } from './modulos/timbrados/timbrados.module';
+import { VentasModule } from './modulos/ventas/ventas.module';
 
 
 @Module({
@@ -35,7 +36,8 @@ import { TimbradosModule } from './modulos/timbrados/timbrados.module';
     SuscripcionesModule,
     DomiciliosModule,
     CuotasModule,
-    TimbradosModule
+    TimbradosModule,
+    VentasModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

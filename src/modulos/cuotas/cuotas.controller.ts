@@ -22,11 +22,12 @@ export class CuotasController {
         @Query('offset') offset: number,
         @Query('limit') limit: number,
         @Query('idsuscripcion') idsuscripcion: number,
-        @Query('idservicio') idservicio: number
+        @Query('idservicio') idservicio: number,
+        @Query('pagado') pagado: boolean
     ): Promise<ServerResponseList<Cuota>>{
         try{
-            const data: Cuota[] = await this.cuotaSrv.findAll({eliminado, sort, offset, limit, idsuscripcion, idservicio});
-            const count: number = await this.cuotaSrv.count({eliminado, idsuscripcion, idservicio});
+            const data: Cuota[] = await this.cuotaSrv.findAll({eliminado, sort, offset, limit, idsuscripcion, idservicio, pagado});
+            const count: number = await this.cuotaSrv.count({eliminado, idsuscripcion, idservicio, pagado});
             const sr: ServerResponseList<Cuota> = new ServerResponseList<Cuota>(data, count);
             return sr;
         }catch(e){

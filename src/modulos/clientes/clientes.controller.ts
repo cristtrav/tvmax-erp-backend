@@ -5,14 +5,17 @@ import { Cliente } from '@dto/cliente.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
+import { SuscripcionesService } from '../suscripciones/suscripciones.service';
+import { Suscripcion } from '@dto/suscripcion.dto';
 
 @Controller('clientes')
 @UseGuards(AuthGuard)
 export class ClientesController {
 
     constructor(
-        private clientesSrv: ClientesService
-    ){}
+        private clientesSrv: ClientesService,
+        private suscripcionesSrv: SuscripcionesService
+    ) { }
 
     @Get()
     @RequirePermission(Permissions.CLIENTES.CONSULTAR)
@@ -21,12 +24,12 @@ export class ClientesController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ): Promise<ServerResponseList<Cliente>>{
-        try{
-            const rows: Cliente[] = await this.clientesSrv.findAll({eliminado, sort, offset, limit});
-            const rowCount: number = await this.clientesSrv.count({eliminado});
+    ): Promise<ServerResponseList<Cliente>> {
+        try {
+            const rows: Cliente[] = await this.clientesSrv.findAll({ eliminado, sort, offset, limit });
+            const rowCount: number = await this.clientesSrv.count({ eliminado });
             return new ServerResponseList<Cliente>(rows, rowCount);
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar Clientes');
             console.log(e);
             throw new HttpException(
@@ -43,10 +46,10 @@ export class ClientesController {
     @RequirePermission(Permissions.CLIENTES.REGISTRAR)
     async create(
         @Body() s: Cliente
-    ){
-        try{
+    ) {
+        try {
             await this.clientesSrv.create(s);
-        }catch(e){
+        } catch (e) {
             console.log('Error al registrar suscripcion');
             console.log(e);
             throw new HttpException(
@@ -61,10 +64,10 @@ export class ClientesController {
 
     @Get('ultimoid')
     @RequirePermission(Permissions.CLIENTES.CONSULTAR)
-    async getLastId(): Promise<number>{
-        try{
+    async getLastId(): Promise<number> {
+        try {
             return await this.clientesSrv.getLastId();
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar ultimo ID');
             console.log(e);
             throw new HttpException(
@@ -81,10 +84,10 @@ export class ClientesController {
     @RequirePermission(Permissions.CLIENTES.CONSULTAR)
     async findById(
         @Param('id') id: number
-    ): Promise<Cliente>{
-        try{
+    ): Promise<Cliente> {
+        try {
             const cli: Cliente = await this.clientesSrv.findById(id);
-            if(!cli) throw new HttpException(
+            if (!cli) throw new HttpException(
                 {
                     request: 'get',
                     description: `No se encontró el cliente con código ${id}.`
@@ -92,7 +95,7 @@ export class ClientesController {
                 HttpStatus.NOT_FOUND
             );
             return cli;
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar cliente por id');
             console.log(e);
             throw new HttpException(
@@ -109,16 +112,16 @@ export class ClientesController {
     @RequirePermission(Permissions.CLIENTES.EDITAR)
     async edit(
         @Param('id') oldId: number, @Body() c: Cliente
-    ){
-        try{
-            if(!(await this.clientesSrv.edit(oldId, c))) throw new HttpException(
+    ) {
+        try {
+            if (!(await this.clientesSrv.edit(oldId, c))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró el cliente con código ${oldId}.`
                 },
                 HttpStatus.NOT_FOUND
             );
-        }catch(e){
+        } catch (e) {
             console.log('Error al editar cliente');
             console.log(e);
             throw new HttpException(
@@ -135,21 +138,47 @@ export class ClientesController {
     @RequirePermission(Permissions.CLIENTES.ELIMINAR)
     async delete(
         @Param('id') id: number
-    ){
-        try{
-            if(!(await this.clientesSrv.delete(id))) throw new HttpException(
+    ) {
+        try {
+            if (!(await this.clientesSrv.delete(id))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el cliente con código ${id}.`
                 },
                 HttpStatus.NOT_FOUND
             );
-        }catch(e){
+        } catch (e) {
             console.log('Error al eliminar cliente');
             console.log(e);
             throw new HttpException(
                 {
                     request: 'delete',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get(':id/suscripciones')
+    @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
+    async findSuscripcionesPorCliente(
+        @Param('id') idcliente: number,
+        @Query('eliminado') eliminado: boolean,
+        @Query('sort') sort: string,
+        @Query('offset') offset: number,
+        @Query('limit') limit: number
+    ): Promise<ServerResponseList<Suscripcion>> {
+        try {
+            const rows: Suscripcion[] = await this.suscripcionesSrv.findSuscripcionesPorCliente(idcliente, { eliminado, sort, offset, limit });
+            const count: number = await this.suscripcionesSrv.countSuscripcionesPorCliente(idcliente, {eliminado});
+            return new ServerResponseList<Suscripcion>(rows, count);
+        } catch (e) {
+            console.log('Error al consultar suscripciones por cliente');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
                     description: e.detail ?? e.error ?? e.message
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR

@@ -2,6 +2,7 @@ import { IWhereParam } from "./iwhereparam.interface";
 
 export class Util {
     public static buildAndWhereParam(params): IWhereParam {
+        var lastParamIndex: number = 0;
         var paramsFiltered = { ...params }
         var whereStr: string = "";
         const whereParams: any[] = [];
@@ -17,8 +18,9 @@ export class Util {
             if (i > 0) whereStr += ` AND`;
             whereStr += ` ${objKeysArray[i]}=$${i + 1}`;
             whereParams.push(paramsFiltered[objKeysArray[i]]);
+            lastParamIndex = i+1;
         }
-        return { whereStr, whereParams };
+        return { whereStr, whereParams, lastParamIndex };
     }
 
     public static buildSortOffsetLimitStr(sort: string, offset: number, limit: number): string {

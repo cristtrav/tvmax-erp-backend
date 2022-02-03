@@ -11,8 +11,8 @@ export class TimbradosService {
     ){}
 
     async findAll(params): Promise<Timbrado[]>{
-        const { eliminado, sort, offset, limit } = params;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        const { eliminado, activo, sort, offset, limit } = params;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, activo});
         const sol: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
         const query: string = `SELECT * FROM public.vw_timbrados ${wp.whereStr} ${sol}`;        
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
@@ -26,8 +26,8 @@ export class TimbradosService {
     }
 
     async count(params): Promise<number>{
-        const { eliminado } = params;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        const { eliminado, activo } = params;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, activo});
         const query: string = `SELECT COUNT(*) FROM public.timbrado ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }

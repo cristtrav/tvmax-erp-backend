@@ -9,6 +9,7 @@ import { ServiciosService } from '../servicios/servicios.service';
 @Module({
   imports: [JwtModule.register({})],
   providers: [SuscripcionesService, DatabaseService, CuotasService, ServiciosService],
-  controllers: [SuscripcionesController]
+  controllers: [SuscripcionesController],
+  exports: [ServiciosService]
 })
 export class SuscripcionesModule {}

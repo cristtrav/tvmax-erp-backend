@@ -13,22 +13,11 @@ export class ServiciosService {
     ){}
 
     async findAll(reqQuery): Promise<Servicio[]>{
-        const { eliminado, sort, offset, limit } = reqQuery;
-        var query: string = "SELECT * FROM public.vw_servicios"
-        const queryParams: any[] = []
-        if(eliminado){
-            query += " WHERE eliminado = $1"
-            queryParams.push(eliminado)
-        }
-        if(sort){
-            const srtOrder = sort.substring(0, 1) === '-' ? 'DESC' : 'ASC'
-            const srtColumn = sort.substring(1, sort.length)
-            query += ` ORDER BY ${srtColumn} ${srtOrder}`
-        }
-        if(offset && limit){
-            query += ` OFFSET ${offset} LIMIT ${limit}`
-        }
-        return (await this.dbsrv.execute(query, queryParams)).rows
+        const { eliminado, suscribible, sort, offset, limit } = reqQuery;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, suscribible});
+        const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
+        var query: string = `SELECT * FROM public.vw_servicios ${wp.whereStr} ${sof}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(reqQuery): Promise<number>{
@@ -69,36 +58,21 @@ export class ServiciosService {
     }
 
     async getServiciosEnCuotas(idsusc: number, queryParams): Promise<Servicio[]>{
-        const { eliminado, sort, offset, limit } = queryParams;
-        const params: any[] = [idsusc];
+        const { eliminado, pagado,sort, offset, limit } = queryParams;
+        const wpCuota: IWhereParam = Util.buildAndWhereParam({'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado, eliminado});
+        const sofServicios: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
         var query: string = `SELECT * FROM public.vw_servicios WHERE id IN
-        (SELECT cuota.idservicio AS idcuota FROM public.cuota WHERE cuota.idsuscripcion = $1 ${eliminado?' AND eliminado = $2':''})`;        
-        if(eliminado){
-            params.push(eliminado);
-        }
-        if(sort){
-            const srtOrder = sort.substring(0,1) === '-' ? 'DESC' : 'ASC';
-            const srtColumn = sort.substring(1, sort.length);
-            query += ` ORDER BY ${srtColumn} ${srtOrder}`;
-        }
-        if(offset){
-            query += ` OFFSET ${offset}`;
-        }
-        if(limit){
-            query += ` LIMIT ${limit}`;
-        }
-        return (await this.dbsrv.execute(query, params)).rows;
+        (SELECT vw_cuotas.idservicio AS idcuota FROM public.vw_cuotas ${wpCuota.whereStr}) ${sofServicios}`;        
+        return (await this.dbsrv.execute(query, wpCuota.whereParams)).rows;
     }
 
     async countServiciosEnCuotas(idsusc, queryParams): Promise<number>{
-        const { eliminado } = queryParams;
-        const params: any[] = [idsusc];
+        const { eliminado, pagado } = queryParams;
+        //const params: any[] = [idsusc];
+        const wpCuotas: IWhereParam = Util.buildAndWhereParam({'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado})
         var query: string = `SELECT COUNT(*) FROM public.vw_servicios WHERE id IN
-        (SELECT cuota.idservicio AS idcuota FROM public.cuota WHERE cuota.idsuscripcion = $1 ${eliminado?' AND eliminado = $2':''})`;
-        if(eliminado){
-            params.push(eliminado);
-        }
-        return (await this.dbsrv.execute(query, params)).rows[0].count;
+        (SELECT vw_cuotas.idservicio AS idservicio FROM public.vw_cuotas ${wpCuotas.whereStr})`;
+        return (await this.dbsrv.execute(query, wpCuotas.whereParams)).rows[0].count;
     }
 
 }

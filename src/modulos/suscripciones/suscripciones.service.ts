@@ -60,4 +60,19 @@ export class SuscripcionesService {
         return (await this.dbsrv.execute(query, [id])).rowCount > 0;
     }
 
+    async findSuscripcionesPorCliente(idcliente: number, params): Promise<Suscripcion[]>{
+        const { eliminado, sort, offset, limit } = params;
+        const wp: IWhereParam = Util.buildAndWhereParam({idcliente, eliminado});
+        const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
+        const query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${sof}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    }
+
+    async countSuscripcionesPorCliente(idcliente, params): Promise<number>{
+        const { eliminado } = params;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        const query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    }
+
 }

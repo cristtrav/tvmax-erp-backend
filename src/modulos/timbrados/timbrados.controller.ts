@@ -1,30 +1,32 @@
+import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Timbrado } from '@dto/timbrado.dto';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { TimbradosService } from './timbrados.service';
 
 @Controller('timbrados')
+@UseGuards(AuthGuard)
 export class TimbradosController {
 
     constructor(
         private timbradosSrv: TimbradosService
-    ){ }
+    ) { }
 
     @Post()
     @RequirePermission(Permissions.TIMBRADOS.REGISTRAR)
     async create(
         @Body() t: Timbrado
-    ){
-        try{
+    ) {
+        try {
             await this.timbradosSrv.create(t);
-        }catch(e){
+        } catch (e) {
             console.log('Error al registrar timbrado');
             console.log(e);
             throw new HttpException(
                 {
-                    request:  'post',
+                    request: 'post',
                     description: e.detail ?? e.error ?? e.message
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR
@@ -36,16 +38,17 @@ export class TimbradosController {
     @RequirePermission(Permissions.TIMBRADOS.CONSULTAR)
     async findAll(
         @Query('eliminado') eliminado: boolean,
+        @Query('activo') activo: boolean,
         @Query('offset') offset: string,
         @Query('limit') limit: number,
         @Query('sort') sort: string
-    ): Promise<ServerResponseList<Timbrado>>{
-        try{
-            const rows: Timbrado[] = await this.timbradosSrv.findAll({eliminado, sort, offset, limit});
-            const count: number = await this.timbradosSrv.count({eliminado});
+    ): Promise<ServerResponseList<Timbrado>> {
+        try {
+            const rows: Timbrado[] = await this.timbradosSrv.findAll({ eliminado, activo, sort, offset, limit });
+            const count: number = await this.timbradosSrv.count({ eliminado, activo });
             const srp: ServerResponseList<Timbrado> = new ServerResponseList(rows, count);
             return srp;
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar timbrados');
             console.log(e);
             throw new HttpException(
@@ -62,10 +65,10 @@ export class TimbradosController {
     @RequirePermission(Permissions.TIMBRADOS.CONSULTAR)
     async findById(
         @Param('id') id: number
-    ){
-        try{
+    ) {
+        try {
             const t: Timbrado = await this.timbradosSrv.findById(id);
-            if(!t) throw new HttpException(
+            if (!t) throw new HttpException(
                 {
                     request: 'get',
                     description: `No se encontró el timbrado con código ${id}`
@@ -73,7 +76,7 @@ export class TimbradosController {
                 HttpStatus.NOT_FOUND
             );
             return t;
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar timbrado por id');
             console.log(e);
             throw new HttpException(
@@ -91,16 +94,16 @@ export class TimbradosController {
     async edit(
         @Param('id') oldid: number,
         @Body() t: Timbrado
-    ){
-        try{
-            if(!(await this.timbradosSrv.edit(oldid, t))) throw new HttpException(
+    ) {
+        try {
+            if (!(await this.timbradosSrv.edit(oldid, t))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró el timbrado con código ${oldid}`
                 },
                 HttpStatus.NOT_FOUND
             );
-        }catch(e){
+        } catch (e) {
             console.log('Error al editar timbrado');
             console.log(e);
             throw new HttpException(
@@ -117,16 +120,16 @@ export class TimbradosController {
     @RequirePermission(Permissions.TIMBRADOS.ELIMINAR)
     async delete(
         @Param('id') id: number
-    ){
-        try{
-            if(!(await this.timbradosSrv.delete(id))) throw new HttpException(
+    ) {
+        try {
+            if (!(await this.timbradosSrv.delete(id))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el timbrado con código ${id}`
                 },
                 HttpStatus.NOT_FOUND
             );
-        }catch(e){
+        } catch (e) {
             console.log('Error al eliminar timbrado');
             console.log(e);
             throw new HttpException(

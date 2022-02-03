@@ -25,4 +25,8 @@ export class DatabaseService {
         }
     }
 
+    async getDBClient(): Client{
+        return await this.dbpool.connect();
+    }
+
 }

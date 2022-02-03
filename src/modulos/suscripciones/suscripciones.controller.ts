@@ -197,13 +197,14 @@ export class SuscripcionesController {
     async getServiciosByCuotas(
         @Param('id') idsusc: number,
         @Query('eliminado') eliminado: boolean,
+        @Query('pagado') pagado: boolean,
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
     ): Promise<ServerResponseList<Servicio>>{
         try{
-            const data: Servicio[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, {eliminado, sort, offset, limit});
-            const count: number = await this.serviciosSrv.countServiciosEnCuotas(idsusc, {eliminado});
+            const data: Servicio[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, {eliminado, pagado,sort, offset, limit});
+            const count: number = await this.serviciosSrv.countServiciosEnCuotas(idsusc, {eliminado, pagado});
             return new ServerResponseList<Servicio>(data, count); 
         }catch(e){
             console.log('Error al consultar servicios por cuotas');
