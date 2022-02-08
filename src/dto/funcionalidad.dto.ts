@@ -1,6 +1,7 @@
 export class Funcionalidad {
-    id: number
-    descripcion: string
-    idmodulo: number
-    modulo: string
+    id: number | null = null;
+    descripcion: string | null = null;
+    nombre: string | null = null;
+    idmodulo: number | null = null;
+    modulo: string | null = null;
 }

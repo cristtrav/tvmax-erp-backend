@@ -96,4 +96,10 @@ export class Permissions {
         ANULAR: 57,
         REVERTIRANUL:58
     }
+
+    static readonly PERMISOS = {
+        CONSULTARMODULOSFUNCIONALIDADES: 59,
+        CONSULTARPERMISOSUSUARIO: 60,
+        EDITARPERMISOSUSUARIO: 61
+    }
 }
