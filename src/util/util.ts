@@ -16,9 +16,13 @@ export class Util {
         for (let i = 0; i < keysLength; i++) {
             if (i === 0) whereStr += `WHERE`;
             if (i > 0) whereStr += ` AND`;
-            whereStr += ` ${objKeysArray[i]}=$${i + 1}`;
-            whereParams.push(paramsFiltered[objKeysArray[i]]);
-            lastParamIndex = i+1;
+            if(Array.isArray(paramsFiltered[objKeysArray[i]])){
+                whereStr += ` ${objKeysArray[i]} IN (${paramsFiltered[objKeysArray[i]].join()})`;
+            }else{
+                whereStr += ` ${objKeysArray[i]}=$${i + 1}`;
+                whereParams.push(paramsFiltered[objKeysArray[i]]);
+                lastParamIndex = i+1;
+            }
         }
         return { whereStr, whereParams, lastParamIndex };
     }

@@ -13,22 +13,37 @@ export class ServiciosService {
     ){}
 
     async findAll(reqQuery): Promise<Servicio[]>{
-        const { eliminado, suscribible, sort, offset, limit } = reqQuery;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, suscribible});
+        const { eliminado, idgrupo, suscribible, search, sort, offset, limit } = reqQuery;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, suscribible, idgrupo});
         const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
-        var query: string = `SELECT * FROM public.vw_servicios ${wp.whereStr} ${sof}`;
+        let query: string = `SELECT * FROM public.vw_servicios ${wp.whereStr}`;
+        if(search){
+            if(wp.whereStr){
+                query += ` AND`;
+            }else{
+                query += ` WHERE`;
+            }
+            query += ` (LOWER(descripcion) LIKE $${wp.lastParamIndex+1})`;
+            wp.whereParams.push(`%${search.toLowerCase()}%`);
+        }
+        query += ` ${sof}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(reqQuery): Promise<number>{
-        const { eliminado } = reqQuery
-        var query: string = "SELECT COUNT(*) FROM public.vw_servicios" 
-        const queryParams: any[] = [];
-        if(eliminado){
-            query += ` WHERE eliminado = $1`
-            queryParams.push(eliminado)
+        const { eliminado, search, suscribible, idgrupo } = reqQuery;
+        const iwp: IWhereParam = Util.buildAndWhereParam({eliminado, suscribible, idgrupo});
+        let query: string = `SELECT COUNT(*) FROM public.vw_servicios ${iwp.whereStr}`;
+        if(search){
+            if(iwp.whereStr){
+                query += ` AND`;
+            }else{
+                query += ` WHERE`;
+            }
+            query += ` (LOWER(descripcion) LIKE $${iwp.lastParamIndex+1})`;
+            iwp.whereParams.push(`%${search.toLowerCase()}%`);
         }
-        return (await this.dbsrv.execute(query, queryParams)).rows[0].count
+        return (await this.dbsrv.execute(query, iwp.whereParams)).rows[0].count
     }
 
     async create(s: Servicio){

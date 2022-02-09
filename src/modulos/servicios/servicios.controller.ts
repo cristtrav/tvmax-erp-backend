@@ -21,11 +21,13 @@ export class ServiciosController {
         @Query('suscribible') suscribible: boolean,
         @Query('offset') offset: number,
         @Query('limit') limit: number,
-        @Query('sort') sort: string
+        @Query('sort') sort: string,
+        @Query('idgrupo') idgrupo: string[],
+        @Query('search') search: string
     ): Promise<ServerResponseList<Servicio>>{
         try{
-            const data: Servicio[] = await this.serviciosSrv.findAll({eliminado, suscribible, offset, limit, sort});
-            const rowCount: number = await this.serviciosSrv.count({eliminado});
+            const data: Servicio[] = await this.serviciosSrv.findAll({eliminado, idgrupo, search, suscribible, offset, limit, sort});
+            const rowCount: number = await this.serviciosSrv.count({eliminado, idgrupo, suscribible, search});
             return new ServerResponseList<Servicio>(data, rowCount);
         }catch(e){
             console.log('Error al consultar Servicios')
