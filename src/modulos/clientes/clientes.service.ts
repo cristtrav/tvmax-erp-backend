@@ -12,28 +12,39 @@ export class ClientesService {
     ) { }
 
     async findAll(queryParams): Promise<Cliente[]> {
-        const { eliminado, search, sort, offset, limit } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        const { eliminado, search, idcobrador, sort, offset, limit } = queryParams;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcobrador});
         const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
         var query: string = `SELECT * FROM public.vw_clientes ${wp.whereStr}`;
         if(search){
-            if(query.indexOf('WHERE') === -1) query += `WHERE`;
-            query += ` OR LOWER(razonsocial) LIKE $${wp.lastParamIndex+1}`
+            if(wp.whereStr){
+                query += ` AND`;
+            }else{
+                query += ` WHERE`;
+            }
+            query += ` (LOWER(razonsocial) LIKE $${wp.lastParamIndex + 1} OR ci = $${wp.lastParamIndex + 2})`;
             wp.whereParams.push(`%${search.toLowerCase()}%`);
+            wp.whereParams.push(search);
         }
         query += ` ${sof}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number> {
-        const { eliminado } = queryParams;
-        var query: string = `SELECT COUNT(*) FROM public.vw_clientes`;
-        const params: any[] = [];
-        if (eliminado) {
-            query += ` WHERE eliminado = $1`;
-            params.push(eliminado);
+        const { eliminado, search, idcobrador } = queryParams;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcobrador});
+        var query: string = `SELECT COUNT(*) FROM public.vw_clientes ${wp.whereStr}`;
+        if(search){
+            if(wp.whereParams){
+                query += ` AND`;
+            }else{
+                query += ` WHERE`;
+            }
+            query += ` (LOWER(razonsocial) LIKE $${wp.lastParamIndex + 1} OR ci = $${wp.lastParamIndex + 2})`;
+            wp.whereParams.push(`%${search.toLowerCase()}%`);
+            wp.whereParams.push(search);
         }
-        return (await this.dbsrv.execute(query, params)).rows[0].count;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
     async create(c: Cliente) {
