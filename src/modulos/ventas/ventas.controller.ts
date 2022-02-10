@@ -46,11 +46,40 @@ export class VentasController {
         @Query('eliminado') eliminado: boolean,
         @Query('sort') sort: string,
         @Query('offset') offset: number,
-        @Query('limit') limit: number
+        @Query('limit') limit: number,
+        @Query('search') search: string,
+        @Query('fechainicio') fechainicio: string,
+        @Query('fechafin') fechafin: string,
+        @Query('pagado') pagado: boolean,
+        @Query('anulado') anulado: boolean,
+        @Query('idcobradorcomision') idcobradorcomision: number
     ): Promise<ServerResponseList<FacturaVenta>>{
         try{
-            const data: FacturaVenta[] = await this.ventasSrv.findAll({eliminado, sort, offset, limit});
-            const count: number = await this.ventasSrv.count({eliminado});
+            const data: FacturaVenta[] = await this.ventasSrv.findAll(
+                {
+                    eliminado,
+                    search,
+                    fechainicio,
+                    fechafin,
+                    pagado,
+                    anulado,
+                    idcobradorcomision,
+                    sort,
+                    offset,
+                    limit
+                }
+            );
+            const count: number = await this.ventasSrv.count(
+                {
+                    eliminado,
+                    search,
+                    fechainicio,
+                    fechafin,
+                    pagado,
+                    anulado,
+                    idcobradorcomision
+                }
+            );
             return new ServerResponseList<FacturaVenta>(data, count);
         }catch(e){
             console.log('Error al consultar facturas de venta');

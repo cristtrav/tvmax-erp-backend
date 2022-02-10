@@ -20,9 +20,9 @@ export class VentasService {
 
     async create(fv: FacturaVenta, registraCobro: boolean, idusu: number): Promise<number> {
         const dbcli: Client = await this.dbsrv.getDBClient();
-        const queryCabecera: string = `INSERT INTO public.factura_venta (id, idcliente, total, fecha, pagado, anulado, idtimbrado, nro_factura, exento, iva5, iva10, eliminado)
+        const queryCabecera: string = `INSERT INTO public.factura_venta (id, idcliente, total, fecha, pagado, anulado, idtimbrado, nro_factura, exento, iva5, iva10, fecha_cobro, idcobrador_comision, idusuario_registro_factura, idusuario_registro_cobro, eliminado)
         VALUES(nextval('public.seq_factura_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false) RETURNING *`;
-        const paramsCabecera: any[] = [fv.idcliente, fv.total, fv.fecha, fv.pagado, fv.anulado, fv.idtimbrado, fv.nrofactura, fv.exento, fv.iva5, fv.iva10];
+        const paramsCabecera: any[] = [fv.idcliente, fv.total, fv.fechafactura, fv.pagado, fv.anulado, fv.idtimbrado, fv.nrofactura, fv.exento, fv.iva5, fv.iva10, fv.fechacobro, fv.idcobradorcomision, fv.idusuarioregistrofactura, fv.idusuarioregistrocobro];
         try {
             await dbcli.query('BEGIN');
             const res = await dbcli.query(queryCabecera, paramsCabecera);
@@ -37,13 +37,13 @@ export class VentasService {
             const paramsTimbrado: any[] = [fv.nrofactura, fv.idtimbrado];;
             await dbcli.query(queryTimbrado, paramsTimbrado);
 
-            if (registraCobro) {
+            /*if (registraCobro) {
                 const clie: Cliente = await this.clienteSrv.findById(fv.idcliente);
                 const queryCobro: String = `INSERT INTO public.cobro(id, idfactura, fecha, cobrado_por, comision_para, anulado, eliminado)
                 VALUES(nextval('public.seq_cobros'), $1, $2, $3, $4, false, false)`;
-                const paramsCobro: any[] = [idgenerado, fv.fecha, idusu, clie.idcobrador];
+                const paramsCobro: any[] = [idgenerado, fv.fechafactura, idusu, clie.idcobrador];
                 await dbcli.query(queryCobro, paramsCobro);
-            }
+            }*/
 
             await dbcli.query('COMMIT');
             return idgenerado;
@@ -56,27 +56,70 @@ export class VentasService {
     }
 
     async findAll(params): Promise<FacturaVenta[]> {
-        const { eliminado, sort, offset, limit } = params;
-        const wp: IWhereParam = Util.buildAndWhereParam({ eliminado });
+        const { eliminado, search, fechainicio, fechafin, pagado, anulado, idcobradorcomision, sort, offset, limit } = params;        
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, pagado, anulado, idcobradorcomision});
         const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
-        const query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr} ${sof}`;
+        let query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr}`;
+        if (search) {
+            if (wp.whereStr) {
+                query += ` AND`;
+            } else {
+                query += ` WHERE`;
+            }
+            query += ` (LOWER(cliente) LIKE $${wp.lastParamIndex + 1} OR nrofactura::text = $${wp.lastParamIndex + 2})`;
+            wp.whereParams.push(`%${search.toLowerCase()}%`);
+            wp.whereParams.push(search);
+            wp.lastParamIndex = wp.lastParamIndex + 2;
+        }
+        if (fechainicio) {
+            query += ` AND fecha_venta >= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechainicio);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
+        if (fechafin) {
+            query += ` AND fecha_venta <= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechafin);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
+        query += ` ${sof}`;
         const rows: FacturaVenta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
         for (let fv of rows) {
             const queryDetalle: string = `SELECT * FROM public.vw_detalles_factura_venta WHERE eliminado = false AND idfacturaventa = $1`;
             const detalles: DetalleFacturaVenta[] = (await this.dbsrv.execute(queryDetalle, [fv.id])).rows;
             fv.detalles = detalles;
 
-            const queryCobro: string = `SELECT * FROM public.vw_cobros WHERE eliminado = false AND idfactura = $1`;
+            /*const queryCobro: string = `SELECT * FROM public.vw_cobros WHERE eliminado = false AND idfactura = $1`;
             const cobros: Cobro[] = (await this.dbsrv.execute(queryCobro, [fv.id])).rows;
-            fv.cobros = cobros;
+            fv.cobros = cobros;*/
         }
         return rows;
     }
 
     async count(params): Promise<number> {
-        const { eliminado } = params;
-        const wp: IWhereParam = Util.buildAndWhereParam({ eliminado });
-        const query: string = `SELECT COUNT(*) FROM public.factura_venta ${wp.whereStr}`;
+        const { eliminado, fechainicio, fechafin, search, pagado, anulado, idcobradorcomision } = params;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, pagado, anulado, idcobradorcomision});
+        let query: string = `SELECT COUNT(*) FROM public.vw_facturas_venta ${wp.whereStr}`;
+        if (search) {
+            if (wp.whereStr) {
+                query += ` AND`;
+            } else {
+                query += ` WHERE`;
+            }
+            query += ` (LOWER(cliente) LIKE $${wp.lastParamIndex + 1} OR nrofactura::text = $${wp.lastParamIndex + 2})`;
+            wp.whereParams.push(`%${search.toLowerCase()}%`);
+            wp.whereParams.push(search);
+            wp.lastParamIndex = wp.lastParamIndex + 2;
+        }
+        if (fechainicio) {
+            query += ` AND fecha_venta >= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechainicio);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
+        if (fechafin) {
+            query += ` AND fecha_venta <= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechafin);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
