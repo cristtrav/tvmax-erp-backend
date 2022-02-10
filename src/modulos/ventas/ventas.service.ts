@@ -56,8 +56,30 @@ export class VentasService {
     }
 
     async findAll(params): Promise<FacturaVenta[]> {
-        const { eliminado, search, fechainicio, fechafin, pagado, anulado, idcobradorcomision, sort, offset, limit } = params;        
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, pagado, anulado, idcobradorcomision});
+        const { 
+            eliminado,
+            search,
+            fechainiciofactura,
+            fechafinfactura,
+            pagado,
+            anulado,
+            idcobradorcomision,
+            idusuarioregistrocobro,
+            fechainiciocobro,
+            fechafincobro,
+            sort,
+            offset,
+            limit 
+        } = params;        
+        const wp: IWhereParam = Util.buildAndWhereParam(
+            {
+                eliminado,
+                pagado,
+                anulado,
+                idcobradorcomision,
+                idusuarioregistrocobro
+            }
+        );
         const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
         let query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr}`;
         if (search) {
@@ -71,14 +93,24 @@ export class VentasService {
             wp.whereParams.push(search);
             wp.lastParamIndex = wp.lastParamIndex + 2;
         }
-        if (fechainicio) {
-            query += ` AND fecha_venta >= $${wp.lastParamIndex + 1}`;
-            wp.whereParams.push(fechainicio);
+        if (fechainiciofactura) {
+            query += ` AND fecha_factura >= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechainiciofactura);
             wp.lastParamIndex = wp.lastParamIndex + 1;
         }
-        if (fechafin) {
-            query += ` AND fecha_venta <= $${wp.lastParamIndex + 1}`;
-            wp.whereParams.push(fechafin);
+        if (fechafinfactura) {
+            query += ` AND fecha_factura <= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechafinfactura);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
+        if (fechainiciocobro) {
+            query += ` AND fecha_cobro >= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechainiciocobro);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
+        if (fechafincobro) {
+            query += ` AND fecha_cobro <= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechafincobro);
             wp.lastParamIndex = wp.lastParamIndex + 1;
         }
         query += ` ${sof}`;
@@ -96,8 +128,19 @@ export class VentasService {
     }
 
     async count(params): Promise<number> {
-        const { eliminado, fechainicio, fechafin, search, pagado, anulado, idcobradorcomision } = params;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, pagado, anulado, idcobradorcomision});
+        const { 
+            eliminado,
+            fechainiciofactura,
+            fechafinfactura,
+            search,
+            pagado,
+            anulado,
+            idcobradorcomision,
+            idusuarioregistrocobro,
+            fechainiciocobro,
+            fechafincobro
+        } = params;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, pagado, anulado, idcobradorcomision, idusuarioregistrocobro});
         let query: string = `SELECT COUNT(*) FROM public.vw_facturas_venta ${wp.whereStr}`;
         if (search) {
             if (wp.whereStr) {
@@ -110,14 +153,24 @@ export class VentasService {
             wp.whereParams.push(search);
             wp.lastParamIndex = wp.lastParamIndex + 2;
         }
-        if (fechainicio) {
-            query += ` AND fecha_venta >= $${wp.lastParamIndex + 1}`;
-            wp.whereParams.push(fechainicio);
+        if (fechainiciofactura) {
+            query += ` AND fecha_factura >= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechainiciofactura);
             wp.lastParamIndex = wp.lastParamIndex + 1;
         }
-        if (fechafin) {
-            query += ` AND fecha_venta <= $${wp.lastParamIndex + 1}`;
-            wp.whereParams.push(fechafin);
+        if (fechafinfactura) {
+            query += ` AND fecha_factura <= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechafinfactura);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
+        if (fechainiciocobro) {
+            query += ` AND fecha_cobro >= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechainiciocobro);
+            wp.lastParamIndex = wp.lastParamIndex + 1;
+        }
+        if (fechafincobro) {
+            query += ` AND fecha_cobro <= $${wp.lastParamIndex + 1}`;
+            wp.whereParams.push(fechafincobro);
             wp.lastParamIndex = wp.lastParamIndex + 1;
         }
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;

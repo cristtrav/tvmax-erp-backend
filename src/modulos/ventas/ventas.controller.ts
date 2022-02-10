@@ -48,22 +48,28 @@ export class VentasController {
         @Query('offset') offset: number,
         @Query('limit') limit: number,
         @Query('search') search: string,
-        @Query('fechainicio') fechainicio: string,
-        @Query('fechafin') fechafin: string,
+        @Query('fechainiciofactura') fechainiciofactura: string,
+        @Query('fechafinfactura') fechafinfactura: string,
         @Query('pagado') pagado: boolean,
         @Query('anulado') anulado: boolean,
-        @Query('idcobradorcomision') idcobradorcomision: number
+        @Query('idcobradorcomision') idcobradorcomision: number,
+        @Query('idusuarioregistrocobro') idusuarioregistrocobro: number,
+        @Query('fechainiciocobro') fechainiciocobro: string,
+        @Query('fechafincobro') fechafincobro: string
     ): Promise<ServerResponseList<FacturaVenta>>{
         try{
             const data: FacturaVenta[] = await this.ventasSrv.findAll(
                 {
                     eliminado,
                     search,
-                    fechainicio,
-                    fechafin,
+                    fechainiciofactura,
+                    fechafinfactura,
                     pagado,
                     anulado,
                     idcobradorcomision,
+                    idusuarioregistrocobro,
+                    fechainiciocobro,
+                    fechafincobro,
                     sort,
                     offset,
                     limit
@@ -73,11 +79,14 @@ export class VentasController {
                 {
                     eliminado,
                     search,
-                    fechainicio,
-                    fechafin,
+                    fechainiciofactura,
+                    fechafinfactura,
                     pagado,
                     anulado,
-                    idcobradorcomision
+                    idcobradorcomision,
+                    idusuarioregistrocobro,
+                    fechainiciocobro,
+                    fechafincobro,
                 }
             );
             return new ServerResponseList<FacturaVenta>(data, count);

@@ -10,7 +10,7 @@ export class Util {
             if (paramsFiltered[propName] === null || paramsFiltered[propName] === undefined) {
                 delete paramsFiltered[propName];
             }
-        }
+        }        
         const objKeysArray: string[] = Object.keys(paramsFiltered);
         const keysLength: number = objKeysArray.length;
         for (let i = 0; i < keysLength; i++) {
