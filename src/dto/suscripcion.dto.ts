@@ -2,6 +2,8 @@ export class Suscripcion{
     id: number | null = null;
     idservicio: number | null = null;
     servicio: string | null = null;
+    idgrupo: number | null = null;
+    grupo: string | null = null;
     estado: string | null = null
     fechacambioestado: string | null = null;
     fechasuscripcion: string | null = null;

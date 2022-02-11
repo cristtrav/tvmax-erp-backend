@@ -27,11 +27,45 @@ export class SuscripcionesController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number,
-        @Query('idcliente') idcliente: number
+        @Query('idcliente') idcliente: number,
+        @Query('idgrupo') idgrupo: number[] | number,
+        @Query('idservicio') idservicio: number[] | number,
+        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
+        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
+        @Query('estado') estado: string[] | string,
+        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
+        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number
     ): Promise<ServerResponseList<Suscripcion>> {
         try {
-            const rows: Suscripcion[] = await this.suscripcionesSrv.findAll({ eliminado, idcliente, sort, offset, limit });
-            const rowCount: number = await this.suscripcionesSrv.count({ eliminado, idcliente });
+            const rows: Suscripcion[] = await this.suscripcionesSrv.findAll(
+                {
+                    eliminado,
+                    idcliente,
+                    idgrupo,
+                    idservicio,
+                    fechainiciosuscripcion,
+                    fechafinsuscripcion,
+                    estado,
+                    cuotaspendientesdesde,
+                    cuotaspendienteshasta,
+                    sort,
+                    offset,
+                    limit
+                }
+            );
+            const rowCount: number = await this.suscripcionesSrv.count(
+                { 
+                    eliminado,
+                    idcliente,
+                    idgrupo,
+                    idservicio,
+                    fechainiciosuscripcion,
+                    fechafinsuscripcion,
+                    estado,
+                    cuotaspendientesdesde,
+                    cuotaspendienteshasta
+                }
+            );
             return new ServerResponseList<Suscripcion>(rows, rowCount);
         } catch (e) {
             console.log('Error al consultar Suscripciones');

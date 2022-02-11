@@ -12,21 +12,121 @@ export class SuscripcionesService {
     ){}
 
     async findAll(queryParams){
-        const { eliminado, idcliente, sort, offset, limit } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcliente});
-        var query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${Util.buildSortOffsetLimitStr(sort, offset, limit)}`;
+        const {
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            sort,
+            offset,
+            limit,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta
+        } = queryParams;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcliente, idgrupo, idservicio, estado});
+        const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
+        var query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr}`;
+        if(fechainiciosuscripcion){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` fechasuscripcion::date >= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex ++;
+            wp.whereParams.push(fechainiciosuscripcion);
+        }
+        if(fechafinsuscripcion){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` fechasuscripcion::date <= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex ++;
+            wp.whereParams.push(fechafinsuscripcion);
+        }
+        if(cuotaspendientesdesde){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` cuotaspendientes >= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex++;
+            wp.whereParams.push(cuotaspendientesdesde);
+        }
+        if(cuotaspendienteshasta){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` cuotaspendientes <= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex++;
+            wp.whereParams.push(cuotaspendienteshasta);
+        }
+        console.log(query);
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number>{
-        const { eliminado, idcliente } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcliente});
+        const { 
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta
+        } = queryParams;
+        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcliente, idgrupo, idservicio, estado});
         var query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
-        /*const params: any[] = [];
-        if(eliminado){
-            query += ` WHERE eliminado = $1`;
-            params.push(eliminado);
-        }*/
+        if(fechainiciosuscripcion){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` fechasuscripcion::date >= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex++;
+            wp.whereParams.push(fechainiciosuscripcion);
+        }
+        if(fechafinsuscripcion){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` fechasuscripcion::date <= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex++;
+            wp.whereParams.push(fechafinsuscripcion);
+        }
+        if(cuotaspendientesdesde){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` cuotaspendientes >= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex++;
+            wp.whereParams.push(cuotaspendientesdesde);
+        }
+        if(cuotaspendienteshasta){
+            if(wp.whereStr.length == 0){
+                query += ` WHERE`;
+            }else{
+                query += ` AND`;
+            }
+            query += ` cuotaspendientes <= $${wp.lastParamIndex + 1}`;
+            wp.lastParamIndex++;
+            wp.whereParams.push(cuotaspendienteshasta);
+        }
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
