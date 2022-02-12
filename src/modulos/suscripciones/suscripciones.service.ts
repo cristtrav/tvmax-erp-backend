@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { WhereParam } from '@util/whereparam';
+import { ISearchField } from '@util/isearchfield.interface';
 
 @Injectable()
 export class SuscripcionesService {
@@ -24,7 +25,11 @@ export class SuscripcionesService {
             fechafinsuscripcion,
             estado,
             cuotaspendientesdesde,
-            cuotaspendienteshasta
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
         } = queryParams;
 
         const rangeQuery: IRangeQuery = {
@@ -43,15 +48,32 @@ export class SuscripcionesService {
             ]
         };
 
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
         const wp: WhereParam = new WhereParam(
-            {
-                eliminado, idcliente, estado
-            },
-            {
-                idgrupo, idservicio 
-            },
+            {eliminado, idcliente, estado},
+            [
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
+            ],
             rangeQuery,
-            null,
+            searchQuery,
             { sort, offset, limit }
         );
         var query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
@@ -68,7 +90,11 @@ export class SuscripcionesService {
             fechafinsuscripcion,
             estado,
             cuotaspendientesdesde,
-            cuotaspendienteshasta
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
         } = queryParams;
 
         const rangeQuery: IRangeQuery = {
@@ -87,15 +113,32 @@ export class SuscripcionesService {
             ]
         };
 
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
         const wp: WhereParam = new WhereParam(
-            {
-                eliminado, idcliente, estado
-            },
-            {
-                idgrupo, idservicio
-            },
+            {eliminado, idcliente, estado},
+            [
+                {idgrupo, idservicio},
+                {iddepartamento, iddistrito, idbarrio}
+            ],
             rangeQuery,
-            null,
+            searchQuery,
             null
         );
         var query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;

@@ -34,7 +34,11 @@ export class SuscripcionesController {
         @Query('fechafinsuscripcion') fechafinsuscripcion: string,
         @Query('estado') estado: string[] | string,
         @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
-        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number
+        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
+        @Query('iddepartamento') iddepartamento: number | number[],
+        @Query('iddistrito') iddistrito: number | number[],
+        @Query('idbarrio') idbarrio: number | number[],
+        @Query('search') search: string
     ): Promise<ServerResponseList<Suscripcion>> {
         console.log(fechainiciosuscripcion);
         try {
@@ -49,6 +53,10 @@ export class SuscripcionesController {
                     estado,
                     cuotaspendientesdesde,
                     cuotaspendienteshasta,
+                    iddepartamento,
+                    iddistrito,
+                    idbarrio,
+                    search,
                     sort,
                     offset,
                     limit
@@ -64,7 +72,11 @@ export class SuscripcionesController {
                     fechafinsuscripcion,
                     estado,
                     cuotaspendientesdesde,
-                    cuotaspendienteshasta
+                    cuotaspendienteshasta,
+                    iddepartamento,
+                    iddistrito,
+                    idbarrio,
+                    search
                 }
             );
             return new ServerResponseList<Suscripcion>(rows, rowCount);

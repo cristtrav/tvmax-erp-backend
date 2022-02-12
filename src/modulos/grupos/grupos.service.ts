@@ -19,7 +19,6 @@ export class GruposService {
             { sort, offset, limit}
         );
         var query: string = `SELECT * FROM public.grupo ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        console.log(query);
         return (await this.dbsrv.execute(query, wp.whereParams)).rows
     }
 

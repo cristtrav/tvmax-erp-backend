@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../global/database/database.service';
 import { Distrito } from '../../dto/distrito.dto';
 import { Result } from 'pg';
+import { WhereParam } from '@util/whereparam';
 
 @Injectable()
 export class DistritosService {
@@ -11,33 +12,29 @@ export class DistritosService {
     ) { }
 
     async findAll(queryParam): Promise<Distrito[]> {
-        const { eliminado, sort, limit, offset } = queryParam;
-        var query: string = `SELECT * FROM public.vw_distritos`;
-        const param: any[] = [];
-        if (eliminado) {
-            query += ` WHERE eliminado = $1`;
-            param.push(eliminado);
-        }
-        if (sort) {
-            const srtOrder = sort.substring(0, 1) === '-' ? 'DESC' : 'ASC';
-            const srtColumn = sort.substring(1, sort.lenght);
-            query += ` ORDER BY ${srtColumn} ${srtOrder}`;
-        }
-        if (limit && offset) {
-            query += ` OFFSET ${offset} LIMIT ${limit}`;
-        }
-        return (await this.dbsrv.execute(query, param)).rows;
+        const { eliminado, iddepartamento, sort, limit, offset } = queryParam;
+        const wp: WhereParam = new WhereParam(
+            { eliminado, iddepartamento },
+            null,
+            null,
+            null,
+            { sort, offset, limit }
+        );
+        var query: string = `SELECT * FROM public.vw_distritos ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParam): Promise<number> {
-        const { eliminado } = queryParam;
-        var query: string = `SELECT COUNT(*) FROM public.vw_distritos`;
-        const params: any[] = [];
-        if (eliminado) {
-            query += ` WHERE eliminado = $1`;
-            params.push(eliminado);
-        }
-        return (await this.dbsrv.execute(query, params)).rows[0].count;
+        const { eliminado, iddepartamento } = queryParam;
+        const wp: WhereParam = new WhereParam(
+            { eliminado, iddepartamento },
+            null,
+            null,
+            null,
+            null
+        );
+        var query: string = `SELECT COUNT(*) FROM public.vw_distritos ${wp.whereStr}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
     async create(d: Distrito){

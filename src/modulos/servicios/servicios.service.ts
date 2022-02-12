@@ -29,8 +29,6 @@ export class ServiciosService {
             { sort, offset, limit }
         );
         let query: string = `SELECT * FROM public.vw_servicios ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        console.log(query);
-        console.log(wp.whereParams);
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 

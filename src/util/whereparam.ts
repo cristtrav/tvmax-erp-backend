@@ -1,3 +1,4 @@
+import { Param } from "@nestjs/common";
 import { IRange } from "./irangefield.interface";
 import { IRangeQuery } from "./irangequery.interface";
 import { ISearchField } from "./isearchfield.interface";
@@ -9,16 +10,22 @@ export class WhereParam {
     whereParams: any[] = [];
     sortOffsetLimitStr: string = '';
 
-    constructor(andParams: Object | null, orParams: Object | null, rangeParams: IRangeQuery | null, searchParams: ISearchField[] | null, sof: ISortOffsetLimit | null) {
+    constructor(
+        andParams: Object | null,
+        orParams: Object | Object[] | null,
+        rangeParams: IRangeQuery | null,
+        searchParams: ISearchField[] | null,
+        sof: ISortOffsetLimit | null
+    ) {
         let whereParams: any[] = [];
         let whereStr: string = ``;
         const andParamsFiltered: Object = this.filterParams(andParams);
-        const andSentenceStr: string = andParams ? this.buildConditionalSentence(andParamsFiltered, 'AND', 1) : '';
+        const andSentenceStr: string = this.buildAndSentence(andParamsFiltered, 1);
         whereParams = whereParams.concat(Object.values(andParamsFiltered));
 
-        const orParamsFiltered: Object = this.filterParams(orParams);
-        const orSentenceStr: string = orParams ? this.buildConditionalSentence(orParamsFiltered, 'OR', whereParams.length + 1) : '';
-        whereParams = whereParams.concat(Object.values(orParamsFiltered));
+        const orParamsFiltered: Object | Object[] = Array.isArray(orParams) ? this.filterParamsArray(orParams) : this.filterParams(orParams);
+        const orSentenceStr: string = this.buildOrSentence(orParamsFiltered, whereParams.length + 1);
+        whereParams = whereParams.concat(Object.values(Array.isArray(orParamsFiltered) ? this.paramArrayToObject(orParamsFiltered) : orParamsFiltered));
 
         const rangeParamsFiltered: Object = this.filterParamsRange(rangeParams?.range);
         const rangeSentenceStr: String = this.buildRangeSentenceStr(rangeParams, whereParams.length + 1);
@@ -48,18 +55,50 @@ export class WhereParam {
         if (sof) this.sortOffsetLimitStr = this.buildSortOffsetLimitStr(sof?.sort, sof?.offset, sof?.limit);
     }
 
-    private buildConditionalSentence(params, operator, startParamNum: number): string {
+    private buildAndSentence(params: Object, startParamNum: number): string {
         let currentParNum: number = startParamNum;
         let andSentenceStr: string = '';
         const objKeysArray: string[] = Object.keys(params);
         const keysLength: number = objKeysArray.length;
         for (let i = 0; i < keysLength; i++) {
-            if (i > 0) andSentenceStr += ` ${operator}`;
+            if (i > 0) andSentenceStr += ` AND`;
             if (Array.isArray(params[objKeysArray[i]])) andSentenceStr += ` ${objKeysArray[i]} = ANY($${currentParNum})`
             else andSentenceStr += ` ${objKeysArray[i]}=$${currentParNum}`;
             currentParNum++;
         }
         return andSentenceStr;
+    }
+
+    private buildOrSentence(params: Object | Object[], startParamNum: number): string {
+        let currentParNum: number = startParamNum;
+        let orSentenceStr: string = '';
+        if (Array.isArray(params) && params.length > 1) {
+            params.forEach((paramsObj: Object, index: number) => {
+                if (index > 0) orSentenceStr += ` AND`;
+                const objKeysArray: string[] = Object.keys(paramsObj);
+                const keysLength: number = objKeysArray.length;
+                for (let i = 0; i < keysLength; i++) {
+                    if (i === 0) orSentenceStr += `(`;
+                    if (i > 0) orSentenceStr += ` OR`;
+                    if (Array.isArray(paramsObj[objKeysArray[i]])) orSentenceStr += ` ${objKeysArray[i]} = ANY($${currentParNum})`
+                    else orSentenceStr += ` ${objKeysArray[i]}=$${currentParNum}`;
+                    if (i === keysLength - 1) orSentenceStr += `)`;
+                    currentParNum++;
+                }
+            });
+        } else {
+            const paramsObj: Object = Array.isArray(params) && params.length === 1 ? params[0] : params;
+            const objKeysArray: string[] = Object.keys(paramsObj);
+            const keysLength: number = objKeysArray.length;
+            for (let i = 0; i < keysLength; i++) {
+                if (i > 0) orSentenceStr += ` OR`;
+                if (Array.isArray(paramsObj[objKeysArray[i]])) orSentenceStr += ` ${objKeysArray[i]} = ANY($${currentParNum})`
+                else orSentenceStr += ` ${objKeysArray[i]}=$${currentParNum}`;
+                currentParNum++;
+            }
+        }
+
+        return orSentenceStr;
     }
 
     private buildRangeSentenceStr(rangesQuery: IRangeQuery, startParamNum: number): string {
@@ -70,7 +109,6 @@ export class WhereParam {
             rangesQuery.range.forEach((rg: IRange) => {
                 if ((typeof rg.startValue !== 'undefined' && rg.startValue !== null) || (typeof rg.endValue !== 'undefined' && rg.endValue !== null)) rangeFiltered.push(rg);
             });
-            console.log('cantidad de rangos>' + rangeFiltered.length);
 
             rangeFiltered.forEach((rg: IRange, i: number) => {
                 if (rangeSentenceStr.length !== 0) rangeSentenceStr += ` ${rangesQuery.joinOperator}`;
@@ -119,6 +157,23 @@ export class WhereParam {
             }
         }
         return paramsFiltered;
+    }
+
+    filterParamsArray(paramsArr: Object[]): Object[] {
+        const paramsArrFiltered: Object[] = [];
+        paramsArr.forEach((par: Object) => {
+            const currentGroupFiltered: Object = this.filterParams(par);
+            if (Object.keys(currentGroupFiltered).length !== 0) paramsArrFiltered.push(currentGroupFiltered);
+        });
+        return paramsArrFiltered;
+    }
+
+    paramArrayToObject(paramsArr: Object[]): Object {
+        let params: Object = {};
+        paramsArr.forEach((p: Object) => {
+            params = { ...params, ...p };
+        });
+        return params;
     }
 
     private filterParamsRange(params: IRange[]): Object {
