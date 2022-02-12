@@ -55,8 +55,6 @@ export class SuscripcionesService {
             { sort, offset, limit }
         );
         var query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        console.log(query);
-        console.log(wp.whereParams);
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
@@ -101,9 +99,6 @@ export class SuscripcionesService {
             null
         );
         var query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
-        console.log('###COUNT###');
-        console.log(query);
-        console.log(wp.whereParams);
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
