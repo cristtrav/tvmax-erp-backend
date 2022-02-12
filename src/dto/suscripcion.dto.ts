@@ -11,6 +11,10 @@ export class Suscripcion{
     direccion: string | null = null;
     idbarrio: number | null = null;
     barrio: string | null = null;
+    iddistrito: number | null = null;
+    distrito: string | null = null;
+    iddepartamento: number | null = null;
+    departamento: string | null = null;
     idcliente: number | null = null;
     cliente: string | null = null;
     monto: number| null = null;

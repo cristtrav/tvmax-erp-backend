@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { Cliente } from '@dto/cliente.dto';
-import { Util } from '@util/util';
-import { IWhereParam } from '@util/iwhereparam.interface';
+import { WhereParam } from '@util/whereparam';
+import { ISearchField } from '@util/isearchfield.interface';
 
 @Injectable()
 export class ClientesService {
@@ -13,37 +13,51 @@ export class ClientesService {
 
     async findAll(queryParams): Promise<Cliente[]> {
         const { eliminado, search, idcobrador, sort, offset, limit } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcobrador});
-        const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
-        var query: string = `SELECT * FROM public.vw_clientes ${wp.whereStr}`;
-        if(search){
-            if(wp.whereStr){
-                query += ` AND`;
-            }else{
-                query += ` WHERE`;
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'razonsocial',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'ci',
+                fieldValue: search,
+                exactMatch: true
             }
-            query += ` (LOWER(razonsocial) LIKE $${wp.lastParamIndex + 1} OR ci = $${wp.lastParamIndex + 2})`;
-            wp.whereParams.push(`%${search.toLowerCase()}%`);
-            wp.whereParams.push(search);
-        }
-        query += ` ${sof}`;
+        ];
+        const wp: WhereParam = new WhereParam(
+            {eliminado, idcobrador},
+            null,
+            null,
+            searchQuery,
+            { sort, offset, limit }
+        );
+        var query: string = `SELECT * FROM public.vw_clientes ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number> {
         const { eliminado, search, idcobrador } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idcobrador});
-        var query: string = `SELECT COUNT(*) FROM public.vw_clientes ${wp.whereStr}`;
-        if(search){
-            if(wp.whereParams){
-                query += ` AND`;
-            }else{
-                query += ` WHERE`;
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'razonsocial',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'ci',
+                fieldValue: search,
+                exactMatch: true
             }
-            query += ` (LOWER(razonsocial) LIKE $${wp.lastParamIndex + 1} OR ci = $${wp.lastParamIndex + 2})`;
-            wp.whereParams.push(`%${search.toLowerCase()}%`);
-            wp.whereParams.push(search);
-        }
+        ];
+        const wp: WhereParam = new WhereParam(
+            {eliminado, idcobrador},
+            null,
+            null,
+            searchQuery,
+            null
+        );
+        var query: string = `SELECT COUNT(*) FROM public.vw_clientes ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 

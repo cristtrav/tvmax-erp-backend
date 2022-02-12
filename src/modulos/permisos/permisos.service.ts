@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
-import { IWhereParam } from '@util/iwhereparam.interface';
-import { Util } from '@util/util';
 import { Modulo } from '@dto/modulo.dto';
 import { Funcionalidad } from '@dto/funcionalidad.dto';
 import { Client } from 'pg';
+import { WhereParam } from '@util/whereparam';
 
 @Injectable()
 export class PermisosService {
@@ -14,9 +13,14 @@ export class PermisosService {
 
     async findAllModulos(reqQuery): Promise<Modulo[]> {
         const { eliminado, sort, offset, limit } = reqQuery;
-        const iwp: IWhereParam = Util.buildAndWhereParam({ eliminado });
-        const sol: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
-        const queryModulos: string = `SELECT * FROM public.modulo ${iwp.whereStr} ${sol}`;
+        const iwp: WhereParam = new WhereParam(
+            { eliminado },
+            null,
+            null,
+            null,
+            { sort, offset, limit }
+        );
+        const queryModulos: string = `SELECT * FROM public.modulo ${iwp.whereStr} ${iwp.sortOffsetLimitStr}`;
         const lstModulos: Modulo[] = (await this.dbsrv.execute(queryModulos, iwp.whereParams)).rows;
         for (let m of lstModulos) {
             const queryFunc: string = `SELECT * FROM public.funcionalidad WHERE idmodulo = $1 AND eliminado = false ORDER BY descripcion ASC`;
@@ -28,7 +32,7 @@ export class PermisosService {
 
     async findByIdUsuario(idusuario: number, reqQuery): Promise<Funcionalidad[]> {
         const { eliminado, sort, offset, limit } = reqQuery;
-        const sof: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
+        const sof: string = new WhereParam(null, null, null, null, {sort, offset, limit}).sortOffsetLimitStr;
         const queryPermisos: string = `SELECT * FROM public.funcionalidad 
         WHERE id IN (SELECT idfuncionalidad FROM public.permiso WHERE idusuario = $1) ${sof}`;
         return (await this.dbsrv.execute(queryPermisos, [idusuario])).rows;

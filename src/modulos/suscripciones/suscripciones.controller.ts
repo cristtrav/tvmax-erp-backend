@@ -36,6 +36,7 @@ export class SuscripcionesController {
         @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
         @Query('cuotaspendienteshasta') cuotaspendienteshasta: number
     ): Promise<ServerResponseList<Suscripcion>> {
+        console.log(fechainiciosuscripcion);
         try {
             const rows: Suscripcion[] = await this.suscripcionesSrv.findAll(
                 {

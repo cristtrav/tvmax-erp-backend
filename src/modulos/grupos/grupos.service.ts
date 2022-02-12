@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { WhereParam } from '@util/whereparam';
 import { Grupo } from '../../dto/grupo.dto';
 import { DatabaseService } from './../../global/database/database.service';
 
@@ -10,22 +11,16 @@ export class GruposService {
 
     async findAll(reqQuery): Promise<Grupo[]> {
         const { eliminado, sort, offset, limit } = reqQuery
-        var query: string = `SELECT * FROM public.grupo`
-        var queryParams: any[] = [];
-        if(eliminado){
-            query+=` WHERE eliminado=$1`
-            queryParams.push(eliminado);
-        }
-        if(sort){
-            const order: string = sort.substring(0, 1) === '-'?'DESC':'ASC'
-            const column: string = sort.substring(1, sort.length)
-            query+= ` ORDER BY ${column} ${order}`
-        }
-        if(limit && offset){
-            query+=` LIMIT ${limit} OFFSET ${offset}`
-        }
-        
-        return (await this.dbsrv.execute(query, queryParams)).rows
+        const wp: WhereParam = new WhereParam(
+            { eliminado },
+            null,
+            null,
+            null,
+            { sort, offset, limit}
+        );
+        var query: string = `SELECT * FROM public.grupo ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
+        console.log(query);
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows
     }
 
     async count(reqQuery): Promise<number> {

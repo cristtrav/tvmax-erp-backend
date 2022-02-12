@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../global/database/database.service';
 import { TipoDomicilio } from '../../dto/tipodomicilio.dto';
-import { Util } from '../../util/util';
-import { IWhereParam } from '@util/iwhereparam.interface';
+import { WhereParam } from '@util/whereparam';
 
 @Injectable()
 export class TiposdomiciliosService {
@@ -13,14 +12,26 @@ export class TiposdomiciliosService {
 
     async findAll(queryParams): Promise<TipoDomicilio[]>{
         const { eliminado, sort, offset, limit } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
-        var query: string = `SELECT * FROM public.tipo_domicilio ${wp.whereStr} ${Util.buildSortOffsetLimitStr(sort, offset, limit)}`;
+        const wp: WhereParam = new WhereParam(
+            {eliminado},
+            null,
+            null,
+            null,
+            { sort, offset, limit } 
+        );
+        var query: string = `SELECT * FROM public.tipo_domicilio ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number>{
         const { eliminado } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado});
+        const wp: WhereParam = new WhereParam(
+            {eliminado},
+            null,
+            null,
+            null,
+            null
+        );
         var query: string = `SELECT COUNT(*) FROM public.tipo_domicilio ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }

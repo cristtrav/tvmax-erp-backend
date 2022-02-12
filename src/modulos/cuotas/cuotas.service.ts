@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { Cuota } from '@dto/cuota.dto';
-import { Util } from '@util/util'; 
-import { IWhereParam } from '@util/iwhereparam.interface';
+import { WhereParam } from '@util/whereparam';
 
 @Injectable()
 export class CuotasService {
@@ -13,36 +12,64 @@ export class CuotasService {
 
     async findAll(queryParams): Promise<Cuota[]>{
         const { eliminado, pagado,sort, offset, limit, idservicio, idsuscripcion } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idservicio, idsuscripcion, pagado});
-        const sol: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
-        const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr} ${sol}`;
+        const wp: WhereParam = new WhereParam(
+            {eliminado, idservicio, idsuscripcion, pagado},
+            null,
+            null,
+            null,
+            { sort, offset, limit }
+        );        
+        const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async count(queryParams): Promise<number>{
-        const { eliminado, idservicio, idsuscripcion } = queryParams;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idservicio, idsuscripcion});
+        const { eliminado, idservicio, idsuscripcion, pagado } = queryParams;
+        const wp: WhereParam = new WhereParam(
+            {eliminado, idservicio, idsuscripcion, pagado},
+            null,
+            null,
+            null,
+            null
+        );
         const query: string = `SELECT COUNT(*) FROM public.vw_cuotas ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
     async getCuotasPorSuscripcion(idsuscripcion: number, reqQuery): Promise<Cuota[]> {
         const { eliminado, sort, offset, limit } = reqQuery;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idsuscripcion});
-        const sol: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
-        const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr} ${sol}`;
+        const wp: WhereParam = new WhereParam(
+            {eliminado, idsuscripcion},
+            null,
+            null,
+            null,
+            { sort, offset, limit}
+        );
+        const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
     async countCuotasPorSuscripcion(idsuscripcion: number, reqQuery): Promise<number>{
         const { eliminado } = reqQuery;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, idsuscripcion});
+        const wp: WhereParam = new WhereParam(
+            {eliminado, idsuscripcion},
+            null,
+            null,
+            null,
+            null
+        );
         const query: string = `SELECT COUNT(*) FROM public.vw_cuotas ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
     async findById(id: number): Promise<Cuota> {
-        const wp: IWhereParam = Util.buildAndWhereParam({id});
+        const wp: WhereParam = new WhereParam(
+            {id},
+            null,
+            null,
+            null,
+            null
+        );
         const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr}`;
         const rows: Cuota[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
         if(rows.length > 0) return rows[0];

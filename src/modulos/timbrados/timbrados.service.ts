@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service'
 import { Timbrado } from '@dto/timbrado.dto';
-import { Util } from '@util/util'; 
-import { IWhereParam } from '@util/iwhereparam.interface';
+import { WhereParam } from '@util/whereparam';
 
 @Injectable()
 export class TimbradosService {
@@ -12,9 +11,14 @@ export class TimbradosService {
 
     async findAll(params): Promise<Timbrado[]>{
         const { eliminado, activo, sort, offset, limit } = params;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, activo});
-        const sol: string = Util.buildSortOffsetLimitStr(sort, offset, limit);
-        const query: string = `SELECT * FROM public.vw_timbrados ${wp.whereStr} ${sol}`;        
+        const wp: WhereParam = new WhereParam(
+            {eliminado, activo},
+            null,
+            null,
+            null,
+            { sort, offset, limit }
+        );
+        const query: string = `SELECT * FROM public.vw_timbrados ${wp.whereStr} ${wp.sortOffsetLimitStr}`;        
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
@@ -27,7 +31,13 @@ export class TimbradosService {
 
     async count(params): Promise<number>{
         const { eliminado, activo } = params;
-        const wp: IWhereParam = Util.buildAndWhereParam({eliminado, activo});
+        const wp: WhereParam = new WhereParam(
+            {eliminado, activo},
+            null,
+            null,
+            null,
+            null
+        );
         const query: string = `SELECT COUNT(*) FROM public.timbrado ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
