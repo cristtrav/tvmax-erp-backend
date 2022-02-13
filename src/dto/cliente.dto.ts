@@ -14,6 +14,10 @@ export class Cliente {
     direccion: string | null = null;
     idbarrio: number | null = null;
     barrio: string | null = null;
+    iddistrito: string | null = null;
+    distrito: string | null = null;
+    iddepartamento: string | null = null;
+    departamento: string | null = null;
     cantconectados: number = 0;
     cantdesconectados: number = 0;
 }

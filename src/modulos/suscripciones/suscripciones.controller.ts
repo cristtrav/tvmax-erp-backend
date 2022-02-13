@@ -40,7 +40,6 @@ export class SuscripcionesController {
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
     ): Promise<ServerResponseList<Suscripcion>> {
-        console.log(fechainiciosuscripcion);
         try {
             const rows: Suscripcion[] = await this.suscripcionesSrv.findAll(
                 {

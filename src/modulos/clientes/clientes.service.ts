@@ -12,7 +12,7 @@ export class ClientesService {
     ) { }
 
     async findAll(queryParams): Promise<Cliente[]> {
-        const { eliminado, search, idcobrador, sort, offset, limit } = queryParams;
+        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento, sort, offset, limit } = queryParams;
         const searchQuery: ISearchField[] = [
             {
                 fieldName: 'razonsocial',
@@ -23,11 +23,21 @@ export class ClientesService {
                 fieldName: 'ci',
                 fieldValue: search,
                 exactMatch: true
+            },
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'direccion',
+                fieldValue: search,
+                exactMatch: false
             }
         ];
         const wp: WhereParam = new WhereParam(
             {eliminado, idcobrador},
-            null,
+            { idbarrio, iddistrito, iddepartamento },
             null,
             searchQuery,
             { sort, offset, limit }
@@ -37,7 +47,7 @@ export class ClientesService {
     }
 
     async count(queryParams): Promise<number> {
-        const { eliminado, search, idcobrador } = queryParams;
+        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento } = queryParams;
         const searchQuery: ISearchField[] = [
             {
                 fieldName: 'razonsocial',
@@ -48,11 +58,21 @@ export class ClientesService {
                 fieldName: 'ci',
                 fieldValue: search,
                 exactMatch: true
+            },
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'direccion',
+                fieldValue: search,
+                exactMatch: false
             }
         ];
         const wp: WhereParam = new WhereParam(
             {eliminado, idcobrador},
-            null,
+            { idbarrio, iddistrito, iddepartamento },
             null,
             searchQuery,
             null

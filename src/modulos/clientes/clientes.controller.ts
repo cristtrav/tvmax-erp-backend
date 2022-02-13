@@ -25,11 +25,14 @@ export class ClientesController {
         @Query('offset') offset: number,
         @Query('limit') limit: number,
         @Query('search') search: string,
-        @Query('idcobrador') idcobrador: number[]
+        @Query('idcobrador') idcobrador: number | number[],
+        @Query('idbarrio') idbarrio: number | number[],
+        @Query('iddistrito') iddistrito: string | string[],
+        @Query('iddepartamento') iddepartamento: string | string[]
     ): Promise<ServerResponseList<Cliente>> {
         try {
-            const rows: Cliente[] = await this.clientesSrv.findAll({ eliminado, search, idcobrador, sort, offset, limit });
-            const rowCount: number = await this.clientesSrv.count({ eliminado, search, idcobrador });
+            const rows: Cliente[] = await this.clientesSrv.findAll({ eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento,sort, offset, limit });
+            const rowCount: number = await this.clientesSrv.count({ eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento });
             return new ServerResponseList<Cliente>(rows, rowCount);
         } catch (e) {
             console.log('Error al consultar Clientes');
