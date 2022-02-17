@@ -577,4 +577,87 @@ export class SuscripcionesService {
         return rowsGrupos;
     }
 
+    async getResumenDepartamentosDistritos(params): Promise<ResumenCantSuscDeuda[]>{
+        const {
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
+        } = params;
+        const rangeQuery: IRangeQuery = {
+            joinOperator: 'AND',
+            range: [
+                {
+                    fieldName: 'fechasuscripcion::date',
+                    startValue: fechainiciosuscripcion,
+                    endValue: fechafinsuscripcion
+                },
+                {
+                    fieldName: 'cuotaspendientes',
+                    startValue: cuotaspendientesdesde,
+                    endValue: cuotaspendienteshasta
+                }
+            ]
+        };
+
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
+        const wp: WhereParam = new WhereParam(
+            { eliminado, idcliente, estado },
+            [
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
+            ],
+            rangeQuery,
+            searchQuery,
+            null
+        );
+
+        const queryDepartamentos: string = `SELECT iddepartamento AS idreferencia, departamento AS referencia, COUNT(*) as cantidad, SUM(deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY iddepartamento, departamento
+        ORDER BY departamento ASC`;
+
+        const queryDistritos: string = `SELECT iddepartamento, iddistrito AS idreferencia, distrito AS referencia, COUNT(*) as cantidad, SUM(deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY iddepartamento, iddistrito, distrito
+        ORDER BY distrito ASC`;
+
+        const rowsDepart: ResumenCantSuscDeuda[] = (await this.dbsrv.execute(queryDepartamentos, wp.whereParams)).rows;
+        const rowsDistr = (await this.dbsrv.execute(queryDistritos, wp.whereParams)).rows;
+
+        rowsDepart.forEach((rdep: ResumenCantSuscDeuda)=>{
+            rdep.children = [];
+            if(Array.isArray(rowsDistr)) rowsDistr.forEach((rdis)=>{
+                if(rdep.idreferencia === rdis.iddepartamento) rdep.children.push(rdis);
+            });
+        });
+        return rowsDepart;
+    }
+
 }

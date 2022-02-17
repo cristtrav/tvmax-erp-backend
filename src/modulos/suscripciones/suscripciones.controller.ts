@@ -449,7 +449,7 @@ export class SuscripcionesController {
             );
             return new ServerResponseList(rows, rows.length);
         }catch(e){
-            console.log('Error al consultar resumen por estado');
+            console.log('Error al consultar resumen por grupos y servicios');
             console.log(e);
             throw new HttpException(
                 {
@@ -460,6 +460,53 @@ export class SuscripcionesController {
             );
         }
     }
-    
 
+    @Get('resumen/departamentosdistritos')
+    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARSUSCRIPCIONES)
+    async getResumenDepartamentosDistritos(
+        @Query('eliminado') eliminado: boolean,
+        @Query('idcliente') idcliente: number,
+        @Query('idgrupo') idgrupo: number[] | number,
+        @Query('idservicio') idservicio: number[] | number,
+        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
+        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
+        @Query('estado') estado: string[] | string,
+        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
+        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
+        @Query('iddepartamento') iddepartamento: number | number[],
+        @Query('iddistrito') iddistrito: number | number[],
+        @Query('idbarrio') idbarrio: number | number[],
+        @Query('search') search: string
+    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+        try{
+            const rows: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenDepartamentosDistritos(
+                {   
+                    eliminado,
+                    idcliente,
+                    idgrupo,
+                    idservicio,
+                    fechainiciosuscripcion,
+                    fechafinsuscripcion,
+                    estado,
+                    cuotaspendientesdesde,
+                    cuotaspendienteshasta,
+                    iddepartamento,
+                    iddistrito,
+                    idbarrio,
+                    search
+                }
+            );
+            return new ServerResponseList(rows, rows.length);
+        }catch(e){
+            console.log('Error al consultar resumen por departamentos y distritos');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
