@@ -7,99 +7,105 @@ export class Permissions {
     }
 
     static readonly SERVICIOS = {
-        CONSULTAR: 5,
-        REGISTRAR: 6,
-        EDITAR: 7,
-        ELIMINAR: 8
+        CONSULTAR: 20,
+        REGISTRAR: 21,
+        EDITAR: 22,
+        ELIMINAR: 23
     }
 
     static readonly DEPARTAMENTOS = {
-        CONSULTAR: 9,
-        REGISTRAR: 10,
-        EDITAR: 11, 
-        ELIMINAR: 12
+        CONSULTAR: 40,
+        REGISTRAR: 41,
+        EDITAR: 42, 
+        ELIMINAR: 43
     }
 
     static readonly DISTRITOS = {
-        CONSULTAR: 13,
-        REGISTRAR: 14,
-        EDITAR: 15,
-        ELIMINAR: 16
+        CONSULTAR: 60,
+        REGISTRAR: 61,
+        EDITAR: 62,
+        ELIMINAR: 63
     }
 
     static readonly BARRIOS = {
-        CONSULTAR: 17,
-        REGISTRAR: 18,
-        EDITAR: 19,
-        ELIMINAR: 20
+        CONSULTAR: 80,
+        REGISTRAR: 81,
+        EDITAR: 82,
+        ELIMINAR: 83
     }
 
     static readonly TIPOSDOMICILIOS = {
-        CONSULTAR: 21,
-        REGISTRAR: 22,
-        EDITAR: 23,
-        ELIMINAR: 24
+        CONSULTAR: 100,
+        REGISTRAR: 101,
+        EDITAR: 102,
+        ELIMINAR: 103
     }
 
     static readonly USUARIOS = {
-        CONSULTAR: 25,
-        REGISTRAR: 26,
-        EDITAR: 27,
-        ELIMINAR: 28
+        CONSULTAR: 120,
+        REGISTRAR: 121,
+        EDITAR: 122,
+        ELIMINAR: 123
     }
 
     static readonly COBRADORES = {
-        CONSULTAR: 29,
-        REGISTRAR: 30,
-        EDITAR: 31,
-        ELIMINAR: 32
+        CONSULTAR: 140,
+        REGISTRAR: 141,
+        EDITAR: 142,
+        ELIMINAR: 143
     }
 
     static readonly SUSCRIPCIONES = {
-        CONSULTAR: 33,
-        REGISTRAR: 34,
-        EDITAR: 35,
-        ELIMINAR: 36
+        CONSULTAR: 160,
+        REGISTRAR: 161,
+        EDITAR: 162,
+        ELIMINAR: 163,
+        CONTAR: 164
     }
 
     static readonly CLIENTES = {
-        CONSULTAR: 37,
-        REGISTRAR: 38,
-        EDITAR: 39,
-        ELIMINAR: 40
+        CONSULTAR: 180,
+        REGISTRAR: 181,
+        EDITAR: 182,
+        ELIMINAR: 183
     }
 
     static readonly DOMICILIOS = {
-        CONSULTAR: 41,
-        REGISTRAR: 42,
-        EDITAR: 43,
-        ELIMINAR: 44
+        CONSULTAR: 200,
+        REGISTRAR: 201,
+        EDITAR: 202,
+        ELIMINAR: 203
     }
     static readonly CUOTAS = {
-        CONSULTAR: 45,
-        REGISTRAR: 46,
-        EDITAR: 47,
-        ELIMINAR: 48
+        CONSULTAR: 220,
+        REGISTRAR: 221,
+        EDITAR: 222,
+        ELIMINAR: 223
     }
     static readonly TIMBRADOS = {
-        CONSULTAR: 49,
-        REGISTRAR: 50,
-        EDITAR: 51,
-        ELIMINAR: 52
+        CONSULTAR: 240,
+        REGISTRAR: 241,
+        EDITAR: 242,
+        ELIMINAR: 243
     }
 
     static readonly VENTAS = {
-        CONSULTAR: 53,
-        REGISTRAR: 54,
-        EDITAR: 55,
-        ELIMINAR: 56,
-        ANULAR: 57,
-        REVERTIRANUL:58
+        CONSULTAR: 260,
+        REGISTRAR: 261,
+        EDITAR: 262,
+        ELIMINAR: 263,
+        ANULAR: 264,
+        REVERTIRANUL: 265
     }
 
     static readonly PERMISOS = {
-        CONSULTARMODULOSFUNCIONALIDADES: 59,
-        CONSULTARPERMISOSUSUARIO: 60,
-        EDITARPERMISOSUSUARIO: 61
+        CONSULTARMODULOSFUNCIONALIDADES: 280,
+        CONSULTARPERMISOSUSUARIO: 281,
+        EDITARPERMISOSUSUARIO: 282
+    }
+
+    static readonly ESTADISTICAS = {
+        CONSULTARSUSCRIPCIONES: 300,
+        CONSULTARSUCPORESTADO: 301
     }
 }

@@ -4,6 +4,7 @@ import { DatabaseService } from '@database/database.service';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
+import { ResumenCantSuscDeuda } from '@dto/resumen-cantsusc-deuda.dto';
 
 @Injectable()
 export class SuscripcionesService {
@@ -67,7 +68,7 @@ export class SuscripcionesService {
         ];
 
         const wp: WhereParam = new WhereParam(
-            {eliminado, idcliente, estado},
+            { eliminado, idcliente, estado },
             [
                 { idgrupo, idservicio },
                 { iddepartamento, iddistrito, idbarrio }
@@ -76,6 +77,7 @@ export class SuscripcionesService {
             searchQuery,
             { sort, offset, limit }
         );
+
         var query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
@@ -132,15 +134,16 @@ export class SuscripcionesService {
         ];
 
         const wp: WhereParam = new WhereParam(
-            {eliminado, idcliente, estado},
+            { eliminado, idcliente, estado },
             [
-                {idgrupo, idservicio},
-                {iddepartamento, iddistrito, idbarrio}
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
             ],
             rangeQuery,
             searchQuery,
             null
         );
+
         var query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
@@ -199,6 +202,379 @@ export class SuscripcionesService {
         );
         const query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    }
+
+    async getResumenSuscCuotasPendientes(params): Promise<ResumenCantSuscDeuda[]> {
+        const {
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
+        } = params;
+        const rangeQuery: IRangeQuery = {
+            joinOperator: 'AND',
+            range: [
+                {
+                    fieldName: 'fechasuscripcion::date',
+                    startValue: fechainiciosuscripcion,
+                    endValue: fechafinsuscripcion
+                },
+                {
+                    fieldName: 'cuotaspendientes',
+                    startValue: cuotaspendientesdesde,
+                    endValue: cuotaspendienteshasta
+                }
+            ]
+        };
+
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
+        const wp: WhereParam = new WhereParam(
+            { eliminado, idcliente, estado },
+            [
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
+            ],
+            rangeQuery,
+            searchQuery,
+            null
+        );
+
+        const query: string = `SELECT vw_suscripciones.cuotaspendientes AS referencia, COUNT(*) as cantidad, SUM(vw_suscripciones.deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY cuotaspendientes
+        ORDER BY cuotaspendientes ASC`;
+        /*const rows: ResumenCantSuscDeuda[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        const rowsFilled: ResumenCantSuscDeuda [] = [];
+        let min: number = 999;
+        let max: number = 0;
+        for(let r of rows){
+            if(Number(r.referencia) < min) min = Number(r.referencia);
+            if(Number(r.referencia) > max) max = Number(r.referencia);
+        }
+        for(let i = min; i <= max; i++){
+            
+            let existe: boolean = false;
+            for(let r of rows){
+                
+                if( Number(r.referencia) === i){
+                    rowsFilled.push(r);
+                    existe = true;
+                    break;
+                };
+            }
+            if(!existe) rowsFilled.push({referencia: i, cantidad: 0, monto: 0});
+        }*/
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    }
+
+    async getResumenSuscEstados(params): Promise<ResumenCantSuscDeuda[]> {
+        const {
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
+        } = params;
+        const rangeQuery: IRangeQuery = {
+            joinOperator: 'AND',
+            range: [
+                {
+                    fieldName: 'fechasuscripcion::date',
+                    startValue: fechainiciosuscripcion,
+                    endValue: fechafinsuscripcion
+                },
+                {
+                    fieldName: 'cuotaspendientes',
+                    startValue: cuotaspendientesdesde,
+                    endValue: cuotaspendienteshasta
+                }
+            ]
+        };
+
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
+        const wp: WhereParam = new WhereParam(
+            { eliminado, idcliente, estado },
+            [
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
+            ],
+            rangeQuery,
+            searchQuery,
+            null
+        );
+        const query: string = `SELECT estado AS referencia, COUNT(*) AS cantidad, SUM(deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY estado
+        ORDER BY
+            CASE estado
+            WHEN 'C' THEN 1
+            WHEN 'R' THEN 2
+            WHEN 'D' THEN 3
+            ELSE 4
+        END`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    }
+
+    async getResumenGrupos(params): Promise<ResumenCantSuscDeuda[]> {
+        const {
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
+        } = params;
+        const rangeQuery: IRangeQuery = {
+            joinOperator: 'AND',
+            range: [
+                {
+                    fieldName: 'fechasuscripcion::date',
+                    startValue: fechainiciosuscripcion,
+                    endValue: fechafinsuscripcion
+                },
+                {
+                    fieldName: 'cuotaspendientes',
+                    startValue: cuotaspendientesdesde,
+                    endValue: cuotaspendienteshasta
+                }
+            ]
+        };
+
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
+        const wp: WhereParam = new WhereParam(
+            { eliminado, idcliente, estado },
+            [
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
+            ],
+            rangeQuery,
+            searchQuery,
+            null
+        );
+        const query: string = `SELECT idgrupo AS idreferencia, grupo AS referencia, COUNT(*) AS cantidad, SUM(deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY idgrupo, grupo
+        ORDER BY grupo ASC`;
+        return (this.dbsrv.execute(query, wp.whereParams)).rows;
+    }
+
+    async getResumenServicios(params): Promise<ResumenCantSuscDeuda[]> {
+        const {
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
+        } = params;
+        const rangeQuery: IRangeQuery = {
+            joinOperator: 'AND',
+            range: [
+                {
+                    fieldName: 'fechasuscripcion::date',
+                    startValue: fechainiciosuscripcion,
+                    endValue: fechafinsuscripcion
+                },
+                {
+                    fieldName: 'cuotaspendientes',
+                    startValue: cuotaspendientesdesde,
+                    endValue: cuotaspendienteshasta
+                }
+            ]
+        };
+
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
+        const wp: WhereParam = new WhereParam(
+            { eliminado, idcliente, estado },
+            [
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
+            ],
+            rangeQuery,
+            searchQuery,
+            null
+        );
+        const query: string = `SELECT idservicio AS idreferencia, servicio AS referencia, COUNT(*) AS cantidad, SUM(deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY idservicio, servicio ORDER BY servicio DESC`;
+        return (this.dbsrv.execute(query, wp.whereParams)).rows;
+    }
+
+    async getResumenGruposServicios(params): Promise<ResumenCantSuscDeuda[]>{
+        const {
+            eliminado,
+            idcliente,
+            idgrupo,
+            idservicio,
+            fechainiciosuscripcion,
+            fechafinsuscripcion,
+            estado,
+            cuotaspendientesdesde,
+            cuotaspendienteshasta,
+            iddepartamento,
+            iddistrito,
+            idbarrio,
+            search
+        } = params;
+        const rangeQuery: IRangeQuery = {
+            joinOperator: 'AND',
+            range: [
+                {
+                    fieldName: 'fechasuscripcion::date',
+                    startValue: fechainiciosuscripcion,
+                    endValue: fechafinsuscripcion
+                },
+                {
+                    fieldName: 'cuotaspendientes',
+                    startValue: cuotaspendientesdesde,
+                    endValue: cuotaspendienteshasta
+                }
+            ]
+        };
+
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'id',
+                fieldValue: search,
+                exactMatch: true
+            },
+            {
+                fieldName: 'cliente',
+                fieldValue: search,
+                exactMatch: false
+            },
+            {
+                fieldName: 'monto',
+                fieldValue: search,
+                exactMatch: true
+            }
+        ];
+
+        const wp: WhereParam = new WhereParam(
+            { eliminado, idcliente, estado },
+            [
+                { idgrupo, idservicio },
+                { iddepartamento, iddistrito, idbarrio }
+            ],
+            rangeQuery,
+            searchQuery,
+            null
+        );
+        const queryGrupos: string = `SELECT idgrupo AS idreferencia, grupo AS referencia, COUNT(*) AS cantidad, SUM(deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY idgrupo, grupo
+        ORDER BY grupo ASC`;
+        const rowsGrupos: ResumenCantSuscDeuda[] = (await this.dbsrv.execute(queryGrupos, wp.whereParams)).rows;
+        const queryServicios: string = `SELECT idservicio AS idreferencia, servicio AS referencia, idgrupo, COUNT(*) AS cantidad, SUM(deuda) AS monto
+        FROM public.vw_suscripciones ${wp.whereStr}
+        GROUP BY idservicio, servicio, idgrupo ORDER BY servicio DESC`;
+        const rowsServicios = (await this.dbsrv.execute(queryServicios, wp.whereParams)).rows;
+        rowsGrupos.forEach((rg: ResumenCantSuscDeuda)=>{
+            if(!rg.children) rg.children = [];
+            for(let rs of rowsServicios){
+                if(rs.idgrupo == rg.idreferencia) rg.children.push(rs);
+            }
+        });
+        return rowsGrupos;
     }
 
 }

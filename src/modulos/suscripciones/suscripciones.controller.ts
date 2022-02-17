@@ -8,7 +8,8 @@ import { Suscripcion } from '../../dto/suscripcion.dto';
 import { CuotasService } from '../cuotas/cuotas.service';
 import { Cuota } from '@dto/cuota.dto';
 import { Servicio } from '@dto/servicio.dto';
-import { ServiciosService } from '../servicios/servicios.service';
+import { ServiciosService } from '../servicios/servicios.service'
+import { ResumenCantSuscDeuda } from '@dto/resumen-cantsusc-deuda.dto';
 
 @Controller('suscripciones')
 @UseGuards(AuthGuard)
@@ -100,6 +101,54 @@ export class SuscripcionesController {
             return await this.suscripcionesSrv.getLastId();
         } catch (e) {
             console.log('Error al consultar ultimo id');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get('count')
+    @RequirePermission(Permissions.SUSCRIPCIONES.CONTAR)
+    async count(
+        @Query('eliminado') eliminado: boolean,
+        @Query('idcliente') idcliente: number,
+        @Query('idgrupo') idgrupo: number[] | number,
+        @Query('idservicio') idservicio: number[] | number,
+        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
+        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
+        @Query('estado') estado: string[] | string,
+        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
+        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
+        @Query('iddepartamento') iddepartamento: number | number[],
+        @Query('iddistrito') iddistrito: number | number[],
+        @Query('idbarrio') idbarrio: number | number[],
+        @Query('search') search: string
+    ): Promise<number>{
+        try{
+            return await(this.suscripcionesSrv.count(
+                {
+                    eliminado,
+                    idcliente,
+                    idgrupo,
+                    idservicio,
+                    fechainiciosuscripcion,
+                    fechafinsuscripcion,
+                    estado,
+                    cuotaspendientesdesde,
+                    cuotaspendienteshasta,
+                    iddepartamento,
+                    iddistrito,
+                    idbarrio,
+                    search
+                }
+            ));
+        }catch(e){
+            console.log('Error al contar total de suscripciones');
             console.log(e);
             throw new HttpException(
                 {
@@ -264,5 +313,153 @@ export class SuscripcionesController {
             );
         }
     }
+
+    @Get('resumen/cuotaspendientes')
+    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARSUSCRIPCIONES)
+    async getResumenSuscCuotasPendientes(
+        @Query('eliminado') eliminado: boolean,
+        @Query('idcliente') idcliente: number,
+        @Query('idgrupo') idgrupo: number[] | number,
+        @Query('idservicio') idservicio: number[] | number,
+        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
+        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
+        @Query('estado') estado: string[] | string,
+        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
+        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
+        @Query('iddepartamento') iddepartamento: number | number[],
+        @Query('iddistrito') iddistrito: number | number[],
+        @Query('idbarrio') idbarrio: number | number[],
+        @Query('search') search: string
+    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+        try{
+            const data: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenSuscCuotasPendientes(
+                {   
+                    eliminado,
+                    idcliente,
+                    idgrupo,
+                    idservicio,
+                    fechainiciosuscripcion,
+                    fechafinsuscripcion,
+                    estado,
+                    cuotaspendientesdesde,
+                    cuotaspendienteshasta,
+                    iddepartamento,
+                    iddistrito,
+                    idbarrio,
+                    search
+                }
+            );
+            return new ServerResponseList(data, data.length);
+        }catch(e){
+            console.log('Error al consultar resument por cuotas pendientes');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get('resumen/estados')
+    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARSUSCRIPCIONES)
+    async getResumenSuscEstados(
+        @Query('eliminado') eliminado: boolean,
+        @Query('idcliente') idcliente: number,
+        @Query('idgrupo') idgrupo: number[] | number,
+        @Query('idservicio') idservicio: number[] | number,
+        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
+        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
+        @Query('estado') estado: string[] | string,
+        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
+        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
+        @Query('iddepartamento') iddepartamento: number | number[],
+        @Query('iddistrito') iddistrito: number | number[],
+        @Query('idbarrio') idbarrio: number | number[],
+        @Query('search') search: string
+    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+        try{
+            const rows: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenSuscEstados(
+                {   
+                    eliminado,
+                    idcliente,
+                    idgrupo,
+                    idservicio,
+                    fechainiciosuscripcion,
+                    fechafinsuscripcion,
+                    estado,
+                    cuotaspendientesdesde,
+                    cuotaspendienteshasta,
+                    iddepartamento,
+                    iddistrito,
+                    idbarrio,
+                    search
+                }
+            );
+            return new ServerResponseList(rows, rows.length);
+        }catch(e){
+            console.log('Error al consultar resumen por estado');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get('resumen/gruposservicios')
+    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARSUSCRIPCIONES)
+    async getResumenGruposServicios(
+        @Query('eliminado') eliminado: boolean,
+        @Query('idcliente') idcliente: number,
+        @Query('idgrupo') idgrupo: number[] | number,
+        @Query('idservicio') idservicio: number[] | number,
+        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
+        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
+        @Query('estado') estado: string[] | string,
+        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
+        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
+        @Query('iddepartamento') iddepartamento: number | number[],
+        @Query('iddistrito') iddistrito: number | number[],
+        @Query('idbarrio') idbarrio: number | number[],
+        @Query('search') search: string
+    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+        try{
+            const rows: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenGruposServicios(
+                {   
+                    eliminado,
+                    idcliente,
+                    idgrupo,
+                    idservicio,
+                    fechainiciosuscripcion,
+                    fechafinsuscripcion,
+                    estado,
+                    cuotaspendientesdesde,
+                    cuotaspendienteshasta,
+                    iddepartamento,
+                    iddistrito,
+                    idbarrio,
+                    search
+                }
+            );
+            return new ServerResponseList(rows, rows.length);
+        }catch(e){
+            console.log('Error al consultar resumen por estado');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+    
 
 }
