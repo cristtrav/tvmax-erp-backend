@@ -13,7 +13,7 @@ export class ServiciosService {
     ){}
 
     async findAll(reqQuery): Promise<Servicio[]>{
-        const { eliminado, idgrupo, suscribible, search, sort, offset, limit } = reqQuery;
+        const { eliminado, idgrupo, suscribible, search, id, sort, offset, limit } = reqQuery;
         const searchQuery: ISearchField[] = [
             {
                 fieldName: 'descripcion',
@@ -22,7 +22,7 @@ export class ServiciosService {
             }
         ];
         const wp: WhereParam = new WhereParam(
-            { eliminado, suscribible, idgrupo },
+            { eliminado, suscribible, idgrupo, id },
             null,
             null,
             searchQuery,
@@ -33,7 +33,7 @@ export class ServiciosService {
     }
 
     async count(reqQuery): Promise<number>{
-        const { eliminado, search, suscribible, idgrupo } = reqQuery;
+        const { eliminado, search, suscribible, idgrupo, id } = reqQuery;
         const searchQuery: ISearchField[] = [
             {
                 fieldName: 'descripcion',
@@ -42,7 +42,7 @@ export class ServiciosService {
             }
         ];
         const wp: WhereParam = new WhereParam(
-            { eliminado, suscribible, idgrupo },
+            { eliminado, suscribible, idgrupo, id },
             null,
             null,
             searchQuery,

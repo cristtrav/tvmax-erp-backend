@@ -12,9 +12,9 @@ export class BarriosService {
     ){}
 
     async findAll(queryParams): Promise<Barrio[]>{
-        const { eliminado, iddistrito, sort, offset, limit } = queryParams;
+        const { eliminado, iddistrito, id, sort, offset, limit } = queryParams;
         const wp: WhereParam = new WhereParam(
-            {eliminado, iddistrito},
+            {eliminado, iddistrito, id},
             null,
             null,
             null,
@@ -25,9 +25,9 @@ export class BarriosService {
     }
 
     async count(queryParam): Promise<number>{
-        const { eliminado, iddistrito } = queryParam;
+        const { eliminado, iddistrito, id } = queryParam;
         const wp: WhereParam = new WhereParam(
-            {eliminado, iddistrito},
+            {eliminado, iddistrito, id},
             null,
             null,
             null,

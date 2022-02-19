@@ -23,11 +23,12 @@ export class ServiciosController {
         @Query('limit') limit: number,
         @Query('sort') sort: string,
         @Query('idgrupo') idgrupo: string[],
-        @Query('search') search: string
+        @Query('search') search: string,
+        @Query('id') id: number[]
     ): Promise<ServerResponseList<Servicio>>{
         try{
-            const data: Servicio[] = await this.serviciosSrv.findAll({eliminado, idgrupo, search, suscribible, offset, limit, sort});
-            const rowCount: number = await this.serviciosSrv.count({eliminado, idgrupo, suscribible, search});
+            const data: Servicio[] = await this.serviciosSrv.findAll({eliminado, idgrupo, search, suscribible, id, offset, limit, sort});
+            const rowCount: number = await this.serviciosSrv.count({eliminado, idgrupo, suscribible, search, id});
             return new ServerResponseList<Servicio>(data, rowCount);
         }catch(e){
             console.log('Error al consultar Servicios')

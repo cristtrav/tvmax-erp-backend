@@ -10,9 +10,9 @@ export class GruposService {
     }
 
     async findAll(reqQuery): Promise<Grupo[]> {
-        const { eliminado, sort, offset, limit } = reqQuery
+        const { eliminado, id, sort, offset, limit } = reqQuery
         const wp: WhereParam = new WhereParam(
-            { eliminado },
+            { eliminado, id },
             null,
             null,
             null,
@@ -23,14 +23,16 @@ export class GruposService {
     }
 
     async count(reqQuery): Promise<number> {
-        const { eliminado } = reqQuery
-        var queryParams: any[] = []
-        var query: string = "SELECT COUNT(*) FROM public.grupo"
-        if(eliminado){
-            query+=` WHERE eliminado = $1`
-            queryParams.push(eliminado)
-        }
-        return (await this.dbsrv.execute(query, queryParams)).rows[0].count
+        const { eliminado, id } = reqQuery
+        const wp: WhereParam = new WhereParam(
+            { eliminado, id },
+            null,
+            null,
+            null,
+            null
+        );
+        var query: string = `SELECT COUNT(*) FROM public.grupo ${wp.whereStr}`;
+        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count
     }
 
     async findById(id: number): Promise<Grupo> {

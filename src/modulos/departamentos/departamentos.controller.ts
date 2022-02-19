@@ -20,11 +20,12 @@ export class DepartamentosController {
         @Query('eliminado') eliminado: boolean,
         @Query('sort') sort: string,
         @Query('offset') offset: number,
-        @Query('limit') limit: number
+        @Query('limit') limit: number,
+        @Query('id') id: number[]
     ): Promise<ServerResponseList<Departamento>> {
         try {
-            const data: Departamento[] = await this.departamentoSrv.findAll({ eliminado, sort, offset, limit });
-            const rowCount: number = await this.departamentoSrv.count({eliminado});
+            const data: Departamento[] = await this.departamentoSrv.findAll({ eliminado, sort, id, offset, limit });
+            const rowCount: number = await this.departamentoSrv.count({eliminado, id});
             return new ServerResponseList<Departamento>(data, rowCount);
         } catch (e) {
             console.log('Error al consultar departamentos');

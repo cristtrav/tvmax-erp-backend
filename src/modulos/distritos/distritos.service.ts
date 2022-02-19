@@ -12,9 +12,9 @@ export class DistritosService {
     ) { }
 
     async findAll(queryParam): Promise<Distrito[]> {
-        const { eliminado, iddepartamento, sort, limit, offset } = queryParam;
+        const { eliminado, iddepartamento, id, sort, limit, offset } = queryParam;
         const wp: WhereParam = new WhereParam(
-            { eliminado, iddepartamento },
+            { eliminado, iddepartamento, id },
             null,
             null,
             null,
@@ -25,9 +25,9 @@ export class DistritosService {
     }
 
     async count(queryParam): Promise<number> {
-        const { eliminado, iddepartamento } = queryParam;
+        const { eliminado, iddepartamento, id } = queryParam;
         const wp: WhereParam = new WhereParam(
-            { eliminado, iddepartamento },
+            { eliminado, iddepartamento, id },
             null,
             null,
             null,

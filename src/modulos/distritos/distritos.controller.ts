@@ -21,11 +21,12 @@ export class DistritosController {
         @Query('sort') sort: string,
         @Query('limit') limit: number,
         @Query('offset') offset: number,
-        @Query('iddepartamento') iddepartamento: number[] | number
+        @Query('iddepartamento') iddepartamento: number[] | number,
+        @Query('id') id: number[]
     ): Promise<ServerResponseList<Distrito>>{
         try{
-            const data: Distrito[] = await this.distritosSrv.findAll({eliminado, iddepartamento, sort, limit, offset});
-            const rowCount: number = await this.distritosSrv.count({eliminado, iddepartamento});
+            const data: Distrito[] = await this.distritosSrv.findAll({eliminado, iddepartamento, id, sort, limit, offset});
+            const rowCount: number = await this.distritosSrv.count({eliminado, iddepartamento, id});
             return new ServerResponseList<Distrito>(data, rowCount);
         }catch(e){
             console.log('Error al consultar distritos');
