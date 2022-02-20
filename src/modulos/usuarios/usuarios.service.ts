@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../global/database/database.service';
 import { Usuario } from '../../dto/usuario.dto';
+import * as argon2 from "argon2";
 
 @Injectable()
 export class UsuariosService {
@@ -40,10 +41,26 @@ export class UsuariosService {
     }
 
     async create(u: Usuario){
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `INSERT INTO public.usuario(id, nombres, apellidos, ci, email, telefono, activo)
-        VALUES($1, $2, $3, $4, $5, $6, $7)`;
+        VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
         const params: any[] = [u.id, u.nombres, u.apellidos, u.ci, u.email, u.telefono, u.activo]
-        await this.dbsrv.execute(query, params);
+        try{
+            cli.query('BEGIN');
+            await cli.query(query, params);
+            if(u.password){
+                const pwdHash = await argon2.hash(u.password);
+                await cli.query('UPDATE public.usuario SET password = $1 WHERE id = $2', [pwdHash, u.id]);
+            }
+            cli.query('COMMIT');
+        }catch(e){
+            cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        
+
     }
 
     async findById(id: number): Promise<Usuario | null>{
@@ -54,8 +71,24 @@ export class UsuariosService {
     }
 
     async edit(oldId: number, u: Usuario): Promise<boolean>{
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.usuario SET id = $1, nombres = $2, apellidos = $3, ci = $4, email = $5, telefono = $6, activo = $7 WHERE id = $8`;
         const params: any[] = [u.id, u.nombres, u.apellidos, u.ci, u.email, u.telefono, u.activo, oldId];
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, params)).rowCount;
+            if(u.password){
+                const pwdHash = await argon2.hash(u.password);
+                await cli.query('UPDATE public.usuario SET password = $1 WHERE id = $2', [pwdHash, u.id]);
+            }
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
         return (await this.dbsrv.execute(query, params)).rowCount > 0;
     }
 
