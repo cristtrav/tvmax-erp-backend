@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { AuditQueryHelper } from '@util/audit-query-helper';
 import { WhereParam } from '@util/whereparam';
 import { Grupo } from '../../dto/grupo.dto';
 import { DatabaseService } from './../../global/database/database.service';
@@ -16,7 +17,7 @@ export class GruposService {
             null,
             null,
             null,
-            { sort, offset, limit}
+            { sort, offset, limit }
         );
         var query: string = `SELECT * FROM public.grupo ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows
@@ -41,22 +42,60 @@ export class GruposService {
         return (await this.dbsrv.execute(query, params)).rows[0];
     }
 
-    async create(g: Grupo) {
-        const query = `INSERT INTO public.grupo(id, descripcion) VALUES($1, $2)`
+    async create(g: Grupo, idusuario: number) {
+        const cli = await this.dbsrv.getDBClient();
+        const query = `INSERT INTO public.grupo(id, descripcion) VALUES($1, $2)`;
         const params = [g.id, g.descripcion]
-        await this.dbsrv.execute(query, params)
+        try {
+            await cli.query('BEGIN');
+            await cli.query(query, params);
+            await AuditQueryHelper.auditPostInsert(cli, 1, idusuario, g.id);
+            await cli.query('COMMIT');
+        } catch (e) {
+            await cli.query('ROLLBACK');
+            throw e;
+        } finally {
+            cli.release();
+        }
     }
 
-    async update(idviejo: string, g: Grupo): Promise<number> {
+    async update(idviejo: string, g: Grupo, idusuario: number): Promise<number> {
+        const cli = await this.dbsrv.getDBClient();
         const query = `UPDATE public.grupo SET id = $1, descripcion = $2 WHERE id = $3`
         const params = [g.id, g.descripcion, idviejo]
-        return (await this.dbsrv.execute(query, params)).rowCount
+        let rowCount = 0;
+        try {
+            await cli.query('BEGIN');
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, 1, idusuario, idviejo);
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostUpdate(cli, 1, idevento, g.id);
+            await cli.query('COMMIT');
+        } catch (e) {
+            await cli.query('ROLLBACK');
+            throw e;
+        } finally {
+            cli.release();
+        }
+        return rowCount;
     }
 
-    async delete(id: string): Promise<number> {
-        const query = `UPDATE public.grupo SET eliminado = true WHERE id = $1`
-        const params = [id]
-        return (await this.dbsrv.execute(query, params)).rowCount
+    async delete(id: string, idusuario: number): Promise<number> {
+        const cli = await this.dbsrv.getDBClient();
+        const query = `UPDATE public.grupo SET eliminado = true WHERE id = $1`;
+        const params = [id];
+        let rowCount = 0;
+        try {
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostDelete(cli, 1, idusuario, id);
+            await cli.query('COMMIT');
+        } catch (e) {
+            await cli.query('ROLLBACK');
+            throw e;
+        } finally {
+            cli.release();
+        }
+        return rowCount;
     }
 
 }
