@@ -44,15 +44,15 @@ export class TimbradosService {
     
     async create(t: Timbrado){
         const query: string = `INSERT INTO
-        public.timbrado(id, cod_establecimiento, cod_punto_emision, nro_inicio, nro_fin, fecha_vencimiento, timbrado, ultimo_nro_usado, activo, eliminado)
+        public.timbrado(id, cod_establecimiento, cod_punto_emision, nro_inicio, nro_fin, fecha_vencimiento, fecha_inicio_vigencia, timbrado, ultimo_nro_usado, activo, eliminado)
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, false)`;
-        const params = [t.id, t.codestablecimiento, t.codpuntoemision, t.nroinicio, t.nrofin, t.fechavencimiento, t.timbrado, t.ultnrousado, t.activo];
+        const params = [t.id, t.codestablecimiento, t.codpuntoemision, t.nroinicio, t.nrofin, t.fechavencimiento, t.fechainicio ,t.timbrado, t.ultnrousado, t.activo];
         await this.dbsrv.execute(query, params);
     }
 
     async edit(oldid: number, t: Timbrado): Promise<boolean>{
-        const query: string = `UPDATE public.timbrado SET id = $1, cod_establecimiento = $2, cod_punto_emision = $3, nro_inicio = $4, nro_fin = $5, fecha_vencimiento = $6, timbrado = $7, ultimo_nro_usado = $8, activo = $9 WHERE id = $10`;
-        const params: any[] = [t.id, t.codestablecimiento, t.codpuntoemision, t.nroinicio, t.nrofin, t.fechavencimiento, t.timbrado, t.ultnrousado, t.activo, oldid];
+        const query: string = `UPDATE public.timbrado SET id = $1, cod_establecimiento = $2, cod_punto_emision = $3, nro_inicio = $4, nro_fin = $5, fecha_vencimiento = $6, fecha_inicio_vigencia = $7, timbrado = $8, ultimo_nro_usado = $9, activo = $10 WHERE id = $11`;
+        const params: any[] = [t.id, t.codestablecimiento, t.codpuntoemision, t.nroinicio, t.nrofin, t.fechavencimiento, t.fechainicio, t.timbrado, t.ultnrousado, t.activo, oldid];
         return (await this.dbsrv.execute(query, params)).rowCount > 0;
     }
 

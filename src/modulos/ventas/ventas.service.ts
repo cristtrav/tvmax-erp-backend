@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { FacturaVenta } from '@dto/factura-venta.dto';
 import { Client } from 'pg';
-import { IWhereParam } from '@util/iwhereparam.interface';
 import { DetalleFacturaVenta } from '@dto/detalle-factura-venta-dto';
 import { ClientesService } from '../clientes/clientes.service';
 import { WhereParam } from '@util/whereparam';
@@ -19,9 +18,9 @@ export class VentasService {
 
     async create(fv: FacturaVenta, registraCobro: boolean, idusu: number): Promise<number> {
         const dbcli: Client = await this.dbsrv.getDBClient();
-        const queryCabecera: string = `INSERT INTO public.factura_venta (id, idcliente, total, fecha, pagado, anulado, idtimbrado, nro_factura, exento, iva5, iva10, fecha_cobro, idcobrador_comision, idusuario_registro_factura, idusuario_registro_cobro, eliminado)
+        const queryCabecera: string = `INSERT INTO public.factura_venta (id, idcliente, fecha_factura, pagado, anulado, idtimbrado, nro_factura, fecha_cobro, idcobrador_comision, idusuario_registro_factura, idusuario_registro_cobro, eliminado)
         VALUES(nextval('public.seq_factura_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false) RETURNING *`;
-        const paramsCabecera: any[] = [fv.idcliente, fv.total, fv.fechafactura, fv.pagado, fv.anulado, fv.idtimbrado, fv.nrofactura, fv.exento, fv.iva5, fv.iva10, fv.fechacobro, fv.idcobradorcomision, fv.idusuarioregistrofactura, fv.idusuarioregistrocobro];
+        const paramsCabecera: any[] = [fv.idcliente, fv.fechafactura, fv.pagado, fv.anulado, fv.idtimbrado, fv.nrofactura, fv.fechacobro, fv.idcobradorcomision, fv.idusuarioregistrofactura, fv.idusuarioregistrocobro];
         try {
             await dbcli.query('BEGIN');
             const res = await dbcli.query(queryCabecera, paramsCabecera);
@@ -112,39 +111,6 @@ export class VentasService {
             { sort, offset, limit }
         );
         let query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        /*let lastParamIndex: number = wp.whereParams.length;
-        if (search) {
-            if (wp.whereStr) {
-                query += ` AND`;
-            } else {
-                query += ` WHERE`;
-            }
-            query += ` (LOWER(cliente) LIKE $${lastParamIndex + 1} OR nrofactura::text = $${lastParamIndex + 2})`;
-            wp.whereParams.push(`%${search.toLowerCase()}%`);
-            wp.whereParams.push(search);
-            lastParamIndex = lastParamIndex + 2;
-        }
-        if (fechainiciofactura) {
-            query += ` AND fecha_factura >= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechainiciofactura);
-            lastParamIndex = lastParamIndex + 1;
-        }
-        if (fechafinfactura) {
-            query += ` AND fecha_factura <= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechafinfactura);
-            lastParamIndex = lastParamIndex + 1;
-        }
-        if (fechainiciocobro) {
-            query += ` AND fecha_cobro >= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechainiciocobro);
-            lastParamIndex = lastParamIndex + 1;
-        }
-        if (fechafincobro) {
-            query += ` AND fecha_cobro <= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechafincobro);
-            lastParamIndex = lastParamIndex + 1;
-        }
-        query += ` ${sof}`;*/
         const rows: FacturaVenta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
         for (let fv of rows) {
             const queryDetalle: string = `SELECT * FROM public.vw_detalles_factura_venta WHERE eliminado = false AND idfacturaventa = $1`;
@@ -213,38 +179,6 @@ export class VentasService {
             null
         );
         let query: string = `SELECT COUNT(*) FROM public.vw_facturas_venta ${wp.whereStr}`;
-        /*let lastParamIndex: number = wp.whereParams.length;
-        if (search) {
-            if (wp.whereStr) {
-                query += ` AND`;
-            } else {
-                query += ` WHERE`;
-            }
-            query += ` (LOWER(cliente) LIKE $${lastParamIndex + 1} OR nrofactura::text = $${lastParamIndex + 2})`;
-            wp.whereParams.push(`%${search.toLowerCase()}%`);
-            wp.whereParams.push(search);
-            lastParamIndex = lastParamIndex + 2;
-        }
-        if (fechainiciofactura) {
-            query += ` AND fecha_factura >= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechainiciofactura);
-            lastParamIndex = lastParamIndex + 1;
-        }
-        if (fechafinfactura) {
-            query += ` AND fecha_factura <= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechafinfactura);
-            lastParamIndex = lastParamIndex + 1;
-        }
-        if (fechainiciocobro) {
-            query += ` AND fecha_cobro >= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechainiciocobro);
-            lastParamIndex = lastParamIndex + 1;
-        }
-        if (fechafincobro) {
-            query += ` AND fecha_cobro <= $${lastParamIndex + 1}`;
-            wp.whereParams.push(fechafincobro);
-            lastParamIndex = lastParamIndex + 1;
-        }*/
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
@@ -256,6 +190,26 @@ export class VentasService {
     async delete(id: number): Promise<boolean> {
         const query: string = `UPDATE public.factura_venta SET eliminado = true WHERE id = $1`;
         return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+    }
+
+    async findById(id: number): Promise<FacturaVenta>{
+        const wp: WhereParam = new WhereParam(
+            { id },
+            null,
+            null,
+            null,
+            null
+        );
+        const query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr}`;
+        const rows: FacturaVenta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        if(rows.length > 0){
+            const fv: FacturaVenta = rows[0];
+            const queryDetalle: string = `SELECT * FROM public.vw_detalles_factura_venta WHERE eliminado = false AND idfacturaventa = $1`;
+            const detalles: DetalleFacturaVenta[] = (await this.dbsrv.execute(queryDetalle, [fv.id])).rows;
+            fv.detalles = detalles;
+            return fv;
+        };
+        return null;
     }
 
 }

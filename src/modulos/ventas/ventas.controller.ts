@@ -171,4 +171,32 @@ export class VentasController {
         }
     }
 
+    @Get(':id')
+    @RequirePermission(Permissions.VENTAS.CONSULTAR)
+    async findById(
+        @Param('id') id: number
+    ){
+        try{
+            const rows: FacturaVenta = await this.ventasSrv.findById(id);
+            if(!rows) throw new HttpException(
+                {
+                    request: 'get',
+                    description: `No se encontró la venta con código ${id}`
+                },
+                HttpStatus.NOT_FOUND
+            );
+            return rows;
+        }catch(e){
+            console.log('Error al consultar factura venta por id');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 }
