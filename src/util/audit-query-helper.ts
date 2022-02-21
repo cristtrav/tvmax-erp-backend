@@ -10,7 +10,7 @@ export class AuditQueryHelper {
     public static async auditPreUpdate(dbcli, idtabla, idusuario, oldid): Promise<number> {
         const queryAudit: string = `INSERT INTO public.evento_auditoria(id, fecha_hora, idusuario, idtabla, operacion, estado_anterior)
             VALUES(nextval('evento_auditoria_seq'), NOW(), $1, $2, 'M', (SELECT row_to_json(${this.getTableName(idtabla)}) FROM public.${this.getTableName(idtabla)} WHERE id = $3)) RETURNING *`;
-        const paramsAutitI = [idusuario, 1, oldid];
+        const paramsAutitI = [idusuario, idtabla, oldid];
         const idevento: number = (await dbcli.query(queryAudit, paramsAutitI)).rows[0].id;
         return idevento;
     }
@@ -24,13 +24,14 @@ export class AuditQueryHelper {
     public static async auditPostDelete(dbcli, idtabla, idusuario, id){
         const queryAuditI: string = `INSERT INTO public.evento_auditoria(id, fecha_hora, idusuario, idtabla, operacion, estado_anterior)
             VALUES(nextval('evento_auditoria_seq'), NOW(), $1, $2, 'E', (SELECT row_to_json(${this.getTableName(idtabla)}) FROM public.${this.getTableName(idtabla)} WHERE id = $3)) RETURNING *`;
-        const paramsAutitI = [idusuario, 1, id];
+        const paramsAutitI = [idusuario, idtabla, id];
         await dbcli.query(queryAuditI, paramsAutitI);
     }
 
     private static getTableName(idtable: number): string {
         switch (idtable) {
             case 1: return 'grupo';
+            case 2: return 'servicio';
             default: return '';
         }
     }

@@ -4,6 +4,9 @@ import { DatabaseService } from '../../global/database/database.service';
 import { Result } from 'pg';
 import { ISearchField } from '@util/isearchfield.interface';
 import { WhereParam } from '@util/whereparam';
+import { AuditQueryHelper } from '@util/audit-query-helper';
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+
 
 @Injectable()
 export class ServiciosService {
@@ -52,18 +55,41 @@ export class ServiciosService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count
     }
 
-    async create(s: Servicio){
-        const query: string = `INSERT INTO public.servicio 
-        (id, descripcion, idgrupo, precio, suscribible)
-        VALUES ($1, $2, $3, $4, $5)`
+    async create(s: Servicio, idusuario: number){
+        const cli = await this.dbsrv.getDBClient();
+        const query: string = `INSERT INTO public.servicio(id, descripcion, idgrupo, precio, suscribible) VALUES ($1, $2, $3, $4, $5)`;
         const params = [s.id, s.descripcion, s.idgrupo, s.precio, s.suscribible]
-        await this.dbsrv.execute(query, params)
+        try{
+            await cli.query('BEGIN');
+            await cli.query(query, params);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.SERVICIOS, idusuario, s.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
     }
 
-    async update(oldId: number, s: Servicio): Promise<Result> {
+    async update(oldId: number, s: Servicio, idusuario: number): Promise<Result> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.servicio SET id = $1, descripcion = $2, idgrupo = $3, precio = $4, suscribible = $5 WHERE id = $6`
         const params = [s.id, s.descripcion, s.idgrupo, s.precio, s.suscribible, oldId]
-        return (await this.dbsrv.execute(query, params))
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.SERVICIOS, idusuario, oldId);
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.SERVICIOS, idevento, s.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount;
     }
 
     async findById(id: number): Promise<Servicio[]>{
@@ -72,10 +98,23 @@ export class ServiciosService {
         return (await this.dbsrv.execute(query, params)).rows
     }
 
-    async delete(id: number): Promise<Result> {
+    async delete(id: number, idusuario: number): Promise<Result> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.servicio SET eliminado = true WHERE id = $1`
         const params = [id]
-        return (await this.dbsrv.execute(query, params))
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.SERVICIOS, idusuario, id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount;
     }
 
     async getServiciosEnCuotas(idsusc: number, queryParams): Promise<Servicio[]>{

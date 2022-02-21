@@ -1,3 +1,4 @@
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { Injectable } from '@nestjs/common';
 import { AuditQueryHelper } from '@util/audit-query-helper';
 import { WhereParam } from '@util/whereparam';
@@ -49,7 +50,7 @@ export class GruposService {
         try {
             await cli.query('BEGIN');
             await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, 1, idusuario, g.id);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.GRUPOS, idusuario, g.id);
             await cli.query('COMMIT');
         } catch (e) {
             await cli.query('ROLLBACK');
@@ -66,9 +67,9 @@ export class GruposService {
         let rowCount = 0;
         try {
             await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, 1, idusuario, idviejo);
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.GRUPOS, idusuario, idviejo);
             rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, 1, idevento, g.id);
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.GRUPOS, idevento, g.id);
             await cli.query('COMMIT');
         } catch (e) {
             await cli.query('ROLLBACK');
@@ -87,7 +88,7 @@ export class GruposService {
         try {
             await cli.query('BEGIN');
             rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, 1, idusuario, id);
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.GRUPOS, idusuario, id);
             await cli.query('COMMIT');
         } catch (e) {
             await cli.query('ROLLBACK');
