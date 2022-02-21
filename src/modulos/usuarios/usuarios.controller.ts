@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { UsuariosService } from './usuarios.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { Usuario } from 'src/dto/usuario.dto';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('usuarios')
 @UseGuards(AuthGuard)
 export class UsuariosController {
 
     constructor(
-        private usuarioSrv: UsuariosService
+        private usuarioSrv: UsuariosService,
+        private jwtUtil: JwtUtilsService
     ){}
 
     @Get()
@@ -42,10 +44,11 @@ export class UsuariosController {
     @Post()
     @RequirePermission(Permissions.USUARIOS.REGISTRAR)
     async create(
-        @Body() u: Usuario
+        @Body() u: Usuario,
+        @Req() request: Request
     ){
         try{
-            await this.usuarioSrv.create(u);
+            await this.usuarioSrv.create(u, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar Usuario');
             console.log(e);
@@ -90,10 +93,12 @@ export class UsuariosController {
     @Put(':id')
     @RequirePermission(Permissions.USUARIOS.EDITAR)
     async edit(
-        @Param('id') oldId: number, @Body() u: Usuario
+        @Param('id') oldId: number,
+        @Body() u: Usuario,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.usuarioSrv.edit(oldId, u))) throw new HttpException(
+            if(!(await this.usuarioSrv.edit(oldId, u, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró el Usuario con código ${oldId}.`
@@ -116,10 +121,11 @@ export class UsuariosController {
     @Delete(':id')
     @RequirePermission(Permissions.USUARIOS.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.usuarioSrv.delete(id))) throw new HttpException(
+            if(!(await this.usuarioSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el Usuario con código ${id}.`

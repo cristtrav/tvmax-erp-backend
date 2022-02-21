@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../global/database/database.service';
 import { Usuario } from '../../dto/usuario.dto';
 import * as argon2 from "argon2";
+import { AuditQueryHelper } from '@util/audit-query-helper';
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 
 @Injectable()
 export class UsuariosService {
@@ -40,7 +42,7 @@ export class UsuariosService {
         return (await this.dbsrv.execute(query, params)).rowCount;
     }
 
-    async create(u: Usuario){
+    async create(u: Usuario, idusuario: number){
         const cli = await this.dbsrv.getDBClient();
         const query: string = `INSERT INTO public.usuario(id, nombres, apellidos, ci, email, telefono, activo)
         VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
@@ -52,6 +54,7 @@ export class UsuariosService {
                 const pwdHash = await argon2.hash(u.password);
                 await cli.query('UPDATE public.usuario SET password = $1 WHERE id = $2', [pwdHash, u.id]);
             }
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.USUARIOS, idusuario, u.id);
             cli.query('COMMIT');
         }catch(e){
             cli.query('ROLLBACK');
@@ -59,8 +62,6 @@ export class UsuariosService {
         }finally{
             cli.release();
         }
-        
-
     }
 
     async findById(id: number): Promise<Usuario | null>{
@@ -70,18 +71,20 @@ export class UsuariosService {
         return rows[0];
     }
 
-    async edit(oldId: number, u: Usuario): Promise<boolean>{
+    async edit(oldId: number, u: Usuario, idusuario: number): Promise<boolean>{
         const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.usuario SET id = $1, nombres = $2, apellidos = $3, ci = $4, email = $5, telefono = $6, activo = $7 WHERE id = $8`;
         const params: any[] = [u.id, u.nombres, u.apellidos, u.ci, u.email, u.telefono, u.activo, oldId];
         let rowCount = 0;
         try{
             await cli.query('BEGIN');
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.USUARIOS, idusuario, oldId);
             rowCount = (await cli.query(query, params)).rowCount;
             if(u.password){
                 const pwdHash = await argon2.hash(u.password);
                 await cli.query('UPDATE public.usuario SET password = $1 WHERE id = $2', [pwdHash, u.id]);
             }
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.USUARIOS, idevento, u.id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
@@ -89,12 +92,25 @@ export class UsuariosService {
         }finally{
             cli.release();
         }
-        return (await this.dbsrv.execute(query, params)).rowCount > 0;
+        return rowCount > 0;
     }
 
-    async delete(id: number): Promise<boolean>{
+    async delete(id: number, idusuario: number): Promise<boolean>{
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.usuario SET eliminado = true WHERE id = $1`;
-        return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, [id])).rowCount;
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.USUARIOS, idusuario, id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
 }
