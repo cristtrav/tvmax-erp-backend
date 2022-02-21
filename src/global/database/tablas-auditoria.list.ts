@@ -7,6 +7,7 @@ export class TablasAuditoriaList{
     public static TIPODOMICILIO = 6;
     public static COBRADORES = 7;
     public static USUARIOS = 8;
+    public static TIMBRADOS = 9;
 
     public static getTableName(idtable: number): string {
         switch (idtable) {
@@ -18,6 +19,7 @@ export class TablasAuditoriaList{
             case TablasAuditoriaList.TIPODOMICILIO: return 'tipo_domicilio';
             case TablasAuditoriaList.COBRADORES: return 'cobrador';
             case TablasAuditoriaList.USUARIOS: return 'usuario';
+            case TablasAuditoriaList.TIMBRADOS: return 'timbrado';
             default: return '';
         }
     }

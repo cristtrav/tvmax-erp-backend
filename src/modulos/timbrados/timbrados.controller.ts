@@ -3,7 +3,8 @@ import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Timbrado } from '@dto/timbrado.dto';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 import { TimbradosService } from './timbrados.service';
 
 @Controller('timbrados')
@@ -11,16 +12,18 @@ import { TimbradosService } from './timbrados.service';
 export class TimbradosController {
 
     constructor(
-        private timbradosSrv: TimbradosService
+        private timbradosSrv: TimbradosService,
+        private jwtUtil: JwtUtilsService
     ) { }
 
     @Post()
     @RequirePermission(Permissions.TIMBRADOS.REGISTRAR)
     async create(
-        @Body() t: Timbrado
+        @Body() t: Timbrado,
+        @Req() request: Request
     ) {
         try {
-            await this.timbradosSrv.create(t);
+            await this.timbradosSrv.create(t, this.jwtUtil.decodeIdUsuario(request));
         } catch (e) {
             console.log('Error al registrar timbrado');
             console.log(e);
@@ -93,10 +96,11 @@ export class TimbradosController {
     @RequirePermission(Permissions.TIMBRADOS.EDITAR)
     async edit(
         @Param('id') oldid: number,
-        @Body() t: Timbrado
+        @Body() t: Timbrado,
+        @Req() request: Request
     ) {
         try {
-            if (!(await this.timbradosSrv.edit(oldid, t))) throw new HttpException(
+            if (!(await this.timbradosSrv.edit(oldid, t, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró el timbrado con código ${oldid}`
@@ -119,10 +123,11 @@ export class TimbradosController {
     @Delete(':id')
     @RequirePermission(Permissions.TIMBRADOS.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ) {
         try {
-            if (!(await this.timbradosSrv.delete(id))) throw new HttpException(
+            if (!(await this.timbradosSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el timbrado con código ${id}`
