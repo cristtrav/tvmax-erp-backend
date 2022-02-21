@@ -20,7 +20,7 @@ import { TimbradosModule } from './modulos/timbrados/timbrados.module';
 import { VentasModule } from './modulos/ventas/ventas.module';
 import { PermisosModule } from './modulos/permisos/permisos.module';
 import { AuditoriaModule } from './modulos/auditoria/auditoria.module';
-
+import { UtilModule } from './util/util.module';
 
 @Module({
   imports: [
@@ -41,7 +41,8 @@ import { AuditoriaModule } from './modulos/auditoria/auditoria.module';
     TimbradosModule,
     VentasModule,
     PermisosModule,
-    AuditoriaModule
+    AuditoriaModule,
+    UtilModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

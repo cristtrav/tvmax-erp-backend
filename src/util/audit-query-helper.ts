@@ -34,6 +34,7 @@ export class AuditQueryHelper {
             case 2: return 'servicio';
             case 3: return 'departamento';
             case 4: return 'distrito';
+            case 5: return 'barrio'
             default: return '';
         }
     }

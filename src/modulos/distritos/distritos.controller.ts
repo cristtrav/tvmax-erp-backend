@@ -6,6 +6,7 @@ import { AuthGuard } from '../../global/auth/auth.guard';
 import { DistritosService } from './distritos.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { JwtService } from '@nestjs/jwt';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('distritos')
 @UseGuards(AuthGuard)
@@ -13,7 +14,7 @@ export class DistritosController {
 
     constructor(
         private distritosSrv: DistritosService,
-        private jwtSrv: JwtService
+        private jwtUtils: JwtUtilsService
     ){}
 
     @Get()
@@ -70,9 +71,7 @@ export class DistritosController {
         @Req() request: Request
     ){
         try{
-            const authToken: string = request.headers['authorization'].split(" ")[1];
-            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
-            await this.distritosSrv.create(d, idusuario);
+            await this.distritosSrv.create(d, this.jwtUtils.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar distrito');
             console.log(e);
@@ -124,10 +123,8 @@ export class DistritosController {
         @Body() d: Distrito,
         @Req() request: Request
     ){
-        try{
-            const authToken: string = request.headers['authorization'].split(" ")[1];
-            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);            
-            if(await this.distritosSrv.edit(oldId, d, idusuario) === 0){
+        try{            
+            if(await this.distritosSrv.edit(oldId, d, this.jwtUtils.decodeIdUsuario(request)) === 0){
                 throw new HttpException(
                     {
                         request: 'put',
@@ -156,9 +153,7 @@ export class DistritosController {
         @Req() request: Request
     ){
         try{
-            const authToken: string = request.headers['authorization'].split(" ")[1];
-            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
-            if(await this.distritosSrv.delete(id, idusuario) === 0){
+            if(await this.distritosSrv.delete(id, this.jwtUtils.decodeIdUsuario(request)) === 0){
                 throw new HttpException(
                     {
                         request: 'delete',

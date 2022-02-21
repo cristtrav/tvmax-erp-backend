@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { BarriosService } from './barrios.service';
 import { Barrio } from '../../dto/barrio.dto';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('barrios')
 @UseGuards(AuthGuard)
 export class BarriosController {
 
     constructor(
-        private barriosSrv: BarriosService
+        private barriosSrv: BarriosService,
+        private jwtUtils: JwtUtilsService
     ){}
 
     @Get()
@@ -64,10 +66,11 @@ export class BarriosController {
     @Post()
     @RequirePermission(Permissions.BARRIOS.REGISTRAR)
     async create(
-        @Body() b: Barrio
+        @Body() b: Barrio,
+        @Req() request: Request
     ){
         try{
-            await this.barriosSrv.create(b);
+            await this.barriosSrv.create(b, this.jwtUtils.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar Barrio');
             console.log(e);
@@ -115,11 +118,12 @@ export class BarriosController {
     @Put(':id')
     @RequirePermission(Permissions.BARRIOS.EDITAR)
     async edit(
-        @Param('id') oldId: number, @Body() b: Barrio
+        @Param('id') oldId: number,
+        @Body() b: Barrio,
+        @Req() request: Request
     ){
         try{
-            const rowCount: number = (await this.barriosSrv.edit(oldId, b)).rowCount;
-            if(rowCount === 0){
+            if(await this.barriosSrv.edit(oldId, b, this.jwtUtils.decodeIdUsuario(request)) === 0){
                 throw new HttpException(
                     {
                         request: 'put',
@@ -144,11 +148,11 @@ export class BarriosController {
     @Delete(':id')
     @RequirePermission(Permissions.BARRIOS.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            const rowCount: number = (await this.barriosSrv.delete(id)).rowCount;
-            if(rowCount === 0){
+            if(await this.barriosSrv.delete(id, this.jwtUtils.decodeIdUsuario(request)) === 0){
                 throw new HttpException(
                     {
                         request: 'put',
