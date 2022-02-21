@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../global/database/database.service';
 import { TipoDomicilio } from '../../dto/tipodomicilio.dto';
 import { WhereParam } from '@util/whereparam';
+import { AuditQueryHelper } from '@util/audit-query-helper';
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 
 @Injectable()
 export class TiposdomiciliosService {
@@ -36,15 +38,42 @@ export class TiposdomiciliosService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
-    async create(td: TipoDomicilio){
+    async create(td: TipoDomicilio, idusuario: number){
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `INSERT INTO public.tipo_domicilio(id, descripcion, eliminado)
         VALUES($1, $2, false)`;
-        await this.dbsrv.execute(query, [td.id, td.descripcion]);
+        const params =  [td.id, td.descripcion];
+        try{
+            await cli.query('BEGIN');
+            await cli.query(query, params);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.TIPODOMICILIO, idusuario, td.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
     }
 
-    async edit(oldId: number, td: TipoDomicilio): Promise<boolean>{
+    async edit(oldId: number, td: TipoDomicilio, idusuario: number): Promise<boolean>{
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.tipo_domicilio SET id = $1, descripcion = $2 WHERE id = $3`;
-        return (await this.dbsrv.execute(query, [td.id, td.descripcion, oldId])).rowCount > 0;
+        const params = [td.id, td.descripcion, oldId];
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.TIPODOMICILIO, idusuario, oldId);
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.TIPODOMICILIO, idevento, td.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
     async findById(id: number): Promise<TipoDomicilio | null>{
@@ -54,9 +83,21 @@ export class TiposdomiciliosService {
         return rows[0];
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: number, idusuario: number): Promise<boolean> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.tipo_domicilio SET eliminado = true WHERE id = $1`;
-        return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, [id])).rowCount;
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.TIPODOMICILIO, idusuario, id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
     async getLastId(): Promise<number>{

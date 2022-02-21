@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { TipoDomicilio } from '../..//dto/tipodomicilio.dto';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { TiposdomiciliosService } from './tiposdomicilios.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('tiposdomicilios')
 @UseGuards(AuthGuard)
 export class TiposdomiciliosController {
 
     constructor(
-        private tipoServSrv: TiposdomiciliosService
+        private tipoServSrv: TiposdomiciliosService,
+        private jwtUtil: JwtUtilsService
     ){}
 
     @Get()
@@ -62,10 +64,11 @@ export class TiposdomiciliosController {
     @Post()
     @RequirePermission(Permissions.TIPOSDOMICILIOS.REGISTRAR)
     async create(
-        @Body() td: TipoDomicilio
+        @Body() td: TipoDomicilio,
+        @Req() request: Request
     ){
         try{
-            await this.tipoServSrv.create(td);
+            await this.tipoServSrv.create(td, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar Tipo de Domicilio');
             console.log(e);
@@ -82,10 +85,12 @@ export class TiposdomiciliosController {
     @Put(':id')
     @RequirePermission(Permissions.TIPOSDOMICILIOS.EDITAR)
     async edit(
-        @Param('id') oldId: number, @Body() td: TipoDomicilio
+        @Param('id') oldId: number,
+        @Body() td: TipoDomicilio,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.tipoServSrv.edit(oldId, td))){
+            if(!(await this.tipoServSrv.edit(oldId, td, this.jwtUtil.decodeIdUsuario(request)))){
                 throw new HttpException(
                     {
                         request: 'put',
@@ -138,10 +143,11 @@ export class TiposdomiciliosController {
     @Delete(':id')
     @RequirePermission(Permissions.TIPOSDOMICILIOS.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.tipoServSrv.delete(id))) throw new HttpException(
+            if(!(await this.tipoServSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el Tipo de Domicilio con código ${id}.`
