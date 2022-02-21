@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../global/database/database.service';
 import { Cobrador } from '../../dto/cobrador.dto';
+import { AuditQueryHelper } from '@util/audit-query-helper';
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 
 @Injectable()
 export class CobradoresService {
@@ -39,10 +41,22 @@ export class CobradoresService {
         return (await this.dbsrv.execute(query, params)).rows[0].count;
     }
 
-    async create(c: Cobrador){
+    async create(c: Cobrador, idusuario: number){
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `INSERT INTO public.cobrador(id, razon_social, ci, telefono, email, dv_ruc, activo, eliminado)
         VALUES($1, $2, $3, $4, $5, $6, $7, false)`;
-        await this.dbsrv.execute(query, [c.id, c.razonsocial, c.ci, c.telefono, c.email, c.dvruc, c.activo]);
+        const params = [c.id, c.razonsocial, c.ci, c.telefono, c.email, c.dvruc, c.activo];
+        try{
+            await cli.query('BEGIN');
+            await cli.query(query, params);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.COBRADORES, idusuario, c.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
     }
 
     async findById(id: number): Promise<Cobrador> {
@@ -52,15 +66,42 @@ export class CobradoresService {
         return null;
     }
 
-    async edit(oldId: number, c: Cobrador): Promise<boolean>{
+    async edit(oldId: number, c: Cobrador, idusuario: number): Promise<boolean>{
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.cobrador SET id = $1, razon_social = $2, ci = $3, telefono = $4, email = $5, activo = $6, dv_ruc = $7 WHERE id = $8`;
         const params: any[] = [c.id, c.razonsocial, c.ci, c.telefono, c.email, c.activo, c.dvruc, oldId];
-        return (await this.dbsrv.execute(query, params)).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.COBRADORES, idusuario, oldId);
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.COBRADORES, idevento, c.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: number, idusuario: number): Promise<boolean> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.cobrador SET eliminado = true WHERE id = $1`;
-        return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, [id])).rowCount;
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.COBRADORES, idusuario, id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
 }

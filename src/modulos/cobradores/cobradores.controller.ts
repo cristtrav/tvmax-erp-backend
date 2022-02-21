@@ -1,15 +1,17 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
+import { Request, Req, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { Cobrador } from '../../dto/cobrador.dto';
 import { CobradoresService } from './cobradores.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('cobradores')
 export class CobradoresController {
 
     constructor(
-        private cobradorSrv: CobradoresService
+        private cobradorSrv: CobradoresService,
+        private jwtUtil: JwtUtilsService
     ){}
 
     @Get()
@@ -40,10 +42,11 @@ export class CobradoresController {
     @Post()
     @RequirePermission(Permissions.COBRADORES.REGISTRAR)
     async create(
-        @Body() c: Cobrador
+        @Body() c: Cobrador,
+        @Req() request: Request
     ){
         try{
-            await this.cobradorSrv.create(c);
+            await this.cobradorSrv.create(c, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar cobrador');
             console.log(e);
@@ -88,10 +91,12 @@ export class CobradoresController {
     @Put(':id')
     @RequirePermission(Permissions.COBRADORES.EDITAR)
     async edit(
-        @Param('id') oldId: number, @Body() c: Cobrador
+        @Param('id') oldId: number,
+        @Body() c: Cobrador,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.cobradorSrv.edit(oldId, c))) throw new HttpException(
+            if(!(await this.cobradorSrv.edit(oldId, c, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró el Cobrador con código ${oldId}.`
@@ -114,10 +119,11 @@ export class CobradoresController {
     @Delete(':id')
     @RequirePermission(Permissions.COBRADORES.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.cobradorSrv.delete(id))) throw new HttpException(
+            if(!(await this.cobradorSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el Cobrador con código ${id}.`

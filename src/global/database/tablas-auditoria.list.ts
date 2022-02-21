@@ -5,6 +5,7 @@ export class TablasAuditoriaList{
     public static DISTRITO = 4;
     public static BARRIO = 5;
     public static TIPODOMICILIO = 6;
+    public static COBRADORES = 7;
 
     public static getTableName(idtable: number): string {
         switch (idtable) {
@@ -14,6 +15,7 @@ export class TablasAuditoriaList{
             case TablasAuditoriaList.DISTRITO: return 'distrito';
             case TablasAuditoriaList.BARRIO: return 'barrio';
             case TablasAuditoriaList.TIPODOMICILIO: return 'tipo_domicilio';
+            case TablasAuditoriaList.COBRADORES: return 'cobrador';
             default: return '';
         }
     }
