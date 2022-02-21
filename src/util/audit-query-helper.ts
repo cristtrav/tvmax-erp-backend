@@ -32,6 +32,7 @@ export class AuditQueryHelper {
         switch (idtable) {
             case 1: return 'grupo';
             case 2: return 'servicio';
+            case 3: return 'departamento';
             default: return '';
         }
     }

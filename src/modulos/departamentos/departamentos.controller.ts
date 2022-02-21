@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards, Request } from '@nestjs/common';
 import { Departamento } from '../../dto/departamento.dto';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { DepartamentosService } from './departamentos.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('departamentos')
 @UseGuards(AuthGuard)
 export class DepartamentosController {
 
     constructor(
-        private departamentoSrv: DepartamentosService
+        private departamentoSrv: DepartamentosService,
+        private jwtSrv: JwtService
     ) { }
 
     @Get()
@@ -63,10 +65,13 @@ export class DepartamentosController {
     @Post()
     @RequirePermission(Permissions.DEPARTAMENTOS.REGISTRAR)
     async create(
-        @Body() d: Departamento
+        @Body() d: Departamento,
+        @Req() request: Request
     ) {
         try {
-            await this.departamentoSrv.create(d);
+            const authToken: string = request.headers['authorization'].split(" ")[1];
+            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
+            await this.departamentoSrv.create(d, idusuario);
         } catch (e) {
             console.log('Error al registrar departamento');
             console.log(e);
@@ -83,11 +88,14 @@ export class DepartamentosController {
     @Put(':id')
     @RequirePermission(Permissions.DEPARTAMENTOS.EDITAR)
     async update(
-        @Param('id') oldId: string, @Body() d: Departamento
+        @Param('id') oldId: string,
+        @Body() d: Departamento,
+        @Req() request: Request
     ) {
         try {
-            const rowCount = (await this.departamentoSrv.update(oldId, d)).rowCount;
-            if (rowCount === 0) {
+            const authToken: string = request.headers['authorization'].split(" ")[1];
+            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
+            if (await this.departamentoSrv.update(oldId, d, idusuario) === 0) {
                 throw new HttpException(
                     {
                         request: 'put',
@@ -142,11 +150,13 @@ export class DepartamentosController {
     @Delete(':id')
     @RequirePermission(Permissions.DEPARTAMENTOS.ELIMINAR)
     async delete(
-        @Param('id') id: string
+        @Param('id') id: string,
+        @Req() request: Request
     ){
         try{
-            const rowCount = (await this.departamentoSrv.delete(id)).rowCount;
-            if(rowCount === 0){
+            const authToken: string = request.headers['authorization'].split(" ")[1];
+            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
+            if(await this.departamentoSrv.delete(id, idusuario) === 0){
                 throw new HttpException(
                     {
                         request: 'delete',
