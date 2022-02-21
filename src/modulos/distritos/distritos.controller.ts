@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { Distrito } from '../../dto/distrito.dto';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { DistritosService } from './distritos.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('distritos')
 @UseGuards(AuthGuard)
 export class DistritosController {
 
     constructor(
-        private distritosSrv: DistritosService
+        private distritosSrv: DistritosService,
+        private jwtSrv: JwtService
     ){}
 
     @Get()
@@ -64,10 +66,13 @@ export class DistritosController {
     @Post()
     @RequirePermission(Permissions.DISTRITOS.REGISTRAR)
     async create(
-        @Body() d: Distrito
+        @Body() d: Distrito,
+        @Req() request: Request
     ){
         try{
-            await this.distritosSrv.create(d);
+            const authToken: string = request.headers['authorization'].split(" ")[1];
+            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
+            await this.distritosSrv.create(d, idusuario);
         }catch(e){
             console.log('Error al registrar distrito');
             console.log(e);
@@ -116,11 +121,13 @@ export class DistritosController {
     @RequirePermission(Permissions.DISTRITOS.EDITAR)
     async edit(
         @Param('id') oldId: string,
-        @Body() d: Distrito
+        @Body() d: Distrito,
+        @Req() request: Request
     ){
         try{
-            const rowCount = (await this.distritosSrv.edit(oldId, d)).rowCount;
-            if(rowCount === 0){
+            const authToken: string = request.headers['authorization'].split(" ")[1];
+            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);            
+            if(await this.distritosSrv.edit(oldId, d, idusuario) === 0){
                 throw new HttpException(
                     {
                         request: 'put',
@@ -145,11 +152,13 @@ export class DistritosController {
     @Delete(':id')
     @RequirePermission(Permissions.DISTRITOS.ELIMINAR)
     async delete(
-        @Param('id') id: string
+        @Param('id') id: string,
+        @Req() request: Request
     ){
         try{
-            const rowCount: number = (await this.distritosSrv.delete(id)).rowCount;
-            if(rowCount === 0){
+            const authToken: string = request.headers['authorization'].split(" ")[1];
+            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
+            if(await this.distritosSrv.delete(id, idusuario) === 0){
                 throw new HttpException(
                     {
                         request: 'delete',

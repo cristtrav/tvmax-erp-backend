@@ -33,6 +33,7 @@ export class AuditQueryHelper {
             case 1: return 'grupo';
             case 2: return 'servicio';
             case 3: return 'departamento';
+            case 4: return 'distrito';
             default: return '';
         }
     }
