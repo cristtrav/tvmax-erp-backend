@@ -108,4 +108,8 @@ export class Permissions {
         CONSULTARSUSCRIPCIONES: 300,
         CONSULTARSUCPORESTADO: 301
     }
+
+    static readonly AUDITORIA = {
+        CONSULTAREVENTOS: 320
+    }
 }

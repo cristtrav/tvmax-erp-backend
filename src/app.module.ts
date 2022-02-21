@@ -19,6 +19,7 @@ import { CuotasModule } from './modulos/cuotas/cuotas.module';
 import { TimbradosModule } from './modulos/timbrados/timbrados.module';
 import { VentasModule } from './modulos/ventas/ventas.module';
 import { PermisosModule } from './modulos/permisos/permisos.module';
+import { AuditoriaModule } from './modulos/auditoria/auditoria.module';
 
 
 @Module({
@@ -39,7 +40,8 @@ import { PermisosModule } from './modulos/permisos/permisos.module';
     CuotasModule,
     TimbradosModule,
     VentasModule,
-    PermisosModule
+    PermisosModule,
+    AuditoriaModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],
