@@ -7,6 +7,8 @@ import { ClientesService } from '../clientes/clientes.service';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
 import { IRangeQuery } from '@util/irangequery.interface';
+import { AuditQueryHelper } from '@util/audit-query-helper';
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 
 @Injectable()
 export class VentasService {
@@ -24,17 +26,23 @@ export class VentasService {
         try {
             await dbcli.query('BEGIN');
             const res = await dbcli.query(queryCabecera, paramsCabecera);
+        
             const idgenerado = res.rows[0].id;
+            await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.FACTURAVENTA, idusu, idgenerado);
             for (let dv of fv.detalles) {
                 const queryDetalle: string = `INSERT INTO public.detalle_factura_venta(id, idfactura_venta, monto, cantidad, subtotal, descripcion, porcentaje_iva, idservicio, idcuota, idsuscripcion, eliminado)
-                VALUES(nextval('public.seq_detalle_factura_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, false)`;
+                VALUES(nextval('public.seq_detalle_factura_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, false) RETURNING *`;
                 const paramsDetalle: any[] = [idgenerado, dv.monto, dv.cantidad, dv.subtotal, dv.descripcion, dv.porcentajeiva, dv.idservicio, dv.idcuota, dv.idsuscripcion];
-                await dbcli.query(queryDetalle, paramsDetalle);
+                const idddetalle = (await dbcli.query(queryDetalle, paramsDetalle)).rows[0].id;
+                await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.DETALLEFACTURAVENTA, idusu, idddetalle);
             }
+            
             const queryTimbrado: string = `UPDATE public.timbrado SET ultimo_nro_usado = $1 WHERE id = $2`;
             const paramsTimbrado: any[] = [fv.nrofactura, fv.idtimbrado];;
+            const idevento = await AuditQueryHelper.auditPreUpdate(dbcli, TablasAuditoriaList.TIMBRADOS, idusu, fv.idtimbrado);
             await dbcli.query(queryTimbrado, paramsTimbrado);
-
+            await AuditQueryHelper.auditPostUpdate(dbcli, TablasAuditoriaList.TIMBRADOS, idevento, fv.idtimbrado);
+            
             /*if (registraCobro) {
                 const clie: Cliente = await this.clienteSrv.findById(fv.idcliente);
                 const queryCobro: String = `INSERT INTO public.cobro(id, idfactura, fecha, cobrado_por, comision_para, anulado, eliminado)
@@ -182,14 +190,39 @@ export class VentasService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
-    async anular(idventa: number, anulado): Promise<void> {
+    async anular(idventa: number, anulado, idusuario: number): Promise<void> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.factura_venta SET anulado = $1 WHERE id = $2`;
-        await this.dbsrv.execute(query, [anulado, idventa]);
+        const params = [anulado, idventa];
+        try{
+            await cli.query('BEGIN');
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.FACTURAVENTA, idusuario, idventa);
+            await cli.query(query, params);
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.FACTURAVENTA, idevento, idventa);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+        }finally{
+            cli.release();
+        }
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: number, idusuario: number): Promise<boolean> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.factura_venta SET eliminado = true WHERE id = $1`;
-        return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, [id])).rowCount;
+            AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.FACTURAVENTA, idusuario, id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
     async findById(id: number): Promise<FacturaVenta>{

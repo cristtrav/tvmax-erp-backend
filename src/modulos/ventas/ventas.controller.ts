@@ -6,7 +6,7 @@ import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { VentasService } from './ventas.service';
 import { Request } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt'; 
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('ventas')
 @UseGuards(AuthGuard)
@@ -14,7 +14,7 @@ export class VentasController {
 
     constructor(
         private ventasSrv: VentasService,
-        private jwtSrv: JwtService
+        private jwtUtil: JwtUtilsService
     ){}
 
     @Post()
@@ -24,9 +24,7 @@ export class VentasController {
         @Req() request: Request
     ): Promise<number>{
         try{
-            const authToken: string = request.headers['authorization'].split(" ")[1];
-            const idusuario = Number(this.jwtSrv.decode(authToken)['sub']);
-            return await this.ventasSrv.create(fv, true, idusuario);
+            return await this.ventasSrv.create(fv, true, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar venta')
             console.log(e);
@@ -106,10 +104,11 @@ export class VentasController {
     @Get(':id/anular')
     @RequirePermission(Permissions.VENTAS.ANULAR)
     async anular(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            await this.ventasSrv.anular(id, true);
+            await this.ventasSrv.anular(id, true, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al anular venta');
             console.log(e);
@@ -126,10 +125,11 @@ export class VentasController {
     @Get(':id/revertiranulacion')
     @RequirePermission(Permissions.VENTAS.REVERTIRANUL)
     async revertiranul(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            await this.ventasSrv.anular(id, false);
+            await this.ventasSrv.anular(id, false, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al revertir anulacion');
             console.log(e);
@@ -146,10 +146,11 @@ export class VentasController {
     @Delete(':id')
     @RequirePermission(Permissions.VENTAS.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            if(!await this.ventasSrv.delete(id)){
+            if(!await this.ventasSrv.delete(id, this.jwtUtil.decodeIdUsuario(request))){
                 throw new HttpException(
                     {
                         request: 'delete',

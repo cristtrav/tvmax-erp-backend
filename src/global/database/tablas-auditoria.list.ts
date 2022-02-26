@@ -8,6 +8,8 @@ export class TablasAuditoriaList{
     public static COBRADORES = 7;
     public static USUARIOS = 8;
     public static TIMBRADOS = 9;
+    public static FACTURAVENTA = 10;
+    public static DETALLEFACTURAVENTA = 11;
 
     public static getTableName(idtable: number): string {
         switch (idtable) {
@@ -20,6 +22,8 @@ export class TablasAuditoriaList{
             case TablasAuditoriaList.COBRADORES: return 'cobrador';
             case TablasAuditoriaList.USUARIOS: return 'usuario';
             case TablasAuditoriaList.TIMBRADOS: return 'timbrado';
+            case TablasAuditoriaList.FACTURAVENTA: return 'factura_venta';
+            case TablasAuditoriaList.DETALLEFACTURAVENTA: return 'detalle_factura_venta';
             default: return '';
         }
     }
