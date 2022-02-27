@@ -47,7 +47,7 @@ export class BarriosService {
         try{
             await cli.query('BEGIN');
             await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.BARRIO, idusuario, b.id);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.BARRIOS, idusuario, b.id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
@@ -69,9 +69,9 @@ export class BarriosService {
         let rowCount = 0;
         try{
             await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.BARRIO, idusuario, oldId);
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.BARRIOS, idusuario, oldId);
             rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.BARRIO, idevento, b.id);
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.BARRIOS, idevento, b.id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
@@ -89,7 +89,7 @@ export class BarriosService {
         try{
             await cli.query('BEGIN');
             rowCount = (await cli.query(query, [id]));
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.BARRIO, idusuario, id);
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.BARRIOS, idusuario, id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');

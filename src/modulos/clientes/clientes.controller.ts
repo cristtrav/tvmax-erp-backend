@@ -3,10 +3,11 @@ import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Cliente } from '@dto/cliente.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';
 import { Suscripcion } from '@dto/suscripcion.dto';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('clientes')
 @UseGuards(AuthGuard)
@@ -14,7 +15,8 @@ export class ClientesController {
 
     constructor(
         private clientesSrv: ClientesService,
-        private suscripcionesSrv: SuscripcionesService
+        private suscripcionesSrv: SuscripcionesService,
+        private jwtUtil: JwtUtilsService
     ) { }
 
     @Get()
@@ -50,10 +52,11 @@ export class ClientesController {
     @Post()
     @RequirePermission(Permissions.CLIENTES.REGISTRAR)
     async create(
-        @Body() s: Cliente
+        @Body() s: Cliente,
+        @Req() request: Request
     ) {
         try {
-            await this.clientesSrv.create(s);
+            await this.clientesSrv.create(s, this.jwtUtil.decodeIdUsuario(request));
         } catch (e) {
             console.log('Error al registrar suscripcion');
             console.log(e);
@@ -116,10 +119,12 @@ export class ClientesController {
     @Put(':id')
     @RequirePermission(Permissions.CLIENTES.EDITAR)
     async edit(
-        @Param('id') oldId: number, @Body() c: Cliente
+        @Param('id') oldId: number,
+        @Body() c: Cliente,
+        @Req() request: Request
     ) {
         try {
-            if (!(await this.clientesSrv.edit(oldId, c))) throw new HttpException(
+            if (!(await this.clientesSrv.edit(oldId, c, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró el cliente con código ${oldId}.`
@@ -142,10 +147,11 @@ export class ClientesController {
     @Delete(':id')
     @RequirePermission(Permissions.CLIENTES.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ) {
         try {
-            if (!(await this.clientesSrv.delete(id))) throw new HttpException(
+            if (!(await this.clientesSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el cliente con código ${id}.`

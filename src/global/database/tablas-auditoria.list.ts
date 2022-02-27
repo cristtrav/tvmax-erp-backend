@@ -1,32 +1,69 @@
-export class TablasAuditoriaList{
-    public static GRUPOS = 1;
-    public static SERVICIOS = 2;
-    public static DEPARTAMENTOS = 3;
-    public static DISTRITO = 4;
-    public static BARRIO = 5;
-    public static TIPODOMICILIO = 6;
-    public static COBRADORES = 7;
-    public static USUARIOS = 8;
-    public static TIMBRADOS = 9;
-    public static FACTURAVENTA = 10;
-    public static DETALLEFACTURAVENTA = 11;
-    public static SUSCRIPCIONES = 12;
+import { TablaAuditoria } from "@dto/tabla-auditoria.dto";
 
-    public static getTableName(idtable: number): string {
-        switch (idtable) {
-            case TablasAuditoriaList.GRUPOS: return 'grupo';
-            case TablasAuditoriaList.SERVICIOS: return 'servicio';
-            case TablasAuditoriaList.DEPARTAMENTOS: return 'departamento';
-            case TablasAuditoriaList.DISTRITO: return 'distrito';
-            case TablasAuditoriaList.BARRIO: return 'barrio';
-            case TablasAuditoriaList.TIPODOMICILIO: return 'tipo_domicilio';
-            case TablasAuditoriaList.COBRADORES: return 'cobrador';
-            case TablasAuditoriaList.USUARIOS: return 'usuario';
-            case TablasAuditoriaList.TIMBRADOS: return 'timbrado';
-            case TablasAuditoriaList.FACTURAVENTA: return 'factura_venta';
-            case TablasAuditoriaList.DETALLEFACTURAVENTA: return 'detalle_factura_venta';
-            case TablasAuditoriaList.SUSCRIPCIONES: return 'suscripcion';
-            default: return '';
-        }
-    }
+export class TablasAuditoriaList{
+    public static GRUPOS: TablaAuditoria = {
+        id: 1,
+        nombre: 'grupo',
+        descripcion: 'Grupos'
+    };
+    public static SERVICIOS: TablaAuditoria = {
+        id: 2,
+        nombre: 'servicio',
+        descripcion: 'Servicios'
+    };
+    public static DEPARTAMENTOS: TablaAuditoria = {
+        id: 3,
+        nombre: 'departamento',
+        descripcion: 'Departamentos'
+    };
+    public static DISTRITOS: TablaAuditoria = {
+        id: 4,
+        nombre: 'distrito',
+        descripcion: 'Distritos'
+    };
+    public static BARRIOS: TablaAuditoria = {
+        id: 5,
+        nombre: 'barrio',
+        descripcion: 'Barrios'
+    };
+    public static TIPODOMICILIO: TablaAuditoria = {
+        id: 6,
+        nombre: 'tipo_domicilio',
+        descripcion: 'Tipos de Domicilios'
+    };
+    public static COBRADORES: TablaAuditoria = {
+        id: 7,
+        nombre: 'cobrador',
+        descripcion: 'Cobradores'
+    };
+    public static USUARIOS: TablaAuditoria = {
+        id: 8,
+        nombre: 'usuario',
+        descripcion: 'Usuarios'
+    };
+    public static TIMBRADOS: TablaAuditoria = {
+        id: 9,
+        nombre: 'timbrado',
+        descripcion: 'Timbrados'
+    };
+    public static FACTURAVENTA: TablaAuditoria = {
+        id: 10,
+        nombre: 'factura_venta',
+        descripcion: 'Facturas Venta'
+    };
+    public static DETALLEFACTURAVENTA: TablaAuditoria = {
+        id: 11,
+        nombre: 'detalle_factura_venta',
+        descripcion: 'Detalle Factura VEnta'
+    };
+    public static SUSCRIPCIONES: TablaAuditoria = {
+        id: 12,
+        nombre: 'suscripcion',
+        descripcion: 'Suscripciones'
+    };
+    public static CLIENTES: TablaAuditoria = {
+        id: 13,
+        nombre: 'cliente',
+        descripcion: 'Clientes'
+    };
 }

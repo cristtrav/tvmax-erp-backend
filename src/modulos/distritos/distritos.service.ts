@@ -47,7 +47,7 @@ export class DistritosService {
         try{
             await cli.query('BEGIN');
             await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.DISTRITO, idusuario, d.id);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.DISTRITOS, idusuario, d.id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
@@ -69,9 +69,9 @@ export class DistritosService {
         let rowCount = 0;
         try{
             await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.DISTRITO, idusuario, oldId);
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.DISTRITOS, idusuario, oldId);
             rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.DISTRITO, idevento, d.id);
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.DISTRITOS, idevento, d.id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
@@ -89,7 +89,7 @@ export class DistritosService {
         try{
             await cli.query('BEGIN');
             rowCount = (await cli.query(query, [id])).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.DISTRITO, idusuario, id);
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.DISTRITOS, idusuario, id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
