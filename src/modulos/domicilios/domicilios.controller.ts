@@ -3,7 +3,8 @@ import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Domicilio } from '@dto/domicilio.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 import { DomiciliosService } from './domicilios.service';
 
 @Controller('domicilios')
@@ -11,7 +12,8 @@ import { DomiciliosService } from './domicilios.service';
 export class DomiciliosController {
 
     constructor(
-        private domiciliosSrv: DomiciliosService
+        private domiciliosSrv: DomiciliosService,
+        private jwtUtil: JwtUtilsService
     ){}
 
     @Get()
@@ -61,10 +63,11 @@ export class DomiciliosController {
     @Post()
     @RequirePermission(Permissions.DOMICILIOS.REGISTRAR)
     async create(
-        @Body() d: Domicilio
+        @Body() d: Domicilio,
+        @Req() request: Request
     ){
         try{
-            await this.domiciliosSrv.create(d);
+            await this.domiciliosSrv.create(d, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar domicilio');
             console.log(e);
@@ -81,10 +84,12 @@ export class DomiciliosController {
     @Put(':id')
     @RequirePermission(Permissions.DOMICILIOS.EDITAR)
     async edit(
-        @Param('id') oldId: number, @Body() d: Domicilio
+        @Param('id') oldId: number,
+        @Body() d: Domicilio,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.domiciliosSrv.edit(oldId, d))) throw new HttpException(
+            if(!(await this.domiciliosSrv.edit(oldId, d, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró el domicilio con código ${oldId}.`
@@ -135,10 +140,11 @@ export class DomiciliosController {
     @Delete(':id')
     @RequirePermission(Permissions.DOMICILIOS.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.domiciliosSrv.delete(id))) throw new HttpException(
+            if(!(await this.domiciliosSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró el domicilio con código ${id}.`

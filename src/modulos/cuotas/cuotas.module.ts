@@ -3,10 +3,12 @@ import { CuotasService } from './cuotas.service';
 import { DatabaseService } from '@database/database.service';
 import { CuotasController } from './cuotas.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { UtilModule } from '@util/util.module';
 
 @Module({
   imports: [
-    JwtModule.register({})
+    JwtModule.register({}),
+    UtilModule
   ],
   providers: [CuotasService, DatabaseService],
   controllers: [CuotasController]

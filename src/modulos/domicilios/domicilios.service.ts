@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { Domicilio } from '@dto/domicilio.dto';
 import { WhereParam } from '@util/whereparam';
+import { AuditQueryHelper } from '@util/audit-query-helper';
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 
 @Injectable()
 export class DomiciliosService {
@@ -41,25 +43,50 @@ export class DomiciliosService {
         return (await this.dbsrv.execute(query)).rows[0].max;
     }
 
-    async create(d: Domicilio){
-        if(d.principal === true){
-            const queryPrincipal: string = `UPDATE public.domicilio SET principal = false WHERE idcliente = $1`;
-            await this.dbsrv.execute(queryPrincipal, [d.idcliente]);
-        }
+    async create(d: Domicilio, idusuario: number){
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `INSERT INTO public.domicilio(id, direccion, nro_medidor, idbarrio, observacion, idtipo_domicilio, idcliente, principal, eliminado)
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, false)`;
         const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.idtipodomicilio, d.idcliente, d.principal];
-        await this.dbsrv.execute(query, params);
+        try{
+            await cli.query('BEGIN');
+            if(d.principal === true){
+                const queryPrincipal: string = `UPDATE public.domicilio SET principal = false WHERE idcliente = $1`;
+                await cli.query(queryPrincipal, [d.idcliente]);
+            }
+            await cli.query(query, params);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.DOMICILIOS, idusuario, d.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
     }
 
-    async edit(oldId: number, d: Domicilio): Promise<boolean>{
-        if(d.principal === true){
-            const queryPrincipal: string = `UPDATE public.domicilio SET principal = false WHERE idcliente = $1`;
-            await this.dbsrv.execute(queryPrincipal, [d.idcliente]);
-        }
+    async edit(oldId: number, d: Domicilio, idusuario: number): Promise<boolean>{
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.domicilio SET id = $1, direccion = $2, nro_medidor = $3, idbarrio = $4, observacion = $5, idtipo_domicilio = $6, idcliente = $7, principal = $8 WHERE id = $9`;
         const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.idtipodomicilio, d.idcliente, d.principal, oldId];
-        return (await this.dbsrv.execute(query, params)).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            if(d.principal === true){
+                const queryPrincipal: string = `UPDATE public.domicilio SET principal = false WHERE idcliente = $1`;
+                await cli.query(queryPrincipal, [d.idcliente]);
+            }
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.DOMICILIOS, idusuario, oldId);
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.DOMICILIOS, idevento, d.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
     async findById(id: number): Promise<Domicilio | null> {
@@ -69,9 +96,22 @@ export class DomiciliosService {
         return rows[0];
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: number, idusuario: number): Promise<boolean> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.domicilio SET eliminado = true WHERE id = $1`;
-        return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, [id])).rowCount;
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.DOMICILIOS, idusuario, id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
 }

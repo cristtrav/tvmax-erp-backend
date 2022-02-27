@@ -3,7 +3,8 @@ import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Cuota } from '@dto/cuota.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 import { CuotasService } from './cuotas.service';
 
 @Controller('cuotas')
@@ -11,7 +12,8 @@ import { CuotasService } from './cuotas.service';
 export class CuotasController {
 
     constructor(
-        private cuotaSrv: CuotasService
+        private cuotaSrv: CuotasService,
+        private jwtUtil: JwtUtilsService
     ){}
 
     @Get()
@@ -74,10 +76,11 @@ export class CuotasController {
     @Post()
     @RequirePermission(Permissions.CUOTAS.REGISTRAR)
     async create(
-        @Body() c: Cuota
+        @Body() c: Cuota,
+        @Req() request: Request
     ){
         try{
-            await this.cuotaSrv.create(c);
+            await this.cuotaSrv.create(c, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar cuota');
             console.log(e);
@@ -95,10 +98,11 @@ export class CuotasController {
     @RequirePermission(Permissions.CUOTAS.EDITAR)
     async edit(
         @Param('id') oldid: number,
-        @Body() c: Cuota
+        @Body() c: Cuota,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.cuotaSrv.edit(oldid, c))) throw new HttpException(
+            if(!(await this.cuotaSrv.edit(oldid, c, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró la cuota con código ${oldid}`
@@ -121,10 +125,11 @@ export class CuotasController {
     @Delete(':id')
     @RequirePermission(Permissions.CUOTAS.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ){
         try{
-            if(!(await this.cuotaSrv.delete(id))) throw new HttpException(
+            if(!(await this.cuotaSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró la cuota con código ${id}`                    
