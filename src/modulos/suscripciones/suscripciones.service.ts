@@ -5,6 +5,8 @@ import { IRangeQuery } from '@util/irangequery.interface';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
 import { ResumenCantSuscDeuda } from '@dto/resumen-cantsusc-deuda.dto';
+import { AuditQueryHelper } from '@util/audit-query-helper';
+import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 
 @Injectable()
 export class SuscripcionesService {
@@ -153,11 +155,22 @@ export class SuscripcionesService {
         return (await this.dbsrv.execute(query)).rows[0].max;
     }
 
-    async create(s: Suscripcion) {
+    async create(s: Suscripcion, idusuario: number) {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `INSERT INTO public.suscripcion(id, monto, fecha_suscripcion, idcliente, iddomicilio, idservicio, estado, fecha_cambio_estado, eliminado)
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, false)`;
         const params: any[] = [s.id, s.monto, s.fechasuscripcion, s.idcliente, s.iddomicilio, s.idservicio, s.estado, s.fechacambioestado];
-        await this.dbsrv.execute(query, params);
+        try{
+            await cli.query('BEGIN');
+            await cli.query(query, params);
+            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.SUSCRIPCIONES, idusuario, s.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }        
     }
 
     async findById(id: number): Promise<Suscripcion> {
@@ -167,15 +180,43 @@ export class SuscripcionesService {
         return null;
     }
 
-    async edit(oldId: number, s: Suscripcion): Promise<boolean> {
+    async edit(oldId: number, s: Suscripcion, idusuario: number): Promise<boolean> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.suscripcion SET id = $1, monto = $2, fecha_suscripcion = $3, idcliente = $4, iddomicilio = $5, idservicio = $6, estado = $7, fecha_cambio_estado = $8 WHERE id = $9`;
         const params: any[] = [s.id, s.monto, s.fechasuscripcion, s.idcliente, s.iddomicilio, s.idservicio, s.estado, s.fechacambioestado, oldId];
-        return (await this.dbsrv.execute(query, params)).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.SUSCRIPCIONES, idusuario, oldId);
+            rowCount = (await cli.query(query, params)).rowCount;
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.SUSCRIPCIONES, idevento, s.id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        return rowCount > 0;
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: number, idusuario: number): Promise<boolean> {
+        const cli = await this.dbsrv.getDBClient();
         const query: string = `UPDATE public.suscripcion SET eliminado = true WHERE id = $1`;
-        return (await this.dbsrv.execute(query, [id])).rowCount > 0;
+        let rowCount = 0;
+        try{
+            await cli.query('BEGIN');
+            rowCount = (await cli.query(query, [id])).rowCount;
+            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.SUSCRIPCIONES, idusuario, id);
+            await cli.query('COMMIT');
+        }catch(e){
+            await cli.query('ROLLBACK');
+            throw e;
+        }finally{
+            cli.release();
+        }
+        
+        return rowCount > 0;
     }
 
     async findSuscripcionesPorCliente(idcliente: number, params): Promise<Suscripcion[]> {

@@ -10,6 +10,7 @@ export class TablasAuditoriaList{
     public static TIMBRADOS = 9;
     public static FACTURAVENTA = 10;
     public static DETALLEFACTURAVENTA = 11;
+    public static SUSCRIPCIONES = 12;
 
     public static getTableName(idtable: number): string {
         switch (idtable) {
@@ -24,6 +25,7 @@ export class TablasAuditoriaList{
             case TablasAuditoriaList.TIMBRADOS: return 'timbrado';
             case TablasAuditoriaList.FACTURAVENTA: return 'factura_venta';
             case TablasAuditoriaList.DETALLEFACTURAVENTA: return 'detalle_factura_venta';
+            case TablasAuditoriaList.SUSCRIPCIONES: return 'suscripcion';
             default: return '';
         }
     }

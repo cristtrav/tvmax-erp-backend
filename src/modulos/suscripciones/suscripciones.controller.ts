@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
@@ -10,6 +10,7 @@ import { Cuota } from '@dto/cuota.dto';
 import { Servicio } from '@dto/servicio.dto';
 import { ServiciosService } from '../servicios/servicios.service'
 import { ResumenCantSuscDeuda } from '@dto/resumen-cantsusc-deuda.dto';
+import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('suscripciones')
 @UseGuards(AuthGuard)
@@ -18,7 +19,8 @@ export class SuscripcionesController {
     constructor(
         private suscripcionesSrv: SuscripcionesService,
         private cuotasSrv: CuotasService,
-        private serviciosSrv: ServiciosService
+        private serviciosSrv: ServiciosService,
+        private jwtUtil: JwtUtilsService
     ) { }
 
     @Get()
@@ -163,10 +165,11 @@ export class SuscripcionesController {
     @Post()
     @RequirePermission(Permissions.SUSCRIPCIONES.REGISTRAR)
     async create(
-        @Body() s: Suscripcion
+        @Body() s: Suscripcion,
+        @Req() request: Request
     ) {
         try {
-            await this.suscripcionesSrv.create(s);
+            await this.suscripcionesSrv.create(s, this.jwtUtil.decodeIdUsuario(request));
         } catch (e) {
             console.log('Error al registrar')
             console.log(e);
@@ -211,10 +214,12 @@ export class SuscripcionesController {
     @Put(':id')
     @RequirePermission(Permissions.SUSCRIPCIONES.EDITAR)
     async edit(
-        @Param('id') oldId: number, @Body() s: Suscripcion
+        @Param('id') oldId: number,
+        @Body() s: Suscripcion,
+        @Req() request: Request
     ) {
         try {
-            if (!(await this.suscripcionesSrv.edit(oldId, s))) throw new HttpException(
+            if (!(await this.suscripcionesSrv.edit(oldId, s, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
                     description: `No se encontró la suscripción con código ${oldId}.`
@@ -237,10 +242,11 @@ export class SuscripcionesController {
     @Delete(':id')
     @RequirePermission(Permissions.SUSCRIPCIONES.ELIMINAR)
     async delete(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Req() request: Request
     ) {
         try {
-            if (!(await this.suscripcionesSrv.delete(id))) throw new HttpException(
+            if (!(await this.suscripcionesSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
                     description: `No se encontró la suscripción con código ${id}.`
