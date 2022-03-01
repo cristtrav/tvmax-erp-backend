@@ -17,6 +17,48 @@ export class VentasController {
         private jwtUtil: JwtUtilsService
     ){}
 
+    @Get('count')
+    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    async countVentas(
+        @Query('eliminado') eliminado: boolean,
+        @Query('search') search: string,
+        @Query('fechainiciofactura') fechainiciofactura: string,
+        @Query('fechafinfactura') fechafinfactura: string,
+        @Query('pagado') pagado: boolean,
+        @Query('anulado') anulado: boolean,
+        @Query('idcobradorcomision') idcobradorcomision: number,
+        @Query('idusuarioregistrocobro') idusuarioregistrocobro: number,
+        @Query('fechainiciocobro') fechainiciocobro: string,
+        @Query('fechafincobro') fechafincobro: string
+    ): Promise<number>{
+        try{
+            return await this.ventasSrv.count(
+                {
+                    eliminado,
+                    search,
+                    fechainiciofactura,
+                    fechafinfactura,
+                    fechainiciocobro,
+                    fechafincobro,
+                    pagado,
+                    anulado,
+                    idcobradorcomision,
+                    idusuarioregistrocobro,
+                }
+            );
+        }catch(e){
+            console.log('Error al obtener total de facturas venta');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     @Post()
     @RequirePermission(Permissions.VENTAS.REGISTRAR)
     async create(
@@ -199,5 +241,7 @@ export class VentasController {
             );
         }
     }
+
+    
 
 }

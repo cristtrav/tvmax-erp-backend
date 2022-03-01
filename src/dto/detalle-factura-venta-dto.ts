@@ -5,6 +5,9 @@ export class DetalleFacturaVenta {
     cantidad: number | null = null;
     subtotal: number | null = null;
     idservicio: number | null = null;
+    servicio: string | null = null;
+    idgrupo: number | null = null;
+    grupo: string | null = null;
     porcentajeiva: number | null = null;
     idcuota: number | null = null;
     descripcion: string | null = null;

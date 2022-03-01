@@ -8,6 +8,7 @@ export class Cuota{
     nrocuota: number | null = null;
     pagado: boolean = false;
     fechapago: string | null = null;
+    facturapago: string | null = null;
     observacion: string | null = null;
     porcentajeiva: number | null = null;
 }

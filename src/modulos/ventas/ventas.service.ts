@@ -9,6 +9,7 @@ import { ISearchField } from '@util/isearchfield.interface';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
 
 @Injectable()
 export class VentasService {
@@ -186,7 +187,7 @@ export class VentasService {
             searchQuery,
             null
         );
-        let query: string = `SELECT COUNT(*) FROM public.vw_facturas_venta ${wp.whereStr}`;
+        let query: string = `SELECT COUNT(*) FROM public.vw_facturas_venta ${wp.whereStr}`;        
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 

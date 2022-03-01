@@ -9,7 +9,7 @@ import { CuotasService } from '../cuotas/cuotas.service';
 import { Cuota } from '@dto/cuota.dto';
 import { Servicio } from '@dto/servicio.dto';
 import { ServiciosService } from '../servicios/servicios.service'
-import { ResumenCantSuscDeuda } from '@dto/resumen-cantsusc-deuda.dto';
+import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
 import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
 
 @Controller('suscripciones')
@@ -336,9 +336,9 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+    ): Promise<ServerResponseList<ResumenCantMonto>>{
         try{
-            const data: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenSuscCuotasPendientes(
+            const data: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenSuscCuotasPendientes(
                 {   
                     eliminado,
                     idcliente,
@@ -385,9 +385,9 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+    ): Promise<ServerResponseList<ResumenCantMonto>>{
         try{
-            const rows: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenSuscEstados(
+            const rows: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenSuscEstados(
                 {   
                     eliminado,
                     idcliente,
@@ -434,9 +434,9 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+    ): Promise<ServerResponseList<ResumenCantMonto>>{
         try{
-            const rows: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenGruposServicios(
+            const rows: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenGruposServicios(
                 {   
                     eliminado,
                     idcliente,
@@ -483,9 +483,9 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantSuscDeuda>>{
+    ): Promise<ServerResponseList<ResumenCantMonto>>{
         try{
-            const rows: ResumenCantSuscDeuda[] = await this.suscripcionesSrv.getResumenDepartamentosDistritos(
+            const rows: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenDepartamentosDistritos(
                 {   
                     eliminado,
                     idcliente,

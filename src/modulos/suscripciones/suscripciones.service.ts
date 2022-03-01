@@ -4,7 +4,7 @@ import { DatabaseService } from '@database/database.service';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
-import { ResumenCantSuscDeuda } from '@dto/resumen-cantsusc-deuda.dto';
+import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
 import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 
@@ -245,7 +245,7 @@ export class SuscripcionesService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
-    async getResumenSuscCuotasPendientes(params): Promise<ResumenCantSuscDeuda[]> {
+    async getResumenSuscCuotasPendientes(params): Promise<ResumenCantMonto[]> {
         const {
             eliminado,
             idcliente,
@@ -334,7 +334,7 @@ export class SuscripcionesService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
-    async getResumenSuscEstados(params): Promise<ResumenCantSuscDeuda[]> {
+    async getResumenSuscEstados(params): Promise<ResumenCantMonto[]> {
         const {
             eliminado,
             idcliente,
@@ -407,7 +407,7 @@ export class SuscripcionesService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
-    async getResumenGrupos(params): Promise<ResumenCantSuscDeuda[]> {
+    async getResumenGrupos(params): Promise<ResumenCantMonto[]> {
         const {
             eliminado,
             idcliente,
@@ -474,7 +474,7 @@ export class SuscripcionesService {
         return (this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
-    async getResumenServicios(params): Promise<ResumenCantSuscDeuda[]> {
+    async getResumenServicios(params): Promise<ResumenCantMonto[]> {
         const {
             eliminado,
             idcliente,
@@ -540,7 +540,7 @@ export class SuscripcionesService {
         return (this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
-    async getResumenGruposServicios(params): Promise<ResumenCantSuscDeuda[]>{
+    async getResumenGruposServicios(params): Promise<ResumenCantMonto[]>{
         const {
             eliminado,
             idcliente,
@@ -604,12 +604,12 @@ export class SuscripcionesService {
         FROM public.vw_suscripciones ${wp.whereStr}
         GROUP BY idgrupo, grupo
         ORDER BY grupo ASC`;
-        const rowsGrupos: ResumenCantSuscDeuda[] = (await this.dbsrv.execute(queryGrupos, wp.whereParams)).rows;
+        const rowsGrupos: ResumenCantMonto[] = (await this.dbsrv.execute(queryGrupos, wp.whereParams)).rows;
         const queryServicios: string = `SELECT idservicio AS idreferencia, servicio AS referencia, idgrupo, COUNT(*) AS cantidad, SUM(deuda) AS monto
         FROM public.vw_suscripciones ${wp.whereStr}
         GROUP BY idservicio, servicio, idgrupo ORDER BY servicio DESC`;
         const rowsServicios = (await this.dbsrv.execute(queryServicios, wp.whereParams)).rows;
-        rowsGrupos.forEach((rg: ResumenCantSuscDeuda)=>{
+        rowsGrupos.forEach((rg: ResumenCantMonto)=>{
             if(!rg.children) rg.children = [];
             for(let rs of rowsServicios){
                 if(rs.idgrupo == rg.idreferencia) rg.children.push(rs);
@@ -618,7 +618,7 @@ export class SuscripcionesService {
         return rowsGrupos;
     }
 
-    async getResumenDepartamentosDistritos(params): Promise<ResumenCantSuscDeuda[]>{
+    async getResumenDepartamentosDistritos(params): Promise<ResumenCantMonto[]>{
         const {
             eliminado,
             idcliente,
@@ -689,10 +689,10 @@ export class SuscripcionesService {
         GROUP BY iddepartamento, iddistrito, distrito
         ORDER BY distrito ASC`;
 
-        const rowsDepart: ResumenCantSuscDeuda[] = (await this.dbsrv.execute(queryDepartamentos, wp.whereParams)).rows;
+        const rowsDepart: ResumenCantMonto[] = (await this.dbsrv.execute(queryDepartamentos, wp.whereParams)).rows;
         const rowsDistr = (await this.dbsrv.execute(queryDistritos, wp.whereParams)).rows;
 
-        rowsDepart.forEach((rdep: ResumenCantSuscDeuda)=>{
+        rowsDepart.forEach((rdep: ResumenCantMonto)=>{
             rdep.children = [];
             if(Array.isArray(rowsDistr)) rowsDistr.forEach((rdis)=>{
                 if(rdep.idreferencia === rdis.iddepartamento) rdep.children.push(rdis);

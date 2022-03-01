@@ -106,7 +106,7 @@ export class Permissions {
 
     static readonly ESTADISTICAS = {
         CONSULTARSUSCRIPCIONES: 300,
-        CONSULTARSUCPORESTADO: 301
+        CONSULTARVENTAS: 301
     }
 
     static readonly AUDITORIA = {
