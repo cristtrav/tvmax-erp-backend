@@ -10,7 +10,7 @@ export class SesionService {
     }
 
     async login(reqUsr: {ci: string, password: string}): Promise<Usuario> {
-        const query = `SELECT * FROM public.usuario WHERE ci = $1 AND eliminado = false AND activo = true`
+        const query = `SELECT * FROM public.funcionario WHERE ci = $1 AND eliminado = false AND activo = true`
         const params = [reqUsr.ci]
         const response = await this.dbsrv.execute(query, params)
         var dbUsr: Usuario = response?.rows[0] 
@@ -19,9 +19,9 @@ export class SesionService {
         return null
     }
 
-    async guardarRefreshToken(idusuario: number, token: string){
-        const query = `INSERT INTO public.refresh_tokens(token, idusuario) VALUES($1, $2)`
-        const params = [token, idusuario]
+    async guardarRefreshToken(idfuncionario: number, token: string){
+        const query = `INSERT INTO public.refresh_tokens(token, idfuncionario) VALUES($1, $2)`
+        const params = [token, idfuncionario]
         await this.dbsrv.execute(query, params)
     }
 
@@ -30,8 +30,8 @@ export class SesionService {
         const paramsToken = [token]
         const resultToken = await this.dbsrv.execute(queryToken, paramsToken)
         if(resultToken.rowCount === 0) return null
-        const queryUser = `SELECT * FROM public.usuario WHERE id = $1`
-        const paramsUser = [resultToken.rows[0]?.idusuario]
+        const queryUser = `SELECT * FROM public.funcionario WHERE id = $1`
+        const paramsUser = [resultToken.rows[0]?.idfuncionario]
         const resultUser = await this.dbsrv.execute(queryUser, paramsUser)
         return resultUser.rows[0]
     }

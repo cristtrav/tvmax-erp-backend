@@ -24,7 +24,9 @@ import { UtilModule } from './util/util.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true}),
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     GruposModule,
     SesionModule,
     ServiciosModule,

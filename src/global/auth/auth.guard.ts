@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
   }
 
   async tienePermiso(idusuario, idfucionalidad): Promise<boolean> {
-    const query = `SELECT * FROM public.permiso WHERE idusuario = $1 AND idfuncionalidad = $2`
+    const query = `SELECT * FROM public.permiso WHERE idfuncionario = $1 AND idfuncionalidad = $2`
     const params = [idusuario, idfucionalidad]
     const result = await this.dbsrv.execute(query, params)
     if (result.rowCount === 0) {
