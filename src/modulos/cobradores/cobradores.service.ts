@@ -13,10 +13,10 @@ export class CobradoresService {
 
     async findAll(queryParams): Promise<Cobrador[]>{
         const { eliminado, sort, offset, limit } = queryParams;
-        var query: string = `SELECT id, razon_social AS razonsocial, ci, telefono, email, activo, eliminado, dv_ruc AS dvruc FROM public.cobrador`;
+        var query: string = `SELECT id, TRIM(CONCAT(nombres, ' ', apellidos)) AS razonsocial, ci, telefono, email, activo, eliminado, dv_ruc AS dvruc FROM public.funcionario`;
         const params: any[] = [];
         if(eliminado){
-            query += ` WHERE eliminado = $1`;
+            query += ` WHERE es_cobrador = true AND eliminado = $1`;
             params.push(eliminado);
         }
         if(sort){
@@ -32,10 +32,10 @@ export class CobradoresService {
 
     async count(queryParams): Promise<number>{
         const { eliminado } = queryParams;
-        var query: string = `SELECT COUNT(*) FROM public.cobrador`;
+        var query: string = `SELECT COUNT(*) FROM public.funcionario`;
         const params: any[] = [];
         if(eliminado){
-            query += ` WHERE eliminado = $1`;
+            query += ` WHERE es_cobrador = true AND eliminado = $1`;
             params.push(eliminado);
         }
         return (await this.dbsrv.execute(query, params)).rows[0].count;
@@ -60,7 +60,7 @@ export class CobradoresService {
     }
 
     async findById(id: number): Promise<Cobrador> {
-        const query: string = `SELECT id, razon_social AS razonsocial, ci, telefono, email, activo, eliminado, dv_ruc AS dvruc FROM public.cobrador WHERE id = $1`;
+        const query: string = `SELECT id, TRIM(CONCAT(nombres, ' ', apellidos)) AS razonsocial, ci, telefono, email, activo, eliminado, dv_ruc AS dvruc FROM public.cobrador WHERE id = $1`;
         const rows: Cobrador[] = (await this.dbsrv.execute(query, [id])).rows;
         if(rows.length > 0) return rows[0];
         return null;
