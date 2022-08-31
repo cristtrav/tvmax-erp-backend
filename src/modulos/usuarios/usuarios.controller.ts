@@ -4,8 +4,8 @@ import { RequirePermission } from 'src/global/auth/require-permission.decorator'
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { UsuariosService } from './usuarios.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
-import { Usuario } from 'src/dto/usuario.dto';
 import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { Funcionario } from '@dto/funcionario.dto';
 
 @Controller('usuarios')
 @UseGuards(AuthGuard)
@@ -23,11 +23,11 @@ export class UsuariosController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ): Promise<ServerResponseList<Usuario>> {
+    ): Promise<ServerResponseList<Funcionario>> {
         try{
-            const data: Usuario[] = await this.usuarioSrv.findAll({eliminado, sort, offset, limit});
+            const data: Funcionario[] = await this.usuarioSrv.findAll({eliminado, sort, offset, limit});
             const rowCount: number = await this.usuarioSrv.count({eliminado});
-            return new ServerResponseList<Usuario>(data, rowCount);
+            return new ServerResponseList<Funcionario>(data, rowCount);
         }catch(e){
             console.log('Error al consultar usuarios');
             console.log(e);
@@ -44,7 +44,7 @@ export class UsuariosController {
     @Post()
     @RequirePermission(Permissions.USUARIOS.REGISTRAR)
     async create(
-        @Body() u: Usuario,
+        @Body() u: Funcionario,
         @Req() request: Request
     ){
         try{
@@ -66,9 +66,9 @@ export class UsuariosController {
     @RequirePermission(Permissions.USUARIOS.CONSULTAR)
     async findById(
         @Param('id') id: number
-    ): Promise<Usuario>{
+    ): Promise<Funcionario>{
         try{
-            const u: Usuario | null = await this.usuarioSrv.findById(id);
+            const u: Funcionario | null = await this.usuarioSrv.findById(id);
             if(!u) throw new HttpException(
                 {
                     request: 'get',
@@ -94,7 +94,7 @@ export class UsuariosController {
     @RequirePermission(Permissions.USUARIOS.EDITAR)
     async edit(
         @Param('id') oldId: number,
-        @Body() u: Usuario,
+        @Body() u: Funcionario,
         @Req() request: Request
     ){
         try{

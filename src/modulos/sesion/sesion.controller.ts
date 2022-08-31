@@ -2,8 +2,8 @@ import { Controller, Post, Body, HttpException, HttpStatus, Delete } from '@nest
 import { SesionService } from './sesion.service';
 import { TokenSesion } from './../../dto/token-sesion.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Usuario } from './../../dto/usuario.dto';
 import { DatabaseService } from '@database/database.service';  
+import { Funcionario } from '@dto/funcionario.dto';
 
 @Controller('sesion')
 export class SesionController {
@@ -16,7 +16,7 @@ export class SesionController {
 
     @Post('login')
     async login(@Body() user: { ci: string, password: string }): Promise<TokenSesion> {
-        const loggedUser: Usuario = await this.sesionSrv.login(user)
+        const loggedUser: Funcionario = await this.sesionSrv.login(user)
         if (!loggedUser) throw new HttpException('Error de usuario o contraseña', HttpStatus.UNAUTHORIZED)
         const sesToken: TokenSesion = this.generarToken(loggedUser, true)
         this.sesionSrv.guardarRefreshToken(loggedUser.id, sesToken.refreshToken)
@@ -32,7 +32,7 @@ export class SesionController {
             await this.dbsrv.execute(`DELETE FROM public.refresh_tokens WHERE token = $1`, [token.refreshToken]);
             throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
         }
-        const usr: Usuario = await this.sesionSrv.refresh(token.refreshToken)
+        const usr: Funcionario = await this.sesionSrv.refresh(token.refreshToken)
         if (!usr) throw new HttpException('Forbidden', HttpStatus.FORBIDDEN)
         var sesToken: TokenSesion = this.generarToken(usr, false)
         return sesToken
@@ -43,7 +43,7 @@ export class SesionController {
         await this.sesionSrv.logout(token.refreshToken)
     }
 
-    private generarToken(usr: Usuario, crearRefresh: boolean): TokenSesion {
+    private generarToken(usr: Funcionario, crearRefresh: boolean): TokenSesion {
         var sesToken: TokenSesion = new TokenSesion()
         sesToken.nombreUsuario = `${usr.nombres} ${usr.apellidos}`
         sesToken.accessToken = this.jwtsrv.sign({ sub: usr.id }, {

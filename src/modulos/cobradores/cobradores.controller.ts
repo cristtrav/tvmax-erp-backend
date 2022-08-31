@@ -1,10 +1,10 @@
 import { Request, Req, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
-import { Cobrador } from '../../dto/cobrador.dto';
 import { CobradoresService } from './cobradores.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { Funcionario } from '@dto/funcionario.dto';
 
 @Controller('cobradores')
 export class CobradoresController {
@@ -21,11 +21,11 @@ export class CobradoresController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ): Promise<ServerResponseList<Cobrador>>{
+    ): Promise<ServerResponseList<Funcionario>>{
         try{
-            const rows: Cobrador[] = await this.cobradorSrv.findAll({eliminado, sort, offset, limit});
+            const rows: Funcionario[] = await this.cobradorSrv.findAll({eliminado, sort, offset, limit});
             const rowCount: number = await this.cobradorSrv.count({eliminado});
-            return new ServerResponseList<Cobrador>(rows, rowCount);
+            return new ServerResponseList<Funcionario>(rows, rowCount);
         }catch(e){
             console.log('Error al consultar cobradores');
             console.log(e);
@@ -42,7 +42,7 @@ export class CobradoresController {
     @Post()
     @RequirePermission(Permissions.COBRADORES.REGISTRAR)
     async create(
-        @Body() c: Cobrador,
+        @Body() c: Funcionario,
         @Req() request: Request
     ){
         try{
@@ -64,9 +64,9 @@ export class CobradoresController {
     @RequirePermission(Permissions.COBRADORES.CONSULTAR)
     async findById(
         @Param('id') id: number
-    ): Promise<Cobrador>{
+    ): Promise<Funcionario>{
         try{
-            const c: Cobrador = await this.cobradorSrv.findById(id);
+            const c: Funcionario = await this.cobradorSrv.findById(id);
             if(!c) throw new HttpException(
                 {
                     request: 'get',
@@ -92,7 +92,7 @@ export class CobradoresController {
     @RequirePermission(Permissions.COBRADORES.EDITAR)
     async edit(
         @Param('id') oldId: number,
-        @Body() c: Cobrador,
+        @Body() c: Funcionario,
         @Req() request: Request
     ){
         try{
