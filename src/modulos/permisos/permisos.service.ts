@@ -34,7 +34,7 @@ export class PermisosService {
         const { eliminado, sort, offset, limit } = reqQuery;
         const sof: string = new WhereParam(null, null, null, null, {sort, offset, limit}).sortOffsetLimitStr;
         const queryPermisos: string = `SELECT * FROM public.funcionalidad 
-        WHERE id IN (SELECT idfuncionalidad FROM public.permiso WHERE idusuario = $1) ${sof}`;
+        WHERE id IN (SELECT idfuncionalidad FROM public.permiso WHERE idfuncionario = $1) ${sof}`;
         return (await this.dbsrv.execute(queryPermisos, [idusuario])).rows;
     }
 
@@ -42,9 +42,9 @@ export class PermisosService {
         const dbcli: Client = await this.dbsrv.getDBClient();
         try{
             dbcli.query('BEGIN');
-            dbcli.query('DELETE FROM public.permiso WHERE idusuario = $1', [idusuario]);
+            dbcli.query('DELETE FROM public.permiso WHERE idfuncionario = $1', [idusuario]);
             for(let idf of idfuncionalidades){
-                dbcli.query(`INSERT INTO public.permiso(idusuario, idfuncionalidad) VALUES($1, $2)`, [idusuario, idf]);
+                dbcli.query(`INSERT INTO public.permiso(idfuncionario, idfuncionalidad) VALUES($1, $2)`, [idusuario, idf]);
             }
             dbcli.query('COMMIT');
         }catch(e){
