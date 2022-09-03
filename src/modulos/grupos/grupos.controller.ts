@@ -55,6 +55,24 @@ export class GruposController {
         }
     }
 
+    @Get('ultimoid')
+    @RequirePermission(Permissions.GRUPOS.CONSULTAR)
+    async getLastId(): Promise<number>{
+        try{
+            return await this.gruposSrv.getLastId();
+        }catch(e){
+            console.log('Error al consultar ultimo ID de grupos');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     @Get(':id')
     @RequirePermission(Permissions.GRUPOS.CONSULTAR)
     async findById(@Param('id') id: number): Promise<Grupo> {
@@ -156,4 +174,6 @@ export class GruposController {
             )
         }
     }
+
+    
 }

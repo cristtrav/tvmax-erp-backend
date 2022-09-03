@@ -99,4 +99,9 @@ export class GruposService {
         return rowCount;
     }
 
+    async getLastId(): Promise<number>{
+        const query: string = `SELECT MAX(id) FROM public.grupo`;
+        return (await this.dbsrv.execute(query)).rows[0].max;
+    }
+
 }
