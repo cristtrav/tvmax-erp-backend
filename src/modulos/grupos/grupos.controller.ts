@@ -24,11 +24,12 @@ export class GruposController {
         @Query('sort') sort: string,
         @Query('limit') limit: number,
         @Query('offset') offset: number,
-        @Query('id') id: number[] | string[]
+        @Query('id') id: number[] | string[],
+        @Query('search') search: string
     ): Promise<ServerResponseList<Grupo>> {
         try {
-            const data: Grupo[] = await this.gruposSrv.findAll({ eliminado, id, sort, limit, offset });
-            const rowCount: number = await this.gruposSrv.count({ eliminado, id });
+            const data: Grupo[] = await this.gruposSrv.findAll({ eliminado, search, id, sort, limit, offset });
+            const rowCount: number = await this.gruposSrv.count({ eliminado, search, id});
             return new ServerResponseList<Grupo>(data, rowCount);
         } catch (e) {
             throw new HttpException(

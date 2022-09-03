@@ -1,6 +1,7 @@
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { Injectable } from '@nestjs/common';
 import { AuditQueryHelper } from '@util/audit-query-helper';
+import { ISearchField } from '@util/isearchfield.interface';
 import { WhereParam } from '@util/whereparam';
 import { Grupo } from '../../dto/grupo.dto';
 import { DatabaseService } from './../../global/database/database.service';
@@ -12,12 +13,19 @@ export class GruposService {
     }
 
     async findAll(reqQuery): Promise<Grupo[]> {
-        const { eliminado, id, sort, offset, limit } = reqQuery
+        const { eliminado, id, search, sort, offset, limit } = reqQuery
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'descripcion',
+                fieldValue: search,
+                exactMatch: false
+            }
+        ];
         const wp: WhereParam = new WhereParam(
             { eliminado, id },
             null,
             null,
-            null,
+            searchQuery,
             { sort, offset, limit }
         );
         var query: string = `SELECT * FROM public.grupo ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
@@ -25,12 +33,19 @@ export class GruposService {
     }
 
     async count(reqQuery): Promise<number> {
-        const { eliminado, id } = reqQuery
+        const { eliminado, id, search } = reqQuery
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'descripcion',
+                fieldValue: search,
+                exactMatch: false
+            }
+        ];
         const wp: WhereParam = new WhereParam(
             { eliminado, id },
             null,
             null,
-            null,
+            searchQuery,
             null
         );
         var query: string = `SELECT COUNT(*) FROM public.grupo ${wp.whereStr}`;
