@@ -24,12 +24,13 @@ export class BarriosController {
         @Query('offset') offset: number,
         @Query('limit') limit: number,
         @Query('iddistrito') iddistrito: number | number[],
+        @Query('iddepartamento') iddepartamento: number | number[],
         @Query('id') id: number[],
         @Query('search') search: string
     ): Promise<ServerResponseList<Barrio>>{
         try{
-            const data: Barrio[] = await this.barriosSrv.findAll({eliminado, iddistrito, id, search, sort, limit, offset});
-            const rowCount: number = await this.barriosSrv.count({eliminado, iddistrito, id, search});
+            const data: Barrio[] = await this.barriosSrv.findAll({eliminado, iddistrito, iddepartamento, id, search, sort, limit, offset});
+            const rowCount: number = await this.barriosSrv.count({eliminado, iddistrito, iddepartamento, id, search});
             return new ServerResponseList<Barrio>(data, rowCount);
         }catch(e){
             console.log('Error al consultar barrios');
