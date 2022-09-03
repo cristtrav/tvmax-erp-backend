@@ -24,11 +24,12 @@ export class BarriosController {
         @Query('offset') offset: number,
         @Query('limit') limit: number,
         @Query('iddistrito') iddistrito: number | number[],
-        @Query('id') id: number[]
+        @Query('id') id: number[],
+        @Query('search') search: string
     ): Promise<ServerResponseList<Barrio>>{
         try{
-            const data: Barrio[] = await this.barriosSrv.findAll({eliminado, iddistrito, id, sort, limit, offset});
-            const rowCount: number = await this.barriosSrv.count({eliminado, iddistrito, id});
+            const data: Barrio[] = await this.barriosSrv.findAll({eliminado, iddistrito, id, search, sort, limit, offset});
+            const rowCount: number = await this.barriosSrv.count({eliminado, iddistrito, id, search});
             return new ServerResponseList<Barrio>(data, rowCount);
         }catch(e){
             console.log('Error al consultar barrios');
@@ -52,6 +53,24 @@ export class BarriosController {
             return await this.barriosSrv.count({eliminado});
         }catch(e){
             console.log('Error al consultar total de registros de Barrios');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get('ultimoid')
+    @RequirePermission(Permissions.BARRIOS.CONSULTAR)
+    async getLastId(): Promise<number>{
+        try{
+            return await this.barriosSrv.getLastId();
+        }catch(e){
+            console.log('Error al consultar ultimo id de Barrios');
             console.log(e);
             throw new HttpException(
                 {

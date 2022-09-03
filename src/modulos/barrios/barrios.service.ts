@@ -5,6 +5,7 @@ import { Result } from 'pg';
 import { WhereParam } from '@util/whereparam';
 import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { ISearchField } from '@util/isearchfield.interface';
 
 @Injectable()
 export class BarriosService {
@@ -14,12 +15,19 @@ export class BarriosService {
     ){}
 
     async findAll(queryParams): Promise<Barrio[]>{
-        const { eliminado, iddistrito, id, sort, offset, limit } = queryParams;
+        const { eliminado, iddistrito, id, search, sort, offset, limit } = queryParams;
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'descripcion',
+                exactMatch: false,
+                fieldValue: search
+            }
+        ];
         const wp: WhereParam = new WhereParam(
             {eliminado, iddistrito, id},
             null,
             null,
-            null,
+            searchQuery,
             { sort, offset, limit }
         );
         var query: string = `SELECT * FROM public.vw_barrios ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
@@ -27,12 +35,19 @@ export class BarriosService {
     }
 
     async count(queryParam): Promise<number>{
-        const { eliminado, iddistrito, id } = queryParam;
+        const { eliminado, iddistrito, id, search } = queryParam;
+        const searchQuery: ISearchField[] = [
+            {
+                fieldName: 'descripcion',
+                exactMatch: false,
+                fieldValue: search
+            }
+        ];
         const wp: WhereParam = new WhereParam(
             {eliminado, iddistrito, id},
             null,
             null,
-            null,
+            searchQuery,
             null
         );
         var query: string = `SELECT COUNT(*) FROM public.barrio ${wp.whereStr}`;
@@ -98,6 +113,11 @@ export class BarriosService {
             cli.release();
         }
         return rowCount;
+    }
+
+    async getLastId(): Promise<number>{
+        const query: string = `SELECT MAX(id) FROM public.barrio`;
+        return (await this.dbsrv.execute(query)).rows[0].max;
     }
 
 }
