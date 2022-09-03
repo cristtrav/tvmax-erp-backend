@@ -120,6 +120,24 @@ export class ServiciosController {
         }
     }
 
+    @Get('ultimoid')
+    @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
+    async getLastId(): Promise<number>{
+        try{
+            return await this.serviciosSrv.getLastId();
+        }catch(e){
+            console.log('Error al consultar ultimo id de servicios');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     @Get(':id')
     @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
     async findById(

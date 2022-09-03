@@ -145,4 +145,9 @@ export class ServiciosService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
+    async getLastId(): Promise<number>{
+        const query: string = `SELECT MAX(id) FROM public.servicio`;
+        return (await this.dbsrv.execute(query)).rows[0].max;
+    }
+
 }
