@@ -9,7 +9,6 @@ import { ServiciosModule } from './modulos/servicios/servicios.module';
 import { DepartamentosModule } from './modulos/departamentos/departamentos.module';
 import { DistritosModule } from './modulos/distritos/distritos.module';
 import { BarriosModule } from './modulos/barrios/barrios.module';
-import { TiposdomiciliosModule } from './modulos/tiposdomicilios/tiposdomicilios.module';
 import { ClientesModule } from './modulos/clientes/clientes.module';
 import { UsuariosModule } from './modulos/usuarios/usuarios.module';
 import { CobradoresModule } from './modulos/cobradores/cobradores.module';
@@ -33,7 +32,6 @@ import { UtilModule } from './util/util.module';
     DepartamentosModule,
     DistritosModule,
     BarriosModule,
-    TiposdomiciliosModule,
     ClientesModule,
     UsuariosModule,
     CobradoresModule,

@@ -4,8 +4,6 @@ export class Domicilio {
     nromedidor: string | null = null;
     idbarrio: number | null = null;
     barrio: string | null = null;
-    idtipodomicilio: number | null = null;
-    tipodomicilio: string | null = null;
     idcliente: number | null = null;
     cliente: string | null = null;
     observacion: string | null = null;
@@ -14,4 +12,5 @@ export class Domicilio {
     distrito: string | null = null;
     iddepartamento: number | null = null;
     departamento: string| null = null;
+    tipo: string | null = null;
 }

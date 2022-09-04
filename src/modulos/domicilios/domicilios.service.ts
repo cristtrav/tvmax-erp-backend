@@ -45,9 +45,9 @@ export class DomiciliosService {
 
     async create(d: Domicilio, idusuario: number){
         const cli = await this.dbsrv.getDBClient();
-        const query: string = `INSERT INTO public.domicilio(id, direccion, nro_medidor, idbarrio, observacion, idtipo_domicilio, idcliente, principal, eliminado)
+        const query: string = `INSERT INTO public.domicilio(id, direccion, nro_medidor, idbarrio, observacion, tipo, idcliente, principal, eliminado)
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, false)`;
-        const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.idtipodomicilio, d.idcliente, d.principal];
+        const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.tipo, d.idcliente, d.principal];
         try{
             await cli.query('BEGIN');
             if(d.principal === true){
@@ -67,8 +67,8 @@ export class DomiciliosService {
 
     async edit(oldId: number, d: Domicilio, idusuario: number): Promise<boolean>{
         const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.domicilio SET id = $1, direccion = $2, nro_medidor = $3, idbarrio = $4, observacion = $5, idtipo_domicilio = $6, idcliente = $7, principal = $8 WHERE id = $9`;
-        const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.idtipodomicilio, d.idcliente, d.principal, oldId];
+        const query: string = `UPDATE public.domicilio SET id = $1, direccion = $2, nro_medidor = $3, idbarrio = $4, observacion = $5, tipo = $6, idcliente = $7, principal = $8 WHERE id = $9`;
+        const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.tipo, d.idcliente, d.principal, oldId];
         let rowCount = 0;
         try{
             await cli.query('BEGIN');
