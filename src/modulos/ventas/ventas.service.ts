@@ -21,9 +21,34 @@ export class VentasService {
 
     async create(fv: FacturaVenta, registraCobro: boolean, idusu: number): Promise<number> {
         const dbcli: Client = await this.dbsrv.getDBClient();
-        const queryCabecera: string = `INSERT INTO public.factura_venta (id, idcliente, fecha_factura, pagado, anulado, idtimbrado, nro_factura, fecha_cobro, idcobrador_comision, idusuario_registro_factura, idusuario_registro_cobro, eliminado)
-        VALUES(nextval('public.seq_factura_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false) RETURNING *`;
-        const paramsCabecera: any[] = [fv.idcliente, fv.fechafactura, fv.pagado, fv.anulado, fv.idtimbrado, fv.nrofactura, fv.fechacobro, fv.idcobradorcomision, fv.idusuarioregistrofactura, fv.idusuarioregistrocobro];
+        const queryCabecera: string = `
+        INSERT INTO public.factura_venta (
+            id,
+            idcliente,
+            fecha_factura,
+            pagado, anulado,
+            idtimbrado,
+            nro_factura,
+            fecha_cobro,
+            idcobrador_comision,
+            idusuario_registro_factura,
+            idusuario_registro_cobro,
+            eliminado)
+        VALUES
+            (nextval('public.seq_factura_venta'),
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+            false) RETURNING *`;
+        const paramsCabecera: any[] = [
+            fv.idcliente,
+            fv.fechafactura,
+            fv.pagado,
+            fv.anulado,
+            fv.idtimbrado,
+            fv.nrofactura,
+            fv.fechacobro,
+            fv.idcobradorcomision,
+            fv.idfuncionarioregistrofactura,
+            fv.idfuncionarioregistrocobro];
         try {
             await dbcli.query('BEGIN');
             const res = await dbcli.query(queryCabecera, paramsCabecera);
