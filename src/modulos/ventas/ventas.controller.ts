@@ -7,6 +7,8 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { VentasService } from './ventas.service';
 import { Request } from '@nestjs/common';
 import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { DetalleFacturaVenta } from '@dto/detalle-factura-venta-dto';
+import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service';
 
 @Controller('ventas')
 @UseGuards(AuthGuard)
@@ -14,6 +16,7 @@ export class VentasController {
 
     constructor(
         private ventasSrv: VentasService,
+        private detallesVentaSrv: DetallesVentasService,
         private jwtUtil: JwtUtilsService
     ){}
 
@@ -174,6 +177,28 @@ export class VentasController {
             await this.ventasSrv.anular(id, false, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al revertir anulacion');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Get(':id/detalles')
+    @RequirePermission(Permissions.VENTAS.CONSULTAR)
+    async getDetallesVenta(
+        @Param('id') id: number
+    ): Promise<ServerResponseList<DetalleFacturaVenta>>{
+        try{
+            const rows: DetalleFacturaVenta[] = await this.detallesVentaSrv.findByIdVenta(id);
+            const count: number = await this.detallesVentaSrv.countByIdVenta(id);
+            return new ServerResponseList(rows, count)
+        }catch(e){
+            console.log('Error al consultar detalles de venta');
             console.log(e);
             throw new HttpException(
                 {

@@ -7,13 +7,14 @@ import { ClientesService } from '../clientes/clientes.service';
 import { UtilModule } from '@util/util.module';
 import { ResumenVentasService } from './resumen-ventas/resumen-ventas.service';
 import { ResumenVentasController } from './resumen-ventas/resumen-ventas.controller';
+import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule
   ],
-  providers: [VentasService, DatabaseService, ClientesService, ResumenVentasService],
+  providers: [VentasService, DatabaseService, ClientesService, ResumenVentasService, DetallesVentasService],
   controllers: [VentasController, ResumenVentasController]
 })
 export class VentasModule {}

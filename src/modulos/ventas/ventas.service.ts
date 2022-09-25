@@ -3,20 +3,17 @@ import { DatabaseService } from '@database/database.service';
 import { FacturaVenta } from '@dto/factura-venta.dto';
 import { Client } from 'pg';
 import { DetalleFacturaVenta } from '@dto/detalle-factura-venta-dto';
-import { ClientesService } from '../clientes/clientes.service';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
-import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
 
 @Injectable()
 export class VentasService {
 
     constructor(
         private dbsrv: DatabaseService,
-        private clienteSrv: ClientesService
     ) { }
 
     async create(fv: FacturaVenta, registraCobro: boolean, idusu: number): Promise<number> {
@@ -146,15 +143,6 @@ export class VentasService {
         );
         let query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
         const rows: FacturaVenta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
-        for (let fv of rows) {
-            const queryDetalle: string = `SELECT * FROM public.vw_detalles_factura_venta WHERE eliminado = false AND idfacturaventa = $1`;
-            const detalles: DetalleFacturaVenta[] = (await this.dbsrv.execute(queryDetalle, [fv.id])).rows;
-            fv.detalles = detalles;
-
-            /*const queryCobro: string = `SELECT * FROM public.vw_cobros WHERE eliminado = false AND idfactura = $1`;
-            const cobros: Cobro[] = (await this.dbsrv.execute(queryCobro, [fv.id])).rows;
-            fv.cobros = cobros;*/
-        }
         return rows;
     }
 
