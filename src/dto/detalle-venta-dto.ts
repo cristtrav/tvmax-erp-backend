@@ -1,6 +1,6 @@
-export class DetalleFacturaVenta {
+export class DetalleVenta {
     id: number | null = null;
-    idfacturaventa: number | null = null;
+    idventa: number | null = null;
     monto: number | null = null;
     cantidad: number | null = null;
     subtotal: number | null = null;

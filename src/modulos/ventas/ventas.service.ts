@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
-import { FacturaVenta } from '@dto/factura-venta.dto';
+import { Venta } from '@dto/venta.dto';
 import { Client } from 'pg';
-import { DetalleFacturaVenta } from '@dto/detalle-factura-venta-dto';
+import { DetalleVenta } from '@dto/detalle-venta-dto';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
 import { IRangeQuery } from '@util/irangequery.interface';
@@ -16,10 +16,10 @@ export class VentasService {
         private dbsrv: DatabaseService,
     ) { }
 
-    async create(fv: FacturaVenta, registraCobro: boolean, idusu: number): Promise<number> {
+    async create(fv: Venta, registraCobro: boolean, idusu: number): Promise<number> {
         const dbcli: Client = await this.dbsrv.getDBClient();
         const queryCabecera: string = `
-        INSERT INTO public.factura_venta (
+        INSERT INTO public.venta (
             id,
             idcliente,
             fecha_factura,
@@ -32,7 +32,7 @@ export class VentasService {
             idusuario_registro_cobro,
             eliminado)
         VALUES
-            (nextval('public.seq_factura_venta'),
+            (nextval('public.seq_venta'),
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
             false) RETURNING *`;
         const paramsCabecera: any[] = [
@@ -51,13 +51,13 @@ export class VentasService {
             const res = await dbcli.query(queryCabecera, paramsCabecera);
         
             const idgenerado = res.rows[0].id;
-            await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.FACTURAVENTA, idusu, idgenerado);
+            await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.VENTA, idusu, idgenerado);
             for (let dv of fv.detalles) {
-                const queryDetalle: string = `INSERT INTO public.detalle_factura_venta(id, idfactura_venta, monto, cantidad, subtotal, descripcion, porcentaje_iva, idservicio, idcuota, idsuscripcion, eliminado)
-                VALUES(nextval('public.seq_detalle_factura_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, false) RETURNING *`;
+                const queryDetalle: string = `INSERT INTO public.detalle_venta(id, idventa, monto, cantidad, subtotal, descripcion, porcentaje_iva, idservicio, idcuota, idsuscripcion, eliminado)
+                VALUES(nextval('public.seq_detalle_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, false) RETURNING *`;
                 const paramsDetalle: any[] = [idgenerado, dv.monto, dv.cantidad, dv.subtotal, dv.descripcion, dv.porcentajeiva, dv.idservicio, dv.idcuota, dv.idsuscripcion];
                 const idddetalle = (await dbcli.query(queryDetalle, paramsDetalle)).rows[0].id;
-                await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.DETALLEFACTURAVENTA, idusu, idddetalle);
+                await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.DETALLEVENTA, idusu, idddetalle);
             }
             
             const queryTimbrado: string = `UPDATE public.timbrado SET ultimo_nro_usado = $1 WHERE id = $2`;
@@ -84,7 +84,7 @@ export class VentasService {
         }
     }
 
-    async findAll(params): Promise<FacturaVenta[]> {
+    async findAll(params): Promise<Venta[]> {
         const { 
             eliminado,
             search,
@@ -141,8 +141,8 @@ export class VentasService {
             searchQuery,
             { sort, offset, limit }
         );
-        let query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        const rows: FacturaVenta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        let query: string = `SELECT * FROM public.vw_ventas ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
+        const rows: Venta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
         return rows;
     }
 
@@ -200,19 +200,19 @@ export class VentasService {
             searchQuery,
             null
         );
-        let query: string = `SELECT COUNT(*) FROM public.vw_facturas_venta ${wp.whereStr}`;        
+        let query: string = `SELECT COUNT(*) FROM public.vw_ventas ${wp.whereStr}`;        
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
     async anular(idventa: number, anulado, idusuario: number): Promise<void> {
         const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.factura_venta SET anulado = $1 WHERE id = $2`;
+        const query: string = `UPDATE public.venta SET anulado = $1 WHERE id = $2`;
         const params = [anulado, idventa];
         try{
             await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.FACTURAVENTA, idusuario, idventa);
+            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.VENTA, idusuario, idventa);
             await cli.query(query, params);
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.FACTURAVENTA, idevento, idventa);
+            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.VENTA, idevento, idventa);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
@@ -223,12 +223,12 @@ export class VentasService {
 
     async delete(id: number, idusuario: number): Promise<boolean> {
         const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.factura_venta SET eliminado = true WHERE id = $1`;
+        const query: string = `UPDATE public.venta SET eliminado = true WHERE id = $1`;
         let rowCount = 0;
         try{
             await cli.query('BEGIN');
             rowCount = (await cli.query(query, [id])).rowCount;
-            AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.FACTURAVENTA, idusuario, id);
+            AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.VENTA, idusuario, id);
             await cli.query('COMMIT');
         }catch(e){
             await cli.query('ROLLBACK');
@@ -239,7 +239,7 @@ export class VentasService {
         return rowCount > 0;
     }
 
-    async findById(id: number): Promise<FacturaVenta>{
+    async findById(id: number): Promise<Venta>{
         const wp: WhereParam = new WhereParam(
             { id },
             null,
@@ -247,12 +247,12 @@ export class VentasService {
             null,
             null
         );
-        const query: string = `SELECT * FROM public.vw_facturas_venta ${wp.whereStr}`;
-        const rows: FacturaVenta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        const query: string = `SELECT * FROM public.vw_ventas ${wp.whereStr}`;
+        const rows: Venta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
         if(rows.length > 0){
-            const fv: FacturaVenta = rows[0];
-            const queryDetalle: string = `SELECT * FROM public.vw_detalles_factura_venta WHERE eliminado = false AND idfacturaventa = $1`;
-            const detalles: DetalleFacturaVenta[] = (await this.dbsrv.execute(queryDetalle, [fv.id])).rows;
+            const fv: Venta = rows[0];
+            const queryDetalle: string = `SELECT * FROM public.vw_detalles_venta WHERE eliminado = false AND idVenta = $1`;
+            const detalles: DetalleVenta[] = (await this.dbsrv.execute(queryDetalle, [fv.id])).rows;
             fv.detalles = detalles;
             return fv;
         };

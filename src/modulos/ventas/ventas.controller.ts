@@ -1,13 +1,13 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { FacturaVenta } from '@dto/factura-venta.dto';
+import { Venta } from '@dto/venta.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { VentasService } from './ventas.service';
 import { Request } from '@nestjs/common';
 import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
-import { DetalleFacturaVenta } from '@dto/detalle-factura-venta-dto';
+import { DetalleVenta } from '@dto/detalle-venta-dto';
 import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service';
 
 @Controller('ventas')
@@ -65,7 +65,7 @@ export class VentasController {
     @Post()
     @RequirePermission(Permissions.VENTAS.REGISTRAR)
     async create(
-        @Body() fv: FacturaVenta,
+        @Body() fv: Venta,
         @Req() request: Request
     ): Promise<number>{
         try{
@@ -99,9 +99,9 @@ export class VentasController {
         @Query('idusuarioregistrocobro') idusuarioregistrocobro: number,
         @Query('fechainiciocobro') fechainiciocobro: string,
         @Query('fechafincobro') fechafincobro: string
-    ): Promise<ServerResponseList<FacturaVenta>>{
+    ): Promise<ServerResponseList<Venta>>{
         try{
-            const data: FacturaVenta[] = await this.ventasSrv.findAll(
+            const data: Venta[] = await this.ventasSrv.findAll(
                 {
                     eliminado,
                     search,
@@ -132,7 +132,7 @@ export class VentasController {
                     fechafincobro,
                 }
             );
-            return new ServerResponseList<FacturaVenta>(data, count);
+            return new ServerResponseList<Venta>(data, count);
         }catch(e){
             console.log('Error al consultar facturas de venta');
             console.log(e);
@@ -192,9 +192,9 @@ export class VentasController {
     @RequirePermission(Permissions.VENTAS.CONSULTAR)
     async getDetallesVenta(
         @Param('id') id: number
-    ): Promise<ServerResponseList<DetalleFacturaVenta>>{
+    ): Promise<ServerResponseList<DetalleVenta>>{
         try{
-            const rows: DetalleFacturaVenta[] = await this.detallesVentaSrv.findByIdVenta(id);
+            const rows: DetalleVenta[] = await this.detallesVentaSrv.findByIdVenta(id);
             const count: number = await this.detallesVentaSrv.countByIdVenta(id);
             return new ServerResponseList(rows, count)
         }catch(e){
@@ -245,7 +245,7 @@ export class VentasController {
         @Param('id') id: number
     ){
         try{
-            const rows: FacturaVenta = await this.ventasSrv.findById(id);
+            const rows: Venta = await this.ventasSrv.findById(id);
             if(!rows) throw new HttpException(
                 {
                     request: 'get',

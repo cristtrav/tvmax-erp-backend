@@ -55,8 +55,8 @@ export class ResumenVentasService {
         }
         const wp: WhereParam = new WhereParam(
             {
-                'vw_facturas_venta.eliminado': eliminado,
-                'vw_detalles_factura_venta.eliminado': false,
+                'vw_ventas.eliminado': eliminado,
+                'vw_detalles_venta.eliminado': false,
                 pagado,
                 anulado,
                 idcobradorcomision,
@@ -68,24 +68,24 @@ export class ResumenVentasService {
             null
         );
         const queryGrupos: string = `SELECT 
-        vw_detalles_factura_venta.idgrupo AS idreferencia,
-        vw_detalles_factura_venta.grupo AS referencia,
-        SUM(vw_detalles_factura_venta.subtotal) AS monto,
+        vw_detalles_venta.idgrupo AS idreferencia,
+        vw_detalles_venta.grupo AS referencia,
+        SUM(vw_detalles_venta.subtotal) AS monto,
         COUNT(*) As cantidad
-        FROM public.vw_detalles_factura_venta
-        JOIN public.vw_facturas_venta ON vw_detalles_factura_venta.idfacturaventa = vw_facturas_venta.id
+        FROM public.vw_detalles_venta
+        JOIN public.vw_ventas ON vw_detalles_venta.idventa = vw_ventas.id
         ${wp.whereStr}
         GROUP BY idreferencia, referencia`;
         const rowsGrupos: ResumenCantMonto[] = (await this.dbsrv.execute(queryGrupos, wp.whereParams)).rows;
         
         const queryServicios = `SELECT 
-        vw_detalles_factura_venta.idservicio AS idreferencia,
-        vw_detalles_factura_venta.servicio AS referencia,
-        vw_detalles_factura_venta.idgrupo AS idgrupo,
-        SUM(vw_detalles_factura_venta.subtotal) AS monto,
+        vw_detalles_venta.idservicio AS idreferencia,
+        vw_detalles_venta.servicio AS referencia,
+        vw_detalles_venta.idgrupo AS idgrupo,
+        SUM(vw_detalles_venta.subtotal) AS monto,
         COUNT(*) As cantidad
-        FROM public.vw_detalles_factura_venta
-        JOIN public.vw_facturas_venta ON vw_detalles_factura_venta.idfacturaventa = vw_facturas_venta.id
+        FROM public.vw_detalles_venta
+        JOIN public.vw_ventas ON vw_detalles_venta.idventa = vw_ventas.id
         ${wp.whereStr}
         GROUP BY idreferencia, referencia, idgrupo
         ORDER BY referencia ASC`;
@@ -153,7 +153,7 @@ export class ResumenVentasService {
             searchQuery,
             null
         );
-        let query: string = `SELECT SUM(vw_facturas_venta.total) FROM public.vw_facturas_venta ${wp.whereStr}`;        
+        let query: string = `SELECT SUM(vw_ventas.total) FROM public.vw_ventas ${wp.whereStr}`;        
         const rowsSum = (await this.dbsrv.execute(query, wp.whereParams)).rows;
         return rowsSum[0].sum ? rowsSum[0].sum:0;    
     }
@@ -213,11 +213,11 @@ export class ResumenVentasService {
             null
         );
         const query: string = `SELECT
-        vw_facturas_venta.idcobradorcomision AS idreferencia,
-        vw_facturas_venta.cobrador AS referencia,
+        vw_ventas.idcobradorcomision AS idreferencia,
+        vw_ventas.cobrador AS referencia,
         COUNT(*) AS cantidad,
         SUM(total) AS monto
-        FROM public.vw_facturas_venta
+        FROM public.vw_ventas
         ${wp.whereStr}
         GROUP BY idreferencia, referencia
         ORDER BY referencia ASC`;

@@ -46,15 +46,15 @@ export class TablasAuditoriaList{
         nombre: 'timbrado',
         descripcion: 'Timbrados'
     };
-    public static FACTURAVENTA: TablaAuditoria = {
+    public static VENTA: TablaAuditoria = {
         id: 10,
-        nombre: 'factura_venta',
-        descripcion: 'Facturas Venta'
+        nombre: 'venta',
+        descripcion: 'Ventas'
     };
-    public static DETALLEFACTURAVENTA: TablaAuditoria = {
+    public static DETALLEVENTA: TablaAuditoria = {
         id: 11,
-        nombre: 'detalle_factura_venta',
-        descripcion: 'Detalle Factura VEnta'
+        nombre: 'detalle_venta',
+        descripcion: 'Detalles Venta'
     };
     public static SUSCRIPCIONES: TablaAuditoria = {
         id: 12,

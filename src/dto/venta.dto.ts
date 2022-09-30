@@ -1,6 +1,6 @@
-import { DetalleFacturaVenta } from "./detalle-factura-venta-dto";
+import { DetalleVenta } from "./detalle-venta-dto";
 
-export class FacturaVenta {
+export class Venta {
     id: number | null = null;
     cliente: string | null = null;
     ci: number | null = null;
@@ -28,5 +28,5 @@ export class FacturaVenta {
     funcionarioregistrofactura: string | null = null;
     idfuncionarioregistrocobro: number | null = null;
     funcionarioregistrocobro: string | null = null;
-    detalles: DetalleFacturaVenta [] = [];
+    detalles: DetalleVenta [] = [];
 }

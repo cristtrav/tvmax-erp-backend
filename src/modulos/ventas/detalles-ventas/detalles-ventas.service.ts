@@ -1,5 +1,5 @@
 import { DatabaseService } from '@database/database.service';
-import { DetalleFacturaVenta } from '@dto/detalle-factura-venta-dto';
+import { DetalleVenta } from '@dto/detalle-venta-dto';
 import { Injectable } from '@nestjs/common';
 import { WhereParam } from '@util/whereparam';
 
@@ -10,29 +10,29 @@ export class DetallesVentasService {
         private dbsrv: DatabaseService
     ){}
 
-    async findByIdVenta(idfacturaventa: number): Promise<DetalleFacturaVenta[]>{
+    async findByIdVenta(idventa: number): Promise<DetalleVenta[]>{
         const eliminado: boolean = false;
         const wp: WhereParam = new WhereParam(
-            {idfacturaventa, eliminado},
+            {idventa, eliminado},
             null,
             null,
             null,
             null
         );
-        const query: string = `SELECT * FROM public.vw_detalles_factura_venta ${wp.whereStr}`;
+        const query: string = `SELECT * FROM public.vw_detalles_venta ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
-    async countByIdVenta(idfacturaventa: number): Promise<number>{
+    async countByIdVenta(idventa: number): Promise<number>{
         const eliminado: boolean = false;
         const wp: WhereParam = new WhereParam(
-            {idfacturaventa, eliminado},
+            {idventa, eliminado},
             null,
             null,
             null,
             null
         );
-        const query: string = `SELECT COUNT(*) FROM public.vw_detalles_factura_venta ${wp.whereStr}`;
+        const query: string = `SELECT COUNT(*) FROM public.vw_detalles_venta ${wp.whereStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 }
