@@ -1,6 +1,6 @@
 export class Cobro{
     id: number | null = null;
-    idfactura: number | null = null;
+    idventa: number | null = null;
     fecha: string | null = null;
     anulado: boolean = false;
     nrorecibo: string | null = null;

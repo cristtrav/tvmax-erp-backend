@@ -4,6 +4,7 @@ import { Cuota } from '@dto/cuota.dto';
 import { WhereParam } from '@util/whereparam';
 import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { CobroCuota } from '@dto/cobro-cuota.dto';
 
 @Injectable()
 export class CuotasService {
@@ -132,5 +133,19 @@ export class CuotasService {
             cli.release();
         }
         return rowCount > 0;
+    }
+
+    async findCobro(idcuota: number): Promise<CobroCuota | null>{
+        const wp: WhereParam = new WhereParam(
+            {idcuota},
+            null,
+            null,
+            null,
+            null
+        );
+        const query: string = `SELECT * FROM public.vw_cobro_cuotas ${wp.whereStr}`;
+        const rows: CobroCuota[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        if(rows.length > 0) return rows[0];
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
+import { CobroCuota } from '@dto/cobro-cuota.dto';
 import { Cuota } from '@dto/cuota.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
@@ -71,6 +72,36 @@ export class CuotasController {
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    @Get(':id/cobro')
+    @RequirePermission(Permissions.CUOTAS.CONSULTAR)
+    async findCobroCuota(
+        @Param('id') idcuota: number
+    ): Promise<CobroCuota>{
+        let cobroCuota: CobroCuota | null = null;
+        try{
+            cobroCuota = await this.cuotaSrv.findCobro(idcuota);
+            
+        }catch(e){
+            console.log('Error al consultar cobro de cuota');
+            console.log(e);
+            throw new HttpException(
+                {
+                    request: 'get',
+                    description: e.detail ?? e.error ?? e.message
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+        if(cobroCuota !== null) return cobroCuota;
+        throw new HttpException(
+            {
+                request: 'get',
+                description: `No se encontró cobro para la cuota '${idcuota}'.`
+            },
+            HttpStatus.NOT_FOUND
+        );
     }
 
     @Post()
