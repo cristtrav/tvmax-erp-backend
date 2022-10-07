@@ -8,6 +8,7 @@ import { UtilModule } from '@util/util.module';
 import { ResumenVentasService } from './resumen-ventas/resumen-ventas.service';
 import { ResumenVentasController } from './resumen-ventas/resumen-ventas.controller';
 import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service';
+import { DetallesVentasController } from './detalles-ventas/detalles-ventas.controller';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service
     UtilModule
   ],
   providers: [VentasService, DatabaseService, ClientesService, ResumenVentasService, DetallesVentasService],
-  controllers: [VentasController, ResumenVentasController]
+  controllers: [VentasController, ResumenVentasController, DetallesVentasController]
 })
 export class VentasModule {}
