@@ -117,10 +117,11 @@ export class DetallesVentasService {
                 anulado,
                 idusuario: idfuncionarioregistrocobro,
                 idcobrador: idcobradorcomision,
+            },
+            {
                 idgrupo,
                 idservicio
             },
-            null,
             range,
             searches,
             { sort, offset, limit }
@@ -204,10 +205,11 @@ export class DetallesVentasService {
                 anulado,
                 idusuario: idfuncionarioregistrocobro,
                 idcobrador: idcobradorcomision,
+            },
+            {
                 idgrupo,
                 idservicio
             },
-            null,
             range,
             searches,
             null
