@@ -5,7 +5,7 @@ import { AuthGuard } from '../../global/auth/auth.guard';
 import { BarriosService } from './barrios.service';
 import { Barrio } from '../../dto/barrio.dto';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
-import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Controller('barrios')
 @UseGuards(AuthGuard)

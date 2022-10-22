@@ -10,7 +10,7 @@ import { Cuota } from '@dto/cuota.dto';
 import { Servicio } from '@dto/servicio.dto';
 import { ServiciosService } from '../servicios/servicios.service'
 import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
-import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Controller('suscripciones')
 @UseGuards(AuthGuard)

@@ -4,7 +4,7 @@ import { RequirePermission } from '@auth/require-permission.decorator';
 import { Domicilio } from '@dto/domicilio.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
-import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DomiciliosService } from './domicilios.service';
 
 @Controller('domicilios')

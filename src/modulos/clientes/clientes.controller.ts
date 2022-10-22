@@ -7,7 +7,7 @@ import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus,
 import { ClientesService } from './clientes.service';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';
 import { Suscripcion } from '@dto/suscripcion.dto';
-import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Controller('clientes')
 @UseGuards(AuthGuard)

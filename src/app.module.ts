@@ -20,6 +20,9 @@ import { VentasModule } from './modulos/ventas/ventas.module';
 import { PermisosModule } from './modulos/permisos/permisos.module';
 import { AuditoriaModule } from './modulos/auditoria/auditoria.module';
 import { UtilModule } from './util/util.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Departamento } from '@database/entity/departamento.entity';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 @Module({
   imports: [
@@ -42,7 +45,17 @@ import { UtilModule } from './util/util.module';
     VentasModule,
     PermisosModule,
     AuditoriaModule,
-    UtilModule
+    UtilModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.PGHOST,
+      port: Number(process.env.PGPORT),
+      username: process.env.PGUSER,
+      password: process.env.PGPASSWORD,
+      database: process.env.PGDATABASE,
+      synchronize: false,
+      entities: [Departamento, EventoAuditoria]
+    })
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

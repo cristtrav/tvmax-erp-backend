@@ -6,7 +6,7 @@ import { AuthGuard } from '../../global/auth/auth.guard';
 import { DistritosService } from './distritos.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Controller('distritos')
 @UseGuards(AuthGuard)

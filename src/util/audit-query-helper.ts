@@ -1,4 +1,3 @@
-import { TablasAuditoriaList } from "@database/tablas-auditoria.list";
 import { TablaAuditoria } from "@dto/tabla-auditoria.dto";
 
 export class AuditQueryHelper {

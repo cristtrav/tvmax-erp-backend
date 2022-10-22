@@ -4,7 +4,7 @@ import { RequirePermission } from '@auth/require-permission.decorator';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Timbrado } from '@dto/timbrado.dto';
 import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { TimbradosService } from './timbrados.service';
 
 @Controller('timbrados')

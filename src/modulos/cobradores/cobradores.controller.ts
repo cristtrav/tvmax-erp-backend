@@ -3,7 +3,7 @@ import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { CobradoresService } from './cobradores.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
-import { JwtUtilsService } from '@util/jwt-utils/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Funcionario } from '@dto/funcionario.dto';
 
 @Controller('cobradores')

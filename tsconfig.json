@@ -24,6 +24,9 @@
       "@util/*": [
         "./src/util/*"
       ],
+      "@globalutil/*": [
+        "./src/global/util/*"
+      ],
       "@modulos/*":[
         "./src/global/modulos/*"
       ]
