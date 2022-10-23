@@ -74,15 +74,13 @@ export class DepartamentosService {
     }
 
     async delete(id: string, idusuario: number) {
+        const dep: Departamento = await this.departamentoRepository.findOneByOrFail({ id: `${id}` });
+        const oldDep: Departamento = { ...dep };
+        dep.eliminado = true;
+
         await this.dataSource.transaction(async manager => {
-
-            const dep: Departamento = await this.departamentoRepository.findOneByOrFail({ id: `${id}` });
-            const oldDep: Departamento = { ...dep };
-            dep.eliminado = true;
-
             await manager.save(dep);
             await manager.save(this.getEventoAuditoria(idusuario, 'E', oldDep, dep));
         });
     }
-
 }

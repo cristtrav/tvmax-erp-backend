@@ -1,103 +1,100 @@
-import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '../../global/database/database.service';
-import { Distrito } from '../../dto/distrito.dto';
-import { Result } from 'pg';
-import { WhereParam } from '@util/whereparam';
-import { AuditQueryHelper } from '@util/audit-query-helper';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DistritoView } from '@database/view/distritos.view';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Distrito } from '@database/entity/distrito.entity';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 @Injectable()
 export class DistritosService {
 
     constructor(
-        private dbsrv: DatabaseService
+        @InjectRepository(DistritoView)
+        private distritoViewRepo: Repository<DistritoView>,
+        @InjectRepository(Distrito)
+        private distritoRepo: Repository<Distrito>,
+        private dataSource: DataSource
     ) { }
 
-    async findAll(queryParam): Promise<Distrito[]> {
-        const { eliminado, iddepartamento, id, sort, limit, offset } = queryParam;
-        const wp: WhereParam = new WhereParam(
-            { eliminado, iddepartamento, id },
-            null,
-            null,
-            null,
-            { sort, offset, limit }
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<DistritoView> {
+        const { eliminado, iddepartamento, id, sort, limit, offset } = queries;
+        const entityAlias: string = 'distrito';
+        let query: SelectQueryBuilder<DistritoView> = this.distritoViewRepo.createQueryBuilder(entityAlias);
+
+        if (eliminado) query = query.andWhere(`${entityAlias}.eliminado = :eliminado`, { eliminado });
+        if (id) query = query.andWhere(
+            `${entityAlias}.id ${Array.isArray(id) ? 'IN (...id)' : '= :id'}`,
+            { id }
         );
-        var query: string = `SELECT * FROM public.vw_distritos ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
-    }
-
-    async count(queryParam): Promise<number> {
-        const { eliminado, iddepartamento, id } = queryParam;
-        const wp: WhereParam = new WhereParam(
-            { eliminado, iddepartamento, id },
-            null,
-            null,
-            null,
-            null
+        if (iddepartamento) query = query.andWhere(
+            `${entityAlias}.iddepartamento ${Array.isArray(iddepartamento) ? 'IN (...iddepartamento)' : '= :iddepartamento'}`,
+            { iddepartamento }
         );
-        var query: string = `SELECT COUNT(*) FROM public.vw_distritos ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
-    }
-
-    async create(d: Distrito, idusuario: number){
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `INSERT INTO public.distrito(id, descripcion, iddepartamento, eliminado)
-        VALUES($1, $2, $3, $4)`;
-        const params: any = [d.id, d.descripcion, d.iddepartamento, false];
-        try{
-            await cli.query('BEGIN');
-            await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.DISTRITOS, idusuario, d.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
+        if (offset) query = query.skip(offset);
+        if (limit) query = query.take(limit);
+        if (sort) {
+            const sortOrder: 'ASC' | 'DESC' = sort.substring(0, 1) === '-' ? 'DESC' : 'ASC';
+            const sortColumn: string = sort.substring(1);
+            query = query.orderBy(`${entityAlias}.${sortColumn}`, sortOrder)
         }
+        return query;
     }
 
-    async findById(id: string): Promise<Distrito[]>{
-        const query: string = `SELECT * FROM public.vw_distritos WHERE id = $1`;
-        return (await this.dbsrv.execute(query, [id])).rows;
+    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', estadoAnterior: any, estadoNuevo: any): EventoAuditoria {
+        const audit: EventoAuditoria = new EventoAuditoria();
+        audit.idusuario = idusuario;
+        audit.operacion = operacion;
+        audit.fechahora = new Date();
+        audit.estadoanterior = estadoAnterior;
+        audit.estadonuevo = estadoNuevo;
+        audit.idtabla = TablasAuditoriaList.DISTRITOS.id;
+        return audit;
     }
 
-    async edit(oldId: string, d: Distrito, idusuario: number): Promise<number>{
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.distrito SET id = $1, descripcion = $2, iddepartamento = $3 WHERE id = $4`;
-        const params = [d.id, d.descripcion, d.iddepartamento, oldId];
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.DISTRITOS, idusuario, oldId);
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.DISTRITOS, idevento, d.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount;
+    async findAll(queries: { [name: string]: any }): Promise<DistritoView[]> {
+        return this.getSelectQuery(queries).getMany();
     }
 
-    async delete(id: string, idusuario: number): Promise<number>{
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.distrito SET eliminado = true WHERE id = $1`;
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, [id])).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.DISTRITOS, idusuario, id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount;
+    async count(queries): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
+    }
+
+    async create(d: Distrito, idusuario: number) {
+        const distrito: Distrito = await this.distritoRepo.findOneBy({ id: d.id });
+        if (distrito) throw new HttpException({
+            message: `El Distrito con código «${d.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.dataSource.transaction(async manager => {
+            await manager.save(d);
+            await manager.save(this.getEventoAuditoria(idusuario, 'R', null, d));
+        });
+    }
+
+    async findById(id: string): Promise<DistritoView> {
+        return this.distritoViewRepo.findOneByOrFail({ id });
+    }
+
+    async edit(oldId: string, d: Distrito, idusuario: number) {
+        const oldDistrito: Distrito = await this.distritoRepo.findOneByOrFail({id: oldId});
+
+        await this.dataSource.transaction(async manager=>{
+            await manager.save(d);
+            await manager.save(this.getEventoAuditoria(idusuario, 'M', oldDistrito, d));
+            if(d.id !== oldDistrito.id) await manager.remove(oldDistrito);
+        });
+    }
+
+    async delete(id: string, idusuario: number) {
+        const distrito: Distrito = await this.distritoRepo.findOneByOrFail({ id });
+        const oldDistrito = { ...distrito };
+        distrito.eliminado = true;
+
+        await this.dataSource.transaction(async manager => {
+            await manager.save(distrito);
+            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldDistrito, distrito));
+        });
     }
 
 }

@@ -1,9 +1,8 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards, Request, UseFilters, Headers } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { DepartamentosService } from './departamentos.service';
-import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Departamento } from '@database/entity/departamento.entity';
 import { DepartamentoDTO } from '@dto/departamento.dto';

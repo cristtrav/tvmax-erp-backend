@@ -23,6 +23,8 @@ import { UtilModule } from './util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Departamento } from '@database/entity/departamento.entity';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
+import { Distrito } from '@database/entity/distrito.entity';
+import { DistritoView } from '@database/view/distritos.view';
 
 @Module({
   imports: [
@@ -54,7 +56,7 @@ import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       synchronize: false,
-      entities: [Departamento, EventoAuditoria]
+      entities: [Departamento, Distrito, EventoAuditoria, DistritoView],
     })
   ],
   controllers: [AppController],
