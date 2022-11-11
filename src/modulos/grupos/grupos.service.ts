@@ -1,122 +1,95 @@
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
+import { Grupo } from '@database/entity/grupo.entity';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { Injectable } from '@nestjs/common';
-import { AuditQueryHelper } from '@util/audit-query-helper';
-import { ISearchField } from '@util/isearchfield.interface';
-import { WhereParam } from '@util/whereparam';
-import { Grupo } from '../../dto/grupo.dto';
-import { DatabaseService } from './../../global/database/database.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class GruposService {
 
-    constructor(private dbsrv: DatabaseService) {
+    constructor(
+        @InjectRepository(Grupo)
+        private grupoRepo: Repository<Grupo>,
+        private dataSource: DataSource
+    ) { }
+
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<Grupo> {
+        const { eliminado, id, search, sort, offset, limit } = queries;
+        const alias: string = 'grupo';
+        let queryBuilder: SelectQueryBuilder<Grupo> = this.grupoRepo.createQueryBuilder(alias);
+        if (eliminado !== null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (id) queryBuilder = queryBuilder.andWhere(`${alias}.id ${Array.isArray(id) ? 'IN (...:id)' : '= :id'}`, { id });
+        if (offset) queryBuilder = queryBuilder.skip(offset);
+        if (limit) queryBuilder = queryBuilder.take(limit);
+        if (sort) {
+            const sortColumn: string = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            queryBuilder = queryBuilder.orderBy(`${alias}.${sortColumn}`, sortOrder);
+        }
+        if (search) {
+            queryBuilder = queryBuilder.andWhere(new Brackets((qb) => {
+                qb = qb.orWhere(`LOWER(${alias}.descripcion) LIKE :descsearch`, { descsearch: `%${search.toLowerCase()}%` });
+                if (!Number.isNaN(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: Number(search) });
+            }));
+        }
+        return queryBuilder;
     }
 
-    async findAll(reqQuery): Promise<Grupo[]> {
-        const { eliminado, id, search, sort, offset, limit } = reqQuery
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'descripcion',
-                fieldValue: search,
-                exactMatch: false
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            { eliminado, id },
-            null,
-            null,
-            searchQuery,
-            { sort, offset, limit }
-        );
-        var query: string = `SELECT * FROM public.grupo ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows
+    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', estadoanterior: any, estadonuevo: any): EventoAuditoria{
+        const evento: EventoAuditoria = new EventoAuditoria();
+        evento.idusuario = idusuario;
+        evento.fechahora = new Date();
+        evento.idtabla = TablasAuditoriaList.GRUPOS.id;
+        evento.operacion = operacion;
+        evento.estadoanterior = estadoanterior;
+        evento.estadonuevo = estadonuevo;
+        return evento;
     }
 
-    async count(reqQuery): Promise<number> {
-        const { eliminado, id, search } = reqQuery
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'descripcion',
-                fieldValue: search,
-                exactMatch: false
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            { eliminado, id },
-            null,
-            null,
-            searchQuery,
-            null
-        );
-        var query: string = `SELECT COUNT(*) FROM public.grupo ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count
+    async findAll(queries: { [name: string]: any }): Promise<Grupo[]> {
+        return this.getSelectQuery(queries).getMany();
+    }
+
+    async count(queries: { [name: string]: any }): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
     }
 
     async findById(id: number): Promise<Grupo> {
-        const query = `SELECT * FROM public.grupo WHERE id = $1`
-        const params = [id]
-        return (await this.dbsrv.execute(query, params)).rows[0];
+        return this.grupoRepo.findOneByOrFail({id});
     }
 
     async create(g: Grupo, idusuario: number) {
-        const cli = await this.dbsrv.getDBClient();
-        const query = `INSERT INTO public.grupo(id, descripcion) VALUES($1, $2)`;
-        const params = [g.id, g.descripcion]
-        try {
-            await cli.query('BEGIN');
-            await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.GRUPOS, idusuario, g.id);
-            await cli.query('COMMIT');
-        } catch (e) {
-            await cli.query('ROLLBACK');
-            throw e;
-        } finally {
-            cli.release();
-        }
+        await this.dataSource.manager.transaction(async (manager) => {
+            await manager.save(g);
+            await manager.save(this.getEventoAuditoria(idusuario, 'R', null, g));
+        });
     }
 
-    async update(idviejo: string, g: Grupo, idusuario: number): Promise<number> {
-        const cli = await this.dbsrv.getDBClient();
-        const query = `UPDATE public.grupo SET id = $1, descripcion = $2 WHERE id = $3`
-        const params = [g.id, g.descripcion, idviejo]
-        let rowCount = 0;
-        try {
-            await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.GRUPOS, idusuario, idviejo);
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.GRUPOS, idevento, g.id);
-            await cli.query('COMMIT');
-        } catch (e) {
-            await cli.query('ROLLBACK');
-            throw e;
-        } finally {
-            cli.release();
-        }
-        return rowCount;
+    async update(idviejo: number, g: Grupo, idusuario: number) {
+        const oldGrupo: Grupo = await this.grupoRepo.findOneByOrFail({id: idviejo});
+
+        await this.dataSource.manager.transaction(async (manager)=>{
+            await manager.save(g);
+            await manager.save(this.getEventoAuditoria(idusuario, 'M', oldGrupo, g));
+            if(oldGrupo.id !== g.id) await manager.remove(oldGrupo);
+        });
     }
 
-    async delete(id: string, idusuario: number): Promise<number> {
-        const cli = await this.dbsrv.getDBClient();
-        const query = `UPDATE public.grupo SET eliminado = true WHERE id = $1`;
-        const params = [id];
-        let rowCount = 0;
-        try {
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.GRUPOS, idusuario, id);
-            await cli.query('COMMIT');
-        } catch (e) {
-            await cli.query('ROLLBACK');
-            throw e;
-        } finally {
-            cli.release();
-        }
-        return rowCount;
+    async delete(id: number, idusuario: number) {
+        const grupo: Grupo = await this.grupoRepo.findOneByOrFail({id});
+        const oldGrupo: Grupo = {...grupo};
+        grupo.eliminado = true;
+
+        await this.dataSource.manager.transaction(async (manager)=>{
+            await manager.save(grupo);
+            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldGrupo, grupo));
+        });
     }
 
-    async getLastId(): Promise<number>{
-        const query: string = `SELECT MAX(id) FROM public.grupo`;
-        return (await this.dbsrv.execute(query)).rows[0].max;
+    async getLastId(): Promise<number> {
+        return (await this.grupoRepo.createQueryBuilder('grupo')
+        .select('MAX(grupo.id)', 'lastid').getRawOne()).lastid;
     }
 
 }

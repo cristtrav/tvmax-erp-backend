@@ -3,15 +3,20 @@ import { GruposController } from './grupos.controller';
 import { GruposService } from './grupos.service';
 import { DatabaseService } from './../../global/database/database.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Grupo } from '@database/entity/grupo.entity';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
   imports: [
-    JwtModule.register({})
+    JwtModule.register({}),
+    TypeOrmModule.forFeature([Grupo])
   ],
   controllers: [GruposController],
   providers: [
     GruposService,
-    DatabaseService
+    DatabaseService,
+    JwtUtilsService
   ]
 })
 export class GruposModule {}

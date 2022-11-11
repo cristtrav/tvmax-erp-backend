@@ -1,4 +1,4 @@
-export class Grupo{
+export class GrupoDTO{
     id: number
     descripcion: string
 }

@@ -1,9 +1,11 @@
 import { BarrioDTO } from "@dto/barrio.dto";
 import { DepartamentoDTO } from "@dto/departamento.dto";
 import { DistritoDTO } from "@dto/distrito.dto";
+import { GrupoDTO } from "@dto/grupo.dto";
 import { Barrio } from "./entity/barrio.entity";
 import { Departamento } from "./entity/departamento.entity";
 import { Distrito } from "./entity/distrito.entity";
+import { Grupo } from "./entity/grupo.entity";
 
 export class DTOEntityUtis {
 
@@ -28,6 +30,13 @@ export class DTOEntityUtis {
         barrio.descripcion = barrioDTO.descripcion;
         barrio.iddistrito = barrioDTO.iddistrito;
         return barrio;
+    }
+
+    public static grupoDtoToEntity(grupoDTO: GrupoDTO): Grupo{
+        const grupo: Grupo = new Grupo();
+        grupo.id = grupoDTO.id;
+        grupo.descripcion = grupoDTO.descripcion;
+        return grupo;
     }
 
 }
