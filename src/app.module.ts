@@ -25,6 +25,8 @@ import { Departamento } from '@database/entity/departamento.entity';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 import { Distrito } from '@database/entity/distrito.entity';
 import { DistritoView } from '@database/view/distritos.view';
+import { Barrio } from '@database/entity/barrio.entity';
+import { BarrioView } from '@database/view/barrio.view';
 
 @Module({
   imports: [
@@ -56,7 +58,14 @@ import { DistritoView } from '@database/view/distritos.view';
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       synchronize: false,
-      entities: [Departamento, Distrito, EventoAuditoria, DistritoView],
+      entities: [
+        Departamento,
+        Distrito,
+        EventoAuditoria,
+        DistritoView,
+        Barrio,
+        BarrioView
+      ],
     })
   ],
   controllers: [AppController],

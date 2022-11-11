@@ -1,4 +1,4 @@
-export class Barrio {
+export class BarrioDTO {
     id: number | null = null;
     descripcion: string | null = null;
     iddistrito: string | null = null;

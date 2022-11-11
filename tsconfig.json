@@ -27,6 +27,9 @@
       "@globalutil/*": [
         "./src/global/util/*"
       ],
+      "@globalfilter/*":[
+        "./src/global/filters/*"
+      ],
       "@modulos/*":[
         "./src/global/modulos/*"
       ]

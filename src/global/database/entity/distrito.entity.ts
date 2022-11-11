@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Departamento } from "./departamento.entity";
 
 @Entity()
 export class Distrito{
@@ -13,4 +14,8 @@ export class Distrito{
 
     @Column({default: false})
     eliminado: boolean;
+
+    @ManyToOne(()=>Departamento, (departamento)=>departamento.distritos)
+    @JoinColumn({name: 'iddepartamento'})
+    departamento: Departamento;
 }
