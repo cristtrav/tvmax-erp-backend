@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, Headers, UseFilters } from '@nestjs/common';
 import { GruposService } from './grupos.service';
 import { GrupoDTO } from './../../dto/grupo.dto';
 import { AuthGuard } from './../../global/auth/auth.guard';
@@ -7,9 +7,11 @@ import { RequirePermission } from '../../global/auth/require-permission.decorato
 import { Grupo } from '@database/entity/grupo.entity';
 import { DTOEntityUtis } from '@database/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 
 @Controller('grupos')
 @UseGuards(AuthGuard)
+@UseFilters(HttpExceptionFilter)
 export class GruposController {
 
     constructor(

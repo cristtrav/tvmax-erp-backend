@@ -2,10 +2,12 @@ import { BarrioDTO } from "@dto/barrio.dto";
 import { DepartamentoDTO } from "@dto/departamento.dto";
 import { DistritoDTO } from "@dto/distrito.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
+import { ServicioDTO } from "@dto/servicio.dto";
 import { Barrio } from "./entity/barrio.entity";
 import { Departamento } from "./entity/departamento.entity";
 import { Distrito } from "./entity/distrito.entity";
 import { Grupo } from "./entity/grupo.entity";
+import { Servicio } from "./entity/servicio.entity";
 
 export class DTOEntityUtis {
 
@@ -37,6 +39,17 @@ export class DTOEntityUtis {
         grupo.id = grupoDTO.id;
         grupo.descripcion = grupoDTO.descripcion;
         return grupo;
+    }
+
+    public static servicioDtoToEntity(servicioDTO: ServicioDTO): Servicio{
+        const servicio: Servicio = new Servicio();
+        servicio.id = servicioDTO.id;
+        servicio.descripcion = servicioDTO.descripcion;
+        servicio.idgrupo = servicioDTO.idgrupo;
+        servicio.porcentajeIva = servicioDTO.porcentajeiva;
+        servicio.precio = servicioDTO.precio;
+        servicio.suscribible = servicioDTO.suscribible;
+        return servicio;
     }
 
 }

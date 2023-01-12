@@ -1,4 +1,4 @@
-export class Servicio{
+export class ServicioDTO{
     id: number;
     descripcion: string;
     idgrupo: number;

@@ -1,4 +1,4 @@
-export class EventoAuditoria{
+export class EventoAuditoriaDTO{
     id: number | null = null;
     fechahora: string | null = null;
     idusuario: number | null = null;

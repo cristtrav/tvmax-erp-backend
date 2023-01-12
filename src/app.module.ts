@@ -28,6 +28,8 @@ import { DistritoView } from '@database/view/distritos.view';
 import { Barrio } from '@database/entity/barrio.entity';
 import { BarrioView } from '@database/view/barrio.view';
 import { Grupo } from '@database/entity/grupo.entity';
+import { Servicio } from '@database/entity/servicio.entity';
+import { ServicioView } from '@database/view/servicio.view';
 
 @Module({
   imports: [
@@ -64,9 +66,11 @@ import { Grupo } from '@database/entity/grupo.entity';
         Distrito,
         Barrio,
         Grupo,
+        Servicio,
         EventoAuditoria,
         DistritoView,
-        BarrioView
+        BarrioView,
+        ServicioView
       ],
     })
   ],

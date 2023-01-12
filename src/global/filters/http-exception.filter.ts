@@ -9,7 +9,7 @@ export class HttpExceptionFilter implements ExceptionFilter{
         let message: string = 'Ocurrió un error';
         let statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR;
         if(exception instanceof ForbiddenException){
-            message = `No autorizado para realizar la acción sobre el recurso «${this.getResourceStr(request.path)}»`
+            message = `No autorizado para ${this.getActionName(request.method, false)}: «${this.getResourceStr(request.path)}»`
             statusCode = HttpStatus.FORBIDDEN
         }else
         if(exception instanceof EntityNotFoundError){
@@ -40,17 +40,17 @@ export class HttpExceptionFilter implements ExceptionFilter{
             message = exception.toString();
         }
         return {
-            error: `Error al ${this.getActionName(request.method)}`,
+            error: `Error al ${this.getActionName(request.method, true)}`,
             message,
             statusCode
         };
     }
 
-    private getActionName(method: string): string{
-        if(method === 'GET') return 'consultar 🔍';
-        if(method === 'POST') return 'registrar 📄';
-        if(method === 'PUT') return 'editar ✏️';
-        if(method === 'DELETE') return 'eliminar 🗑️';
+    private getActionName(method: string, includeIcon: boolean): string{
+        if(method === 'GET') return `consultar${includeIcon?' 🔍':''}`;
+        if(method === 'POST') return `registrar${includeIcon?' 📄':''}`;
+        if(method === 'PUT') return `editar${includeIcon?' ✏️':''}`;
+        if(method === 'DELETE') return `eliminar${includeIcon?' 🗑️':''}`;
         return 'operar con';
     }
 

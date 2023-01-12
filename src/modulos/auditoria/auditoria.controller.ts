@@ -1,7 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { EventoAuditoria } from '@dto/evento-auditoria.dto';
+import { EventoAuditoriaDTO } from '@dto/evento-auditoria.dto';
 import { ServerResponseList } from '@dto/server-response-list.dto';
 import { TablaAuditoria } from '@dto/tabla-auditoria.dto';
 import { Controller, Get, HttpException, HttpStatus, Query, UseGuards } from '@nestjs/common';
@@ -28,9 +28,9 @@ export class AuditoriaController {
     @Query('fechahorahasta') fechahorahasta: string,
     @Query('operacion') operacion: string | string[],
     @Query('search') search: string
-  ): Promise<ServerResponseList<EventoAuditoria>> {
+  ): Promise<ServerResponseList<EventoAuditoriaDTO>> {
     try {
-      const rows: EventoAuditoria[] = await this.auditoriaSrv.findAllEventos(
+      const rows: EventoAuditoriaDTO[] = await this.auditoriaSrv.findAllEventos(
         { sort, offset, limit, idusuario, idtabla, fechahoradesde, fechahorahasta, operacion, search }
       );
       const count: number = await this.auditoriaSrv.countEventos(

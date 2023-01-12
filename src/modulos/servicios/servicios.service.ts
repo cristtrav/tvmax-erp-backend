@@ -1,140 +1,127 @@
-import { Injectable } from '@nestjs/common';
-import { Servicio } from '../../dto/servicio.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ServicioDTO } from '../../dto/servicio.dto';
 import { DatabaseService } from '../../global/database/database.service';
 import { Result } from 'pg';
-import { ISearchField } from '@util/isearchfield.interface';
 import { WhereParam } from '@util/whereparam';
-import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Servicio } from '@database/entity/servicio.entity';
+import { ServicioView } from '@database/view/servicio.view';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 
 @Injectable()
 export class ServiciosService {
 
     constructor(
+        @InjectRepository(Servicio)
+        private servicioRepo: Repository<Servicio>,
+        @InjectRepository(ServicioView)
+        private servicioViewRepo: Repository<ServicioView>,
+        private datasource: DataSource,
         private dbsrv: DatabaseService
-    ){}
+    ) { }
 
-    async findAll(reqQuery): Promise<Servicio[]>{
-        const { eliminado, idgrupo, suscribible, search, id, sort, offset, limit } = reqQuery;
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'descripcion',
-                fieldValue: search,
-                exactMatch: false
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            { eliminado, suscribible, idgrupo, id },
-            null,
-            null,
-            searchQuery,
-            { sort, offset, limit }
-        );
-        let query: string = `SELECT * FROM public.vw_servicios ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
-    }
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<ServicioView> {
+        const { eliminado, idgrupo, suscribible, search, id, sort, offset, limit } = queries;
+        const alias: string = 'servicio';
+        let queryBuilder: SelectQueryBuilder<ServicioView> = this.servicioViewRepo.createQueryBuilder(alias);
 
-    async count(reqQuery): Promise<number>{
-        const { eliminado, search, suscribible, idgrupo, id } = reqQuery;
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'descripcion',
-                fieldValue: search,
-                exactMatch: false
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            { eliminado, suscribible, idgrupo, id },
-            null,
-            null,
-            searchQuery,
-            null
-        );
-        let query: string = `SELECT COUNT(*) FROM public.vw_servicios ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count
-    }
-
-    async create(s: Servicio, idusuario: number){
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `INSERT INTO public.servicio(id, descripcion, idgrupo, precio, suscribible) VALUES ($1, $2, $3, $4, $5)`;
-        const params = [s.id, s.descripcion, s.idgrupo, s.precio, s.suscribible]
-        try{
-            await cli.query('BEGIN');
-            await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.SERVICIOS, idusuario, s.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
+        if (eliminado != null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (idgrupo) queryBuilder = queryBuilder.andWhere(`${alias}.idgrupo = ${Array.isArray(idgrupo) ? 'IN (...:idgrupo)' : '= :idgrupo'}`, { idgrupo });
+        if (suscribible != null) queryBuilder = queryBuilder.andWhere(`${alias}.suscribible = :suscribible`, { suscribible });
+        if (id) queryBuilder = queryBuilder.andWhere(`${alias}.id = ${Array.isArray(id) ? 'IN (...:id)' : '= :id'}`, { id });
+        if (search) {
+            queryBuilder = queryBuilder.andWhere(new Brackets((qb) => {
+                qb = qb.orWhere(`LOWER(${alias}.descripcion = :descsearch)`, { descsearch: `%${search.toLowerCase()}%` });
+                if (!Number.isNaN(Number(search))) qb = qb.orWhere(`${alias}.id = :id`, { id: Number(search) });
+            }));
         }
+
+        if (limit) queryBuilder = queryBuilder.take(limit);
+        if (offset) queryBuilder = queryBuilder.skip(offset);
+        if (sort) {
+            const sortColumn: string = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            queryBuilder = queryBuilder.orderBy(`${alias}.${sortColumn}`, sortOrder);
+        }
+        return queryBuilder;
+    }
+
+    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', estadoanterior: any, estadonuevo: any): EventoAuditoria {
+        const evento: EventoAuditoria = new EventoAuditoria();
+        evento.idusuario = idusuario;
+        evento.operacion = operacion;
+        evento.fechahora = new Date();
+        evento.estadoanterior = estadoanterior;
+        evento.estadonuevo = estadonuevo;
+        evento.idtabla = TablasAuditoriaList.SERVICIOS.id;
+        return evento;
+    }
+
+    async findAll(queries: { [name: string]: any }): Promise<ServicioView[]> {
+        return this.getSelectQuery(queries).getMany();
+    }
+
+    async count(queries: { [name: string]: any }): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
+    }
+
+    async create(s: Servicio, idusuario: number) {
+        if (await this.servicioRepo.findOneBy({ id: s.id })) throw new HttpException({
+            message: `El servicio con código «${s.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.datasource.manager.transaction(async (manager) => {
+            await manager.save(s);
+            await manager.save(this.getEventoAuditoria(idusuario, 'R', null, s));
+        });
     }
 
     async update(oldId: number, s: Servicio, idusuario: number): Promise<Result> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.servicio SET id = $1, descripcion = $2, idgrupo = $3, precio = $4, suscribible = $5 WHERE id = $6`
-        const params = [s.id, s.descripcion, s.idgrupo, s.precio, s.suscribible, oldId]
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.SERVICIOS, idusuario, oldId);
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.SERVICIOS, idevento, s.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount;
+        await this.datasource.transaction(async manager => {
+            const oldServicio: Servicio = await this.servicioRepo.findOneByOrFail({ id: oldId });
+            await manager.save(s);
+            const newServicio: Servicio = await this.servicioRepo.findOneByOrFail({ id: s.id });
+            await manager.save(this.getEventoAuditoria(idusuario, 'M', oldServicio, newServicio))
+            if (Number(oldId) !== s.id) await manager.remove(oldServicio);
+        })
     }
 
-    async findById(id: number): Promise<Servicio[]>{
-        const query: string = `SELECT * FROM public.servicio WHERE id = $1`
-        const params = [id]
-        return (await this.dbsrv.execute(query, params)).rows
+    async findById(id: number): Promise<ServicioView> {
+        return this.servicioViewRepo.findOneByOrFail({ id });
     }
 
-    async delete(id: number, idusuario: number): Promise<Result> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.servicio SET eliminado = true WHERE id = $1`
-        const params = [id]
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.SERVICIOS, idusuario, id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount;
-    }
+    async delete(id: number, idusuario: number) {
+        const serv: Servicio = await this.servicioRepo.findOneByOrFail({ id });
+        const oldServ: Servicio = { ...serv };
+        serv.eliminado = true;
 
-    async getServiciosEnCuotas(idsusc: number, queryParams): Promise<Servicio[]>{
-        const { eliminado, pagado,sort, offset, limit } = queryParams;
+        await this.datasource.transaction(async manager => {
+            await manager.save(serv);
+            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldServ, serv));
+        });
+    }
+    //PENDIENTE DE CAMBIAR A TYPEORM
+    async getServiciosEnCuotas(idsusc: number, queryParams): Promise<ServicioDTO[]> {
+        const { eliminado, pagado, sort, offset, limit } = queryParams;
         const wp: WhereParam = new WhereParam(
-            {'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado, eliminado},
+            { 'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado, eliminado },
             null,
             null,
             null,
             { sort, offset, limit }
         );
-        var query: string = `SELECT * FROM public.vw_servicios WHERE id IN
-        (SELECT vw_cuotas.idservicio AS idcuota FROM public.vw_cuotas ${wp.whereStr}) ${wp.sortOffsetLimitStr}`;        
+        const query: string = `SELECT * FROM public.vw_servicios WHERE id IN
+        (SELECT vw_cuotas.idservicio AS idcuota FROM public.vw_cuotas ${wp.whereStr}) ${wp.sortOffsetLimitStr}`;
         return (await this.dbsrv.execute(query, wp.whereParams)).rows;
     }
-
-    async countServiciosEnCuotas(idsusc, queryParams): Promise<number>{
+    //PENDIENTE DE CAMBIAR A TYPEORM
+    async countServiciosEnCuotas(idsusc, queryParams): Promise<number> {
         const { eliminado, pagado } = queryParams;
         const wp: WhereParam = new WhereParam(
-            {'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado},
+            { 'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado },
             null,
             null,
             null,
@@ -145,9 +132,12 @@ export class ServiciosService {
         return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
     }
 
-    async getLastId(): Promise<number>{
-        const query: string = `SELECT MAX(id) FROM public.servicio`;
-        return (await this.dbsrv.execute(query)).rows[0].max;
+    async getLastId(): Promise<number> {
+        return (
+            await this.servicioRepo.createQueryBuilder('servicio')
+                .select('MAX(servicio.id)', 'max')
+                .getRawOne()
+        ).max
     }
 
 }

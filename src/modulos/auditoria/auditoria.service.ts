@@ -1,5 +1,5 @@
 import { DatabaseService } from '@database/database.service';
-import { EventoAuditoria } from '@dto/evento-auditoria.dto';
+import { EventoAuditoriaDTO } from '@dto/evento-auditoria.dto';
 import { TablaAuditoria } from '@dto/tabla-auditoria.dto';
 import { Injectable } from '@nestjs/common';
 import { IRangeQuery } from '@util/irangequery.interface';
@@ -13,7 +13,7 @@ export class AuditoriaService {
         private dbsrv: DatabaseService
     ){}
 
-    async findAllEventos(params): Promise<EventoAuditoria[]>{
+    async findAllEventos(params): Promise<EventoAuditoriaDTO[]>{
         const {offset, limit, idusuario, idtabla, fechahoradesde, fechahorahasta, operacion, search } = params;
         let sort = params.sort;
         if(sort && sort.includes('fechahora')) sort = `${sort}::timestamp`;

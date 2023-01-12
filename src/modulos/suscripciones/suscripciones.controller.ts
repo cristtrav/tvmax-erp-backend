@@ -7,7 +7,7 @@ import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { Suscripcion } from '../../dto/suscripcion.dto';
 import { CuotasService } from '../cuotas/cuotas.service';
 import { Cuota } from '@dto/cuota.dto';
-import { Servicio } from '@dto/servicio.dto';
+import { ServicioDTO } from '@dto/servicio.dto';
 import { ServiciosService } from '../servicios/servicios.service'
 import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
@@ -302,11 +302,11 @@ export class SuscripcionesController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ): Promise<ServerResponseList<Servicio>>{
+    ): Promise<ServerResponseList<ServicioDTO>>{
         try{
-            const data: Servicio[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, {eliminado, pagado,sort, offset, limit});
+            const data: ServicioDTO[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, {eliminado, pagado,sort, offset, limit});
             const count: number = await this.serviciosSrv.countServiciosEnCuotas(idsusc, {eliminado, pagado});
-            return new ServerResponseList<Servicio>(data, count); 
+            return new ServerResponseList<ServicioDTO>(data, count); 
         }catch(e){
             console.log('Error al consultar servicios por cuotas');
             console.log(e);
