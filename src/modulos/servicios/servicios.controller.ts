@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseF
 import { ServiciosService } from './servicios.service';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { Permissions } from '../../global/auth/permission.list';
-import { JwtService } from '@nestjs/jwt';
 import { ServicioView } from '@database/view/servicio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@database/dto-entity-utils';

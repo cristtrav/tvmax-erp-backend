@@ -25,7 +25,7 @@ export class AuditQueryHelper {
 
     public static async auditPostDelete(dbcli, tabla: TablaAuditoria, idusuario: number, id: number | string){
         const queryAuditI: string = `INSERT INTO public.evento_auditoria(id, fecha_hora, idusuario, idtabla, operacion, estado_anterior)
-            VALUES(nextval('evento_auditoria_seq'), NOW(), $1, $2, 'E', (SELECT row_to_json(${tabla.nombre}) FROM public.${tabla.nombre} WHERE id = $3)) RETURNING *`;
+            VALUES(nextval('evento_auditoria_id_seq'), NOW(), $1, $2, 'E', (SELECT row_to_json(${tabla.nombre}) FROM public.${tabla.nombre} WHERE id = $3)) RETURNING *`;
         const paramsAutitI = [idusuario, tabla.id, id];
         await dbcli.query(queryAuditI, paramsAutitI);
     }

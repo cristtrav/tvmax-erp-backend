@@ -6,11 +6,12 @@ import { SuscripcionesService } from './suscripciones.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { Suscripcion } from '../../dto/suscripcion.dto';
 import { CuotasService } from '../cuotas/cuotas.service';
-import { Cuota } from '@dto/cuota.dto';
+import { CuotaDTO } from '@dto/cuota.dto';
 import { ServicioDTO } from '@dto/servicio.dto';
 import { ServiciosService } from '../servicios/servicios.service'
 import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { CuotaView } from '@database/view/cuota.view';
 
 @Controller('suscripciones')
 @UseGuards(AuthGuard)
@@ -65,7 +66,7 @@ export class SuscripcionesController {
                 }
             );
             const rowCount: number = await this.suscripcionesSrv.count(
-                { 
+                {
                     eliminado,
                     idcliente,
                     idgrupo,
@@ -130,9 +131,9 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<number>{
-        try{
-            return await(this.suscripcionesSrv.count(
+    ): Promise<number> {
+        try {
+            return await (this.suscripcionesSrv.count(
                 {
                     eliminado,
                     idcliente,
@@ -149,7 +150,7 @@ export class SuscripcionesController {
                     search
                 }
             ));
-        }catch(e){
+        } catch (e) {
             console.log('Error al contar total de suscripciones');
             console.log(e);
             throw new HttpException(
@@ -269,28 +270,19 @@ export class SuscripcionesController {
     @Get(':id/cuotas')
     @RequirePermission(Permissions.CUOTAS.CONSULTAR)
     async getCuotasBySuscripcion(
-        @Param('id') idsusc: number,
-        @Query('eliminado') eliminado: boolean,
-        @Query('sort') sort: string,
-        @Query('offset') offset: number,
-        @Query('limit') limit: number
-    ): Promise<ServerResponseList<Cuota>>{
-        try{
-            const data: Cuota[] = await this.cuotasSrv.getCuotasPorSuscripcion(idsusc, {eliminado, sort, offset, limit});
-            const count: number = await this.cuotasSrv.countCuotasPorSuscripcion(idsusc, {eliminado});
-            const sr: ServerResponseList<Cuota> = new ServerResponseList<Cuota>(data, count);
-            return sr;
-        }catch(e){
-            console.log('Error al consultar cuotas por suscripcion');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        @Param('id') idsuscripcion: number,
+        @Query() queries: { [name: string]: any }
+    ): Promise<CuotaView[]> {
+        return this.cuotasSrv.findAll({ ...queries, idsuscripcion });
+    }
+    
+    @Get(':id/cuotas/total')
+    @RequirePermission(Permissions.CUOTAS.CONSULTAR)
+    async countCuotasBySuscripcion(
+        @Param('id') idsuscripcion: number,
+        @Query() queries: { [name: string]: any }
+    ): Promise<number> {
+        return this.cuotasSrv.count({ ...queries, idsuscripcion });
     }
 
     @Get(':id/cuotas/servicios')
@@ -302,12 +294,12 @@ export class SuscripcionesController {
         @Query('sort') sort: string,
         @Query('offset') offset: number,
         @Query('limit') limit: number
-    ): Promise<ServerResponseList<ServicioDTO>>{
-        try{
-            const data: ServicioDTO[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, {eliminado, pagado,sort, offset, limit});
-            const count: number = await this.serviciosSrv.countServiciosEnCuotas(idsusc, {eliminado, pagado});
-            return new ServerResponseList<ServicioDTO>(data, count); 
-        }catch(e){
+    ): Promise<ServerResponseList<ServicioDTO>> {
+        try {
+            const data: ServicioDTO[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, { eliminado, pagado, sort, offset, limit });
+            const count: number = await this.serviciosSrv.countServiciosEnCuotas(idsusc, { eliminado, pagado });
+            return new ServerResponseList<ServicioDTO>(data, count);
+        } catch (e) {
             console.log('Error al consultar servicios por cuotas');
             console.log(e);
             throw new HttpException(
@@ -336,10 +328,10 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantMonto>>{
-        try{
+    ): Promise<ServerResponseList<ResumenCantMonto>> {
+        try {
             const data: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenSuscCuotasPendientes(
-                {   
+                {
                     eliminado,
                     idcliente,
                     idgrupo,
@@ -356,7 +348,7 @@ export class SuscripcionesController {
                 }
             );
             return new ServerResponseList(data, data.length);
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar resument por cuotas pendientes');
             console.log(e);
             throw new HttpException(
@@ -385,10 +377,10 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantMonto>>{
-        try{
+    ): Promise<ServerResponseList<ResumenCantMonto>> {
+        try {
             const rows: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenSuscEstados(
-                {   
+                {
                     eliminado,
                     idcliente,
                     idgrupo,
@@ -405,7 +397,7 @@ export class SuscripcionesController {
                 }
             );
             return new ServerResponseList(rows, rows.length);
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar resumen por estado');
             console.log(e);
             throw new HttpException(
@@ -434,10 +426,10 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantMonto>>{
-        try{
+    ): Promise<ServerResponseList<ResumenCantMonto>> {
+        try {
             const rows: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenGruposServicios(
-                {   
+                {
                     eliminado,
                     idcliente,
                     idgrupo,
@@ -454,7 +446,7 @@ export class SuscripcionesController {
                 }
             );
             return new ServerResponseList(rows, rows.length);
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar resumen por grupos y servicios');
             console.log(e);
             throw new HttpException(
@@ -483,10 +475,10 @@ export class SuscripcionesController {
         @Query('iddistrito') iddistrito: number | number[],
         @Query('idbarrio') idbarrio: number | number[],
         @Query('search') search: string
-    ): Promise<ServerResponseList<ResumenCantMonto>>{
-        try{
+    ): Promise<ServerResponseList<ResumenCantMonto>> {
+        try {
             const rows: ResumenCantMonto[] = await this.suscripcionesSrv.getResumenDepartamentosDistritos(
-                {   
+                {
                     eliminado,
                     idcliente,
                     idgrupo,
@@ -503,7 +495,7 @@ export class SuscripcionesController {
                 }
             );
             return new ServerResponseList(rows, rows.length);
-        }catch(e){
+        } catch (e) {
             console.log('Error al consultar resumen por departamentos y distritos');
             console.log(e);
             throw new HttpException(

@@ -1,9 +1,11 @@
 import { BarrioDTO } from "@dto/barrio.dto";
+import { CuotaDTO } from "@dto/cuota.dto";
 import { DepartamentoDTO } from "@dto/departamento.dto";
 import { DistritoDTO } from "@dto/distrito.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
 import { ServicioDTO } from "@dto/servicio.dto";
 import { Barrio } from "./entity/barrio.entity";
+import { Cuota } from "./entity/cuota.entity";
 import { Departamento } from "./entity/departamento.entity";
 import { Distrito } from "./entity/distrito.entity";
 import { Grupo } from "./entity/grupo.entity";
@@ -18,7 +20,7 @@ export class DTOEntityUtis {
         return departamento;
     }
 
-    public static distritoDtoToEntity(distritoDTO: DistritoDTO): Distrito{
+    public static distritoDtoToEntity(distritoDTO: DistritoDTO): Distrito {
         const distrito: Distrito = new Distrito();
         distrito.id = distritoDTO.id;
         distrito.descripcion = distritoDTO.descripcion;
@@ -26,7 +28,7 @@ export class DTOEntityUtis {
         return distrito;
     }
 
-    public static barrioDtoToEntity(barrioDTO: BarrioDTO): Barrio{
+    public static barrioDtoToEntity(barrioDTO: BarrioDTO): Barrio {
         const barrio: Barrio = new Barrio();
         barrio.id = barrioDTO.id;
         barrio.descripcion = barrioDTO.descripcion;
@@ -34,14 +36,14 @@ export class DTOEntityUtis {
         return barrio;
     }
 
-    public static grupoDtoToEntity(grupoDTO: GrupoDTO): Grupo{
+    public static grupoDtoToEntity(grupoDTO: GrupoDTO): Grupo {
         const grupo: Grupo = new Grupo();
         grupo.id = grupoDTO.id;
         grupo.descripcion = grupoDTO.descripcion;
         return grupo;
     }
 
-    public static servicioDtoToEntity(servicioDTO: ServicioDTO): Servicio{
+    public static servicioDtoToEntity(servicioDTO: ServicioDTO): Servicio {
         const servicio: Servicio = new Servicio();
         servicio.id = servicioDTO.id;
         servicio.descripcion = servicioDTO.descripcion;
@@ -50,6 +52,20 @@ export class DTOEntityUtis {
         servicio.precio = servicioDTO.precio;
         servicio.suscribible = servicioDTO.suscribible;
         return servicio;
+    }
+
+    public static cuotaDtoToEntity(cuotaDTO: CuotaDTO): Cuota {
+        const cuota: Cuota = new Cuota();
+        if (cuotaDTO.id != null) cuota.id = cuotaDTO.id;
+        cuota.idservicio = cuotaDTO.idservicio;
+        cuota.idsuscripcion = cuotaDTO.idsuscripcion;
+        cuota.monto = cuotaDTO.monto;
+        cuota.nroCuota = cuotaDTO.nrocuota;
+        cuota.observacion = cuotaDTO.observacion;
+        cuota.pagado = cuotaDTO.pagado;
+        if(cuotaDTO.fechavencimiento != null)
+            cuota.fechaVencimiento = new Date(`${cuotaDTO.fechavencimiento}T00:00:00`);
+        return cuota;
     }
 
 }

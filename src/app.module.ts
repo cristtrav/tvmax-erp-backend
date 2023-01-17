@@ -30,6 +30,8 @@ import { BarrioView } from '@database/view/barrio.view';
 import { Grupo } from '@database/entity/grupo.entity';
 import { Servicio } from '@database/entity/servicio.entity';
 import { ServicioView } from '@database/view/servicio.view';
+import { Cuota } from '@database/entity/cuota.entity';
+import { CuotaView } from '@database/view/cuota.view';
 
 @Module({
   imports: [
@@ -63,14 +65,12 @@ import { ServicioView } from '@database/view/servicio.view';
       synchronize: false,
       entities: [
         Departamento,
-        Distrito,
-        Barrio,
+        Distrito, DistritoView,
+        Barrio, BarrioView,
         Grupo,
-        Servicio,
+        Servicio, ServicioView,
         EventoAuditoria,
-        DistritoView,
-        BarrioView,
-        ServicioView
+        Cuota, CuotaView
       ],
     })
   ],

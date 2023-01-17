@@ -1,140 +1,105 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
-import { Cuota } from '@dto/cuota.dto';
 import { WhereParam } from '@util/whereparam';
-import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { CobroCuota } from '@dto/cobro-cuota.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Cuota } from '@database/entity/cuota.entity';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { CuotaView } from '@database/view/cuota.view';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 @Injectable()
 export class CuotasService {
 
     constructor(
+        @InjectRepository(Cuota)
+        private cuotaRepo: Repository<Cuota>,
+        @InjectRepository(CuotaView)
+        private cuotaViewRepo: Repository<CuotaView>,
+        private datasource: DataSource,
         private dbsrv: DatabaseService
     ) { }
 
-    async findAll(queryParams): Promise<Cuota[]> {
-        const { eliminado, pagado, sort, offset, limit, idservicio, idsuscripcion } = queryParams;
-        const wp: WhereParam = new WhereParam(
-            { eliminado, idservicio, idsuscripcion, pagado },
-            null,
-            null,
-            null,
-            { sort, offset, limit }
+    private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<CuotaView>{
+        const { eliminado, pagado, sort, offset, limit, idservicio, idsuscripcion } = queries;
+        const alias: string = "cuota";
+        let queryBuilder: SelectQueryBuilder<CuotaView> = this.cuotaViewRepo.createQueryBuilder(alias);
+
+        if(eliminado != null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
+        if(pagado != null) queryBuilder = queryBuilder.andWhere(`${alias}.pagado`, {pagado});
+        if(idsuscripcion != null)
+            queryBuilder = queryBuilder.andWhere(
+            `${alias}.idsuscripcion 
+            ${Array.isArray(idsuscripcion) ? 'IN (...idsuscripcion)' : '= :idsuscripcion'}`,
+            {idsuscripcion}
         );
-        const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        if(idservicio != null)
+            queryBuilder = queryBuilder.andWhere(
+            `${alias}.idservicio
+            ${Array.isArray(idservicio) ? 'IN (...idservicio)' : '= :idservicio'}`,
+            {idservicio}
+        );
+        if(limit != null) queryBuilder = queryBuilder.take(limit);
+        if(offset != null) queryBuilder = queryBuilder.skip(offset);
+        if(sort){
+            const sortColumn: string = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            queryBuilder = queryBuilder.orderBy(`${alias}.${sortColumn}`, sortOrder); 
+        }
+        return queryBuilder;
     }
 
-    async count(queryParams): Promise<number> {
-        const { eliminado, idservicio, idsuscripcion, pagado } = queryParams;
-        const wp: WhereParam = new WhereParam(
-            { eliminado, idservicio, idsuscripcion, pagado },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.vw_cuotas ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', estadoanterior: any, estadonuevo: any): EventoAuditoria{
+        const evento: EventoAuditoria = new EventoAuditoria();
+        evento.idusuario = idusuario;
+        evento.operacion = operacion;
+        evento.estadoanterior = estadoanterior;
+        evento.estadonuevo = estadonuevo;
+        evento.fechahora = new Date();
+        evento.idtabla = TablasAuditoriaList.CUOTAS.id;
+        return evento;
     }
 
-    async getCuotasPorSuscripcion(idsuscripcion: number, reqQuery): Promise<Cuota[]> {
-        const { eliminado, sort, offset, limit } = reqQuery;
-        const wp: WhereParam = new WhereParam(
-            { eliminado, idsuscripcion },
-            null,
-            null,
-            null,
-            { sort, offset, limit }
-        );
-        const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    async findAll(queries: {[name: string]: any}): Promise<CuotaView[]> {
+        return this.getSelectQuery(queries).getMany();
     }
 
-    async countCuotasPorSuscripcion(idsuscripcion: number, reqQuery): Promise<number> {
-        const { eliminado } = reqQuery;
-        const wp: WhereParam = new WhereParam(
-            { eliminado, idsuscripcion },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.vw_cuotas ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    async count(queries): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
     }
 
-    async findById(id: number): Promise<Cuota> {
-        const wp: WhereParam = new WhereParam(
-            { id },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT * FROM public.vw_cuotas ${wp.whereStr}`;
-        const rows: Cuota[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
-        if (rows.length > 0) return rows[0];
-        return null;
+    async findById(id: number): Promise<CuotaView> {
+        return this.cuotaViewRepo.findOneByOrFail({id});
     }
 
     async create(c: Cuota, idusuario: number) {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `INSERT INTO public.cuota(id, fecha_vencimiento, monto, nro_cuota, observacion, idsuscripcion, idservicio, eliminado)
-        VALUES(nextval('seq_cuotas'), $1, $2, $3, $4, $5, $6, false) RETURNING *`;
-        const params = [c.fechavencimiento, c.monto, c.nrocuota, c.observacion, c.idsuscripcion, c.idservicio];
-        try {
-            await cli.query('BEGIN');
-            const idgen = (await cli.query(query, params)).rows[0].id;
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.CUOTAS, idusuario, idgen);
-            await cli.query('COMMIT');
-        } catch (e) {
-            await cli.query('ROLLBACK');
-            throw e;
-        } finally {
-            cli.release();
-        }
+        await this.datasource.transaction(async manager => {
+            await manager.save(c);
+            await manager.save(this.getEventoAuditoria(idusuario, 'R', null, c));
+        })
     }
 
-    async edit(oldid: number, c: Cuota, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.cuota SET id = $1, fecha_vencimiento = $2, monto = $3, nro_cuota = $4, observacion = $5, idsuscripcion = $6, idservicio = $7 WHERE id = $8`;
-        const params = [c.id, c.fechavencimiento, c.monto, c.nrocuota, c.observacion, c.idsuscripcion, c.idservicio, oldid];
-        let rowCount = 0;
-        try {
-            await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.CUOTAS, idusuario, oldid);
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.CUOTAS, idevento, c.id);
-            await cli.query('COMMIT');
-        } catch (e) {
-            await cli.query('ROLLBACK');
-            throw e;
-        } finally {
-            cli.release();
-        }
-        return rowCount > 0;
+    async edit(oldid: number, c: Cuota, idusuario: number) {
+        await this.datasource.transaction(async manager => {
+            const oldCuota: Cuota = await this.cuotaRepo.findOneByOrFail({id: oldid});
+            await manager.save(c);
+            const newCuota: Cuota = await this.cuotaRepo.findOneByOrFail({id: c.id});
+            await manager.save(this.getEventoAuditoria(idusuario, "M", oldCuota, newCuota));
+            if(oldid != c.id) await manager.remove(oldCuota);
+        })
     }
 
-    async delete(id: number, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.cuota SET eliminado = true WHERE id = $1`;
-        let rowCount = 0;
-        try {
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, [id])).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.CUOTAS, idusuario, id);
-            await cli.query('COMMIT');
-        } catch (e) {
-            await cli.query('ROLLBACK');
-            throw e;
-        } finally {
-            cli.release();
-        }
-        return rowCount > 0;
+    async delete(id: number, idusuario: number) {
+        const cuota: Cuota = await this.cuotaRepo.findOneByOrFail({id});
+        const oldCuota: Cuota = { ...cuota };
+        cuota.eliminado = true;
+        await this.datasource.transaction(async manager => {
+            await manager.save(cuota);
+            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldCuota, cuota));
+        })
     }
-
+    //FALTA MIGRAR A TYPEORM
     async findCobro(idcuota: number): Promise<CobroCuota | null>{
         const wp: WhereParam = new WhereParam(
             {idcuota},

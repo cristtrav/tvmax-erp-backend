@@ -1,4 +1,4 @@
-export class Cuota{
+export class CuotaDTO{
     id: number | null = null;
     idservicio: number | null = null;
     servicio: string | null = null;

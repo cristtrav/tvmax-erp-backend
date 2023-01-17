@@ -8,7 +8,7 @@ export class EventoAuditoria {
 
     @Column({
         name: 'fecha_hora',
-        type: 'time without time zone'
+        type: 'timestamp without time zone'
     })
     fechahora: Date
 

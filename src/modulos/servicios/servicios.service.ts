@@ -1,15 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ServicioDTO } from '../../dto/servicio.dto';
-import { DatabaseService } from '../../global/database/database.service';
-import { Result } from 'pg';
-import { WhereParam } from '@util/whereparam';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { Servicio } from '@database/entity/servicio.entity';
 import { ServicioView } from '@database/view/servicio.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
-
+import { CuotaView } from '@database/view/cuota.view';
 
 @Injectable()
 export class ServiciosService {
@@ -19,8 +15,9 @@ export class ServiciosService {
         private servicioRepo: Repository<Servicio>,
         @InjectRepository(ServicioView)
         private servicioViewRepo: Repository<ServicioView>,
-        private datasource: DataSource,
-        private dbsrv: DatabaseService
+        @InjectRepository(CuotaView)
+        private cuotaViewRepo: Repository<CuotaView>,
+        private datasource: DataSource
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<ServicioView> {
@@ -31,10 +28,11 @@ export class ServiciosService {
         if (eliminado != null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
         if (idgrupo) queryBuilder = queryBuilder.andWhere(`${alias}.idgrupo = ${Array.isArray(idgrupo) ? 'IN (...:idgrupo)' : '= :idgrupo'}`, { idgrupo });
         if (suscribible != null) queryBuilder = queryBuilder.andWhere(`${alias}.suscribible = :suscribible`, { suscribible });
-        if (id) queryBuilder = queryBuilder.andWhere(`${alias}.id = ${Array.isArray(id) ? 'IN (...:id)' : '= :id'}`, { id });
+        if (id) queryBuilder = queryBuilder.andWhere(`${alias}.id ${Array.isArray(id) ? 'IN (...:id)' : '= :id'}`, { id });
         if (search) {
             queryBuilder = queryBuilder.andWhere(new Brackets((qb) => {
-                qb = qb.orWhere(`LOWER(${alias}.descripcion = :descsearch)`, { descsearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.descripcion) LIKE :descsearch`, { descsearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.grupo) LIKE :descsearch`, { descsearch: `%${search.toLowerCase()}%`});
                 if (!Number.isNaN(Number(search))) qb = qb.orWhere(`${alias}.id = :id`, { id: Number(search) });
             }));
         }
@@ -79,7 +77,7 @@ export class ServiciosService {
         });
     }
 
-    async update(oldId: number, s: Servicio, idusuario: number): Promise<Result> {
+    async update(oldId: number, s: Servicio, idusuario: number) {
         await this.datasource.transaction(async manager => {
             const oldServicio: Servicio = await this.servicioRepo.findOneByOrFail({ id: oldId });
             await manager.save(s);
@@ -103,33 +101,36 @@ export class ServiciosService {
             await manager.save(this.getEventoAuditoria(idusuario, 'E', oldServ, serv));
         });
     }
-    //PENDIENTE DE CAMBIAR A TYPEORM
-    async getServiciosEnCuotas(idsusc: number, queryParams): Promise<ServicioDTO[]> {
-        const { eliminado, pagado, sort, offset, limit } = queryParams;
-        const wp: WhereParam = new WhereParam(
-            { 'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado, eliminado },
-            null,
-            null,
-            null,
-            { sort, offset, limit }
-        );
-        const query: string = `SELECT * FROM public.vw_servicios WHERE id IN
-        (SELECT vw_cuotas.idservicio AS idcuota FROM public.vw_cuotas ${wp.whereStr}) ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+
+    private getServiciosEnCuotasQuery(idsusc: number, queries: {[name: string]: any}): SelectQueryBuilder<ServicioView>{
+        const { eliminado, pagado, sort, offset, limit } = queries;
+        
+        let cuotasQuery: SelectQueryBuilder<CuotaView> = this.cuotaViewRepo.createQueryBuilder("cuota")
+            .select('cuota.idservicio')
+            .distinct(true)
+            .where('cuota.idsuscripcion = :idsusc', {idsusc});
+        if(eliminado != null) cuotasQuery = cuotasQuery.andWhere('cuota.eliminado = :eliminado', { eliminado});
+        if(pagado != null) cuotasQuery = cuotasQuery.andWhere('cuota.pagado = :pagado', { pagado });
+        
+        let serviciosQuery: SelectQueryBuilder<ServicioView> = this.servicioViewRepo.createQueryBuilder('servicio');
+        if(limit) serviciosQuery = serviciosQuery.take(limit);
+        if(offset) serviciosQuery = serviciosQuery.skip(offset);
+        if(sort){
+            const sortColumn: string = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            serviciosQuery = serviciosQuery.orderBy(`servicio.${sortColumn}`, sortOrder) ;
+        }
+        serviciosQuery = serviciosQuery.where(`servicio.id IN (${cuotasQuery.getQuery()})`);
+        serviciosQuery.setParameters(cuotasQuery.getParameters());
+        return serviciosQuery;
     }
-    //PENDIENTE DE CAMBIAR A TYPEORM
-    async countServiciosEnCuotas(idsusc, queryParams): Promise<number> {
-        const { eliminado, pagado } = queryParams;
-        const wp: WhereParam = new WhereParam(
-            { 'vw_cuotas.idsuscripcion': idsusc, 'vw_cuotas.pagado': pagado },
-            null,
-            null,
-            null,
-            null
-        );
-        var query: string = `SELECT COUNT(*) FROM public.vw_servicios WHERE id IN
-        (SELECT vw_cuotas.idservicio AS idservicio FROM public.vw_cuotas ${wp.whereStr})`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+
+    async getServiciosEnCuotas(idsusc: number, queries: {[name: string]: any}): Promise<ServicioView[]> {
+        return this.getServiciosEnCuotasQuery(idsusc, queries).getMany();
+    }
+
+    async countServiciosEnCuotas(idsusc, queries: {[name: string]: any}): Promise<number> {
+        return this.getServiciosEnCuotasQuery(idsusc, queries).getCount();
     }
 
     async getLastId(): Promise<number> {

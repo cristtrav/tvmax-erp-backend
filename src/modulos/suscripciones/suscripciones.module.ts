@@ -9,14 +9,21 @@ import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Servicio } from '@database/entity/servicio.entity';
 import { ServicioView } from '@database/view/servicio.view';
+import { CuotaView } from '@database/view/cuota.view';
+import { Cuota } from '@database/entity/cuota.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Servicio, ServicioView]),
+    TypeOrmModule.forFeature([Servicio, ServicioView, Cuota, CuotaView]),
     UtilModule
   ],
-  providers: [SuscripcionesService, DatabaseService, CuotasService, ServiciosService],
+  providers: [
+    SuscripcionesService,
+    DatabaseService,
+    CuotasService,
+    ServiciosService
+  ],
   controllers: [SuscripcionesController],
   exports: [ServiciosService]
 })
