@@ -3,12 +3,14 @@ import { CuotaDTO } from "@dto/cuota.dto";
 import { DepartamentoDTO } from "@dto/departamento.dto";
 import { DistritoDTO } from "@dto/distrito.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
+import { RolDTO } from "@dto/rol.dto";
 import { ServicioDTO } from "@dto/servicio.dto";
 import { Barrio } from "./entity/barrio.entity";
 import { Cuota } from "./entity/cuota.entity";
 import { Departamento } from "./entity/departamento.entity";
 import { Distrito } from "./entity/distrito.entity";
 import { Grupo } from "./entity/grupo.entity";
+import { Rol } from "./entity/rol.entity";
 import { Servicio } from "./entity/servicio.entity";
 
 export class DTOEntityUtis {
@@ -66,6 +68,14 @@ export class DTOEntityUtis {
         if(cuotaDTO.fechavencimiento != null)
             cuota.fechaVencimiento = new Date(`${cuotaDTO.fechavencimiento}T00:00:00`);
         return cuota;
+    }
+
+    public static rolDtoToEntity(rolDTO: RolDTO): Rol{
+        const rol: Rol = new Rol();
+        rol.id = rolDTO.id;
+        rol.descripcion = rolDTO.descripcion;
+        if(rolDTO.eliminado != null) rol.eliminado = rolDTO.eliminado;
+        return rol;
     }
 
 }

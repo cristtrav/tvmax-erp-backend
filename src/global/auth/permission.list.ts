@@ -48,7 +48,7 @@ export class Permissions {
         ELIMINAR: 123
     }
 
-    static readonly COBRADORES = {
+    static readonly ROLES = {
         CONSULTAR: 140,
         REGISTRAR: 141,
         EDITAR: 142,

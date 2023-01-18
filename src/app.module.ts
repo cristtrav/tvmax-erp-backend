@@ -32,6 +32,11 @@ import { Servicio } from '@database/entity/servicio.entity';
 import { ServicioView } from '@database/view/servicio.view';
 import { Cuota } from '@database/entity/cuota.entity';
 import { CuotaView } from '@database/view/cuota.view';
+//import { Funcionario } from '@database/entity/funcionario.entity';
+//import { FuncionarioView } from '@database/view/funcionario.view';
+//import { FuncionariosModule } from './modulos/funcionarios/funcionarios.module';
+import { Rol } from '@database/entity/rol.entity';
+import { RolesModule } from './modulos/roles/roles.module';
 
 @Module({
   imports: [
@@ -70,9 +75,13 @@ import { CuotaView } from '@database/view/cuota.view';
         Grupo,
         Servicio, ServicioView,
         EventoAuditoria,
-        Cuota, CuotaView
+        Cuota, CuotaView,
+        //Funcionario, FuncionarioView,
+        Rol
       ],
-    })
+    }),
+    //FuncionariosModule,
+    RolesModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],
