@@ -83,12 +83,13 @@ export class RolesService {
             message: 'El Rol «Cobrador» no se puede eliminar.'
         }, HttpStatus.FORBIDDEN);
 
-        if(await this.rolRepo.findOneBy({id: rol.id})) throw new HttpException({
+        if(await this.rolRepo.findOneBy({id: rol.id, eliminado: false})) throw new HttpException({
             message: `El Rol con código «${rol.id}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
 
         await this.datasource.transaction(async manager => {
             const oldRol: Rol = await this.rolRepo.findOneByOrFail({id: oldId});
+            rol.eliminado = false;
             await manager.save(rol);
             await manager.save(this.getEventoAuditoria(idusuario, 'M', oldRol, rol));
             if(oldRol.id != rol.id) await manager.remove(oldRol);
