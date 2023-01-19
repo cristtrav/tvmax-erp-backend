@@ -1,46 +1,54 @@
-import { Injectable } from '@nestjs/common';
-import { DatabaseService } from './../../global/database/database.service';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as argon2 from "argon2";
-import { Funcionario } from '@dto/funcionario.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Usuario } from '@database/entity/usuario.entity';
+import { Repository } from 'typeorm';
+import { Sesion } from '@database/entity/sesion.entity';
+import { TokenSesionDTO } from '@dto/token-sesion.dto';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class SesionService {
 
-    constructor(private dbsrv: DatabaseService){
+    constructor(
+        @InjectRepository(Usuario)
+        private usuarioRepo: Repository<Usuario>,
+        @InjectRepository(Sesion)
+        private sesionRepo: Repository<Sesion>,
+        private jwtUtilSrv: JwtUtilsService,
+        private jwtSrv: JwtService
+    ){}
+
+    async login(ci: string, password: string): Promise<TokenSesionDTO> {
+        const usuario = await this.usuarioRepo.findOneBy({ci, eliminado: false, accesoSistema: true});
+        if(!usuario) throw new HttpException({
+            message: 'Error de nro. de documento o contraseña.'
+        }, HttpStatus.FORBIDDEN);
+        if(!await argon2.verify(usuario.password, password)) throw new HttpException({
+            message: 'Error de nro. de documento o contraseña.'
+        }, HttpStatus.FORBIDDEN);
+        const tokenSesion: TokenSesionDTO = this.jwtUtilSrv.generarToken(usuario, true);
+        this.guardarRefreshToken(usuario.id, tokenSesion.refreshToken);
+        return tokenSesion;
     }
 
-    async login(reqUsr: {ci: string, password: string}): Promise<Funcionario> {
-        const query = `SELECT * FROM public.funcionario WHERE ci = $1 AND eliminado = false AND activo = true`
-        const params = [reqUsr.ci]
-        const response = await this.dbsrv.execute(query, params)
-        var dbUsr: Funcionario = response?.rows[0] 
-        if(!dbUsr) return null
-        if(await argon2.verify(dbUsr.password, reqUsr.password)) return dbUsr
-        return null
+    async guardarRefreshToken(idusuario: number, token: string){
+        const sesion: Sesion = new Sesion();
+        sesion.token = token;
+        sesion.idusuario = idusuario;
+        sesion.fechaHora = new Date();
+        await this.sesionRepo.save(sesion);
     }
 
-    async guardarRefreshToken(idfuncionario: number, token: string){
-        const query = `INSERT INTO public.refresh_tokens(token, idfuncionario) VALUES($1, $2)`
-        const params = [token, idfuncionario]
-        await this.dbsrv.execute(query, params)
-    }
-
-    async refresh(token: string): Promise<Funcionario>{
-        const queryToken = `SELECT * FROM public.refresh_tokens WHERE token = $1`
-        const paramsToken = [token]
-        const resultToken = await this.dbsrv.execute(queryToken, paramsToken)
-        if(resultToken.rowCount === 0) return null
-        const queryUser = `SELECT * FROM public.funcionario WHERE id = $1`
-        const paramsUser = [resultToken.rows[0]?.idfuncionario]
-        const resultUser = await this.dbsrv.execute(queryUser, paramsUser)
-        return resultUser.rows[0]
+    async refresh(token: string): Promise<TokenSesionDTO>{
+        const sesion: Sesion = await this.sesionRepo.findOneByOrFail({token});
+        const usuario: Usuario = await this.usuarioRepo.findOneByOrFail({id: sesion.idusuario});
+        this.jwtSrv.verify(token, {secret: process.env.REFRESH_TOKEN_SECRET});
+        return this.jwtUtilSrv.generarToken(usuario, false); 
     }
 
     async logout(token: string){
-        const query = `DELETE FROM public.refresh_tokens WHERE token = $1`
-        const params = [token]
-        await this.dbsrv.execute(query, params)
+        await this.sesionRepo.delete({token});
     }
-
-
 }

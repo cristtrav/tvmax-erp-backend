@@ -1,14 +1,18 @@
-import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { UsuariosService } from './usuarios.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
-import { Funcionario } from '@dto/funcionario.dto';
+import { UsuarioDTO } from '@dto/usuario.dto';
+import { UsuarioView } from '@database/view/usuario.view';
+import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
+import { DTOEntityUtis } from '@database/dto-entity-utils';
 
 @Controller('usuarios')
 @UseGuards(AuthGuard)
+@UseFilters(HttpExceptionFilter)
 export class UsuariosController {
 
     constructor(
@@ -18,36 +22,31 @@ export class UsuariosController {
 
     @Get()
     @RequirePermission(Permissions.USUARIOS.CONSULTAR)
-    async findAll(
-        @Query('eliminado') eliminado: boolean,
-        @Query('sort') sort: string,
-        @Query('offset') offset: number,
-        @Query('limit') limit: number
-    ): Promise<ServerResponseList<Funcionario>> {
-        try{
-            const data: Funcionario[] = await this.usuarioSrv.findAll({eliminado, sort, offset, limit});
-            const rowCount: number = await this.usuarioSrv.count({eliminado});
-            return new ServerResponseList<Funcionario>(data, rowCount);
-        }catch(e){
-            console.log('Error al consultar usuarios');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+    findAll(
+        @Query() queries: {[name: string]: any}
+    ): Promise<UsuarioView[]> {
+        return this.usuarioSrv.findAll(queries);
+    }
+
+    @Get('total')
+    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    count(
+        @Query() queries: {[name: string]: any}
+    ):Promise<number>{
+        return this.usuarioSrv.count(queries);
     }
 
     @Post()
     @RequirePermission(Permissions.USUARIOS.REGISTRAR)
     async create(
-        @Body() u: Funcionario,
-        @Req() request: Request
+        @Body() u: UsuarioDTO,
+        @Headers('authorization') auth: string
     ){
-        try{
+        await this.usuarioSrv.create(
+            DTOEntityUtis.usuarioDtoToEntity(u),
+            this.jwtUtil.extractJwtSub(auth)
+        );
+        /*try{
             await this.usuarioSrv.create(u, this.jwtUtil.decodeIdUsuario(request));
         }catch(e){
             console.log('Error al registrar Usuario');
@@ -59,16 +58,17 @@ export class UsuariosController {
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
-        }
+        }*/
     }
 
     @Get(':id')
     @RequirePermission(Permissions.USUARIOS.CONSULTAR)
     async findById(
         @Param('id') id: number
-    ): Promise<Funcionario>{
-        try{
-            const u: Funcionario | null = await this.usuarioSrv.findById(id);
+    ): Promise<UsuarioView>{
+        return this.usuarioSrv.findById(id);
+        /*try{
+            const u: UsuarioDTO | null = await this.usuarioSrv.findById(id);
             if(!u) throw new HttpException(
                 {
                     request: 'get',
@@ -87,17 +87,22 @@ export class UsuariosController {
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
-        }
+        }*/
     }
 
     @Put(':id')
     @RequirePermission(Permissions.USUARIOS.EDITAR)
     async edit(
         @Param('id') oldId: number,
-        @Body() u: Funcionario,
-        @Req() request: Request
+        @Body() u: UsuarioDTO,
+        @Headers('authorization') auth: string
     ){
-        try{
+        await this.usuarioSrv.edit(
+            oldId,
+            DTOEntityUtis.usuarioDtoToEntity(u),
+            this.jwtUtil.extractJwtSub(auth)
+        );
+        /*try{
             if(!(await this.usuarioSrv.edit(oldId, u, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'put',
@@ -115,16 +120,21 @@ export class UsuariosController {
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
-        }
+        }*/
     }
 
     @Delete(':id')
     @RequirePermission(Permissions.USUARIOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
-        @Req() request: Request
+        @Headers('authorization') auth: string
     ){
-        try{
+        await this.usuarioSrv.delete(
+            id,
+            this.jwtUtil.extractJwtSub(auth)
+        );
+
+        /*try{
             if(!(await this.usuarioSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
                 {
                     request: 'delete',
@@ -142,7 +152,7 @@ export class UsuariosController {
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
-        }
+        }*/
     }
 
 }

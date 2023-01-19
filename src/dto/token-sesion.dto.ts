@@ -1,4 +1,4 @@
-export class TokenSesion{
+export class TokenSesionDTO{
     accessToken: string
     refreshToken: string
     nombreUsuario: string

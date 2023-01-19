@@ -11,7 +11,6 @@ import { DistritosModule } from './modulos/distritos/distritos.module';
 import { BarriosModule } from './modulos/barrios/barrios.module';
 import { ClientesModule } from './modulos/clientes/clientes.module';
 import { UsuariosModule } from './modulos/usuarios/usuarios.module';
-import { CobradoresModule } from './modulos/cobradores/cobradores.module';
 import { SuscripcionesModule } from './modulos/suscripciones/suscripciones.module';
 import { DomiciliosModule } from './modulos/domicilios/domicilios.module';
 import { CuotasModule } from './modulos/cuotas/cuotas.module';
@@ -32,11 +31,11 @@ import { Servicio } from '@database/entity/servicio.entity';
 import { ServicioView } from '@database/view/servicio.view';
 import { Cuota } from '@database/entity/cuota.entity';
 import { CuotaView } from '@database/view/cuota.view';
-//import { Funcionario } from '@database/entity/funcionario.entity';
-//import { FuncionarioView } from '@database/view/funcionario.view';
-//import { FuncionariosModule } from './modulos/funcionarios/funcionarios.module';
 import { Rol } from '@database/entity/rol.entity';
 import { RolesModule } from './modulos/roles/roles.module';
+import { Usuario } from '@database/entity/usuario.entity';
+import { UsuarioView } from '@database/view/usuario.view';
+import { Sesion } from '@database/entity/sesion.entity';
 
 @Module({
   imports: [
@@ -51,7 +50,6 @@ import { RolesModule } from './modulos/roles/roles.module';
     BarriosModule,
     ClientesModule,
     UsuariosModule,
-    CobradoresModule,
     SuscripcionesModule,
     DomiciliosModule,
     CuotasModule,
@@ -76,11 +74,11 @@ import { RolesModule } from './modulos/roles/roles.module';
         Servicio, ServicioView,
         EventoAuditoria,
         Cuota, CuotaView,
-        //Funcionario, FuncionarioView,
-        Rol
+        Usuario, UsuarioView,
+        Rol,
+        Sesion
       ],
     }),
-    //FuncionariosModule,
     RolesModule
   ],
   controllers: [AppController],

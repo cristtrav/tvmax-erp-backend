@@ -26,7 +26,7 @@ export class BarriosService {
         if (id) queryBuilder = queryBuilder.andWhere(`${entityAlias}.id ${Array.isArray(id) ? 'IN (...:id)' : '= :id'}`, { id });
         if (iddistrito) queryBuilder = queryBuilder.andWhere(`${entityAlias}.iddistrito ${Array.isArray(iddistrito) ? 'IN (...:iddistrito)' : '= :iddistrito'}`, { iddistrito });
         if (iddepartamento) queryBuilder = queryBuilder.andWhere(`${entityAlias}.iddepartamento ${Array.isArray(iddepartamento) ? 'IN (...:iddepartamento)' : '= :iddepartamento'}`, { iddepartamento });
-        if (search) {
+        if (search != null) {
             queryBuilder = queryBuilder.andWhere(
                 new Brackets((qb) => {
                     qb = qb.orWhere(`LOWER(${entityAlias}.descripcion) LIKE :descsearch`, { descsearch: `%${search.toLowerCase()}%` });
