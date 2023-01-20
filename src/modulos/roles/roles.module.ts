@@ -6,11 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Rol } from '@database/entity/rol.entity';
 import { DatabaseService } from '@database/database.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { RolView } from '@database/view/rol.view';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Rol])
+    TypeOrmModule.forFeature([Rol, RolView])
   ],
   providers: [RolesService, DatabaseService, JwtUtilsService],
   controllers: [RolesController]

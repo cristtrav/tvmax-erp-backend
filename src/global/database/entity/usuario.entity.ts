@@ -32,4 +32,7 @@ export class Usuario{
 
     @Column({default: false, nullable: false})
     eliminado: boolean;
+
+    @Column({name: 'solo_lectura', update: false, default: false})
+    soloLectura: boolean;
 }

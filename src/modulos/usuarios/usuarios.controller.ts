@@ -1,9 +1,8 @@
-import { Req, Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { UsuariosService } from './usuarios.service';
-import { ServerResponseList } from '../../dto/server-response-list.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { UsuarioDTO } from '@dto/usuario.dto';
 import { UsuarioView } from '@database/view/usuario.view';
@@ -28,6 +27,12 @@ export class UsuariosController {
         return this.usuarioSrv.findAll(queries);
     }
 
+    @Get('ultimoid')
+    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    getLastId(): Promise<number>{
+        return this.usuarioSrv.getLastId();
+    }
+
     @Get('total')
     @RequirePermission(Permissions.USUARIOS.CONSULTAR)
     count(
@@ -46,19 +51,6 @@ export class UsuariosController {
             DTOEntityUtis.usuarioDtoToEntity(u),
             this.jwtUtil.extractJwtSub(auth)
         );
-        /*try{
-            await this.usuarioSrv.create(u, this.jwtUtil.decodeIdUsuario(request));
-        }catch(e){
-            console.log('Error al registrar Usuario');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'post',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }*/
     }
 
     @Get(':id')
@@ -67,27 +59,6 @@ export class UsuariosController {
         @Param('id') id: number
     ): Promise<UsuarioView>{
         return this.usuarioSrv.findById(id);
-        /*try{
-            const u: UsuarioDTO | null = await this.usuarioSrv.findById(id);
-            if(!u) throw new HttpException(
-                {
-                    request: 'get',
-                    description: `No se encontró el Usuario con código ${id}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-            return u;
-        }catch(e){
-            console.log('Error al consultar Usuario por ID');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }*/
     }
 
     @Put(':id')
@@ -102,25 +73,6 @@ export class UsuariosController {
             DTOEntityUtis.usuarioDtoToEntity(u),
             this.jwtUtil.extractJwtSub(auth)
         );
-        /*try{
-            if(!(await this.usuarioSrv.edit(oldId, u, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
-                {
-                    request: 'put',
-                    description: `No se encontró el Usuario con código ${oldId}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-        }catch(e){
-            console.log('Error al editar Usuario');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'put',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }*/
     }
 
     @Delete(':id')
@@ -133,26 +85,6 @@ export class UsuariosController {
             id,
             this.jwtUtil.extractJwtSub(auth)
         );
-
-        /*try{
-            if(!(await this.usuarioSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
-                {
-                    request: 'delete',
-                    description: `No se encontró el Usuario con código ${id}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-        }catch(e){
-            console.log('Error al eliminar Usuario');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'delete',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }*/
     }
 
 }

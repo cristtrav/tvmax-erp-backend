@@ -11,4 +11,5 @@ export interface UsuarioDTO {
     idrol: number;
     rol: string;
     eliminado: boolean;
+    sololectura: boolean;
 }

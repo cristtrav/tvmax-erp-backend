@@ -12,4 +12,7 @@ export class Rol{
     @Column({nullable: false, default: false})
     eliminado: boolean;
 
+    @Column({name: 'solo_lectura', update: false, default: false})
+    soloLectura: boolean;
+
 }

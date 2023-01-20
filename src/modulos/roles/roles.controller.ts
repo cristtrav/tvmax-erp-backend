@@ -3,6 +3,7 @@ import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { DTOEntityUtis } from '@database/dto-entity-utils';
 import { Rol } from '@database/entity/rol.entity';
+import { RolView } from '@database/view/rol.view';
 import { RolDTO } from '@dto/rol.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
@@ -23,7 +24,7 @@ export class RolesController {
     @RequirePermission(Permissions.ROLES.CONSULTAR)
     findAll(
         @Query() queries: {[name: string]: any}
-    ): Promise<Rol[]>{
+    ): Promise<RolView[]>{
         return this.rolesSrv.findAll(queries);
     }
 

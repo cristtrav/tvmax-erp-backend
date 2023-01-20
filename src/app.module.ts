@@ -36,6 +36,7 @@ import { RolesModule } from './modulos/roles/roles.module';
 import { Usuario } from '@database/entity/usuario.entity';
 import { UsuarioView } from '@database/view/usuario.view';
 import { Sesion } from '@database/entity/sesion.entity';
+import { RolView } from '@database/view/rol.view';
 
 @Module({
   imports: [
@@ -75,7 +76,7 @@ import { Sesion } from '@database/entity/sesion.entity';
         EventoAuditoria,
         Cuota, CuotaView,
         Usuario, UsuarioView,
-        Rol,
+        Rol, RolView,
         Sesion
       ],
     }),

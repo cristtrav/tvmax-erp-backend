@@ -1,6 +1,7 @@
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 import { Rol } from '@database/entity/rol.entity';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { RolView } from '@database/view/rol.view';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
@@ -11,13 +12,15 @@ export class RolesService {
     constructor(
         @InjectRepository(Rol)
         private rolRepo: Repository<Rol>,
+        @InjectRepository(RolView)
+        private rolViewRepo: Repository<RolView>,
         private datasource: DataSource
     ){}
 
-    private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<Rol>{
+    private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<RolView>{
         const { eliminado, sort, offset, limit, search } = queries;
         const alias = 'rol';
-        let query: SelectQueryBuilder<Rol> = this.rolRepo.createQueryBuilder(alias);
+        let query: SelectQueryBuilder<RolView> = this.rolViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
@@ -48,7 +51,7 @@ export class RolesService {
         return evento;
     }
 
-    public findAll(queries: {[name: string]: any}): Promise<Rol[]>{
+    public findAll(queries: {[name: string]: any}): Promise<RolView[]>{
         return this.getSelectQuery(queries).getMany();
     }
 
@@ -75,20 +78,17 @@ export class RolesService {
     }
 
     public async edit(oldId: number, rol: Rol, idusuario: number){
-        if(oldId == 1) throw new HttpException({
-            message: 'El Rol «Administrador» no se puede editar.'
+        const oldRol: Rol = await this.rolRepo.findOneByOrFail({id: oldId});
+
+        if(oldRol.soloLectura) throw new HttpException({
+            message: `El Rol «${oldRol.descripcion}» no se puede editar.`
         }, HttpStatus.FORBIDDEN);
 
-        if(oldId == 10) throw new HttpException({
-            message: 'El Rol «Cobrador» no se puede eliminar.'
-        }, HttpStatus.FORBIDDEN);
-
-        if(await this.rolRepo.findOneBy({id: rol.id, eliminado: false})) throw new HttpException({
+        if(oldId != rol.id && await this.rolRepo.findOneBy({id: rol.id, eliminado: false})) throw new HttpException({
             message: `El Rol con código «${rol.id}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
 
         await this.datasource.transaction(async manager => {
-            const oldRol: Rol = await this.rolRepo.findOneByOrFail({id: oldId});
             rol.eliminado = false;
             await manager.save(rol);
             await manager.save(this.getEventoAuditoria(idusuario, 'M', oldRol, rol));
@@ -97,15 +97,12 @@ export class RolesService {
     }
 
     public async delete(id: number, idusuario: number){
-        if(id == 1) throw new HttpException({
-            message: 'El Rol «Administrador» no se puede eliminar.'
-        }, HttpStatus.FORBIDDEN);
-
-        if(id == 10) throw new HttpException({
-            message: 'El Rol «Cobrador» no se puede eliminar.'
-        }, HttpStatus.FORBIDDEN);
-
         const rol: Rol = await this.rolRepo.findOneByOrFail({id});
+
+        if(rol.soloLectura) throw new HttpException({
+            message: `El Rol «${rol.descripcion}» no se puede eliminar.`
+        }, HttpStatus.FORBIDDEN);
+
         const oldRol: Rol = {...rol};
         rol.eliminado = true;
         await this.datasource.transaction(async manager => {
