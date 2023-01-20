@@ -4,7 +4,7 @@ import * as argon2 from "argon2";
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from '@database/entity/usuario.entity';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { UsuarioView } from '@database/view/usuario.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
@@ -21,7 +21,7 @@ export class UsuariosService {
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<UsuarioView> {
-        const { eliminado, sort, offset, limit } = queries;
+        const { eliminado, sort, offset, limit, search } = queries;
         const alias = 'usuario';
         let query = this.usuarioViewRepo.createQueryBuilder(alias);
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
@@ -32,6 +32,16 @@ export class UsuariosService {
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
             query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
+        if (search) query = query.andWhere(
+            new Brackets(qb => {
+                if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :id`, { id: Number(search) });
+                qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombressearch`, { nombressearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellidossearch`, { apellidossearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`${alias}.ci = :cisearch`, { cisearch: search});
+                qb = qb.orWhere(`LOWER(${alias}.rol) LIKE :rolsearch`, { rolsearch: `%${search.toLowerCase()}%`});
+            })
+        );
+
         return query;
     }
 
@@ -96,10 +106,10 @@ export class UsuariosService {
         })
     }
 
-    public async getLastId(): Promise<number>{
+    public async getLastId(): Promise<number> {
         return (await this.usuarioRepo.createQueryBuilder('usuario')
-        .select('MAX(usuario.id)', 'lastid')
-        .getRawOne()).lastid;
+            .select('MAX(usuario.id)', 'lastid')
+            .getRawOne()).lastid;
     }
 
 }

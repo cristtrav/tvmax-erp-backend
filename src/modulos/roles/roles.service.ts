@@ -33,7 +33,7 @@ export class RolesService {
             query = query.andWhere(
                 new Brackets(qb => {
                     qb.orWhere(`LOWER(${alias}.descripcion) LIKE :descsearch`, {descsearch: `%${search.toLowerCase()}%`})
-                    if(!Number.isNaN(Number(search))) qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
+                    if(Number.isInteger(Number(search))) qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
                 })
             );
         }
