@@ -37,6 +37,8 @@ import { Usuario } from '@database/entity/usuario.entity';
 import { UsuarioView } from '@database/view/usuario.view';
 import { Sesion } from '@database/entity/sesion.entity';
 import { RolView } from '@database/view/rol.view';
+import { Timbrado } from '@database/entity/timbrado.entity';
+import { TimbradoView } from '@database/view/timbrado.view';
 
 @Module({
   imports: [
@@ -77,7 +79,8 @@ import { RolView } from '@database/view/rol.view';
         Cuota, CuotaView,
         Usuario, UsuarioView,
         Rol, RolView,
-        Sesion
+        Sesion,
+        Timbrado, TimbradoView
       ],
     }),
     RolesModule

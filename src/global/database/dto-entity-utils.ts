@@ -5,6 +5,7 @@ import { DistritoDTO } from "@dto/distrito.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
 import { RolDTO } from "@dto/rol.dto";
 import { ServicioDTO } from "@dto/servicio.dto";
+import { TimbradoDTO } from "@dto/timbrado.dto";
 import { UsuarioDTO } from "@dto/usuario.dto";
 import { Barrio } from "./entity/barrio.entity";
 import { Cuota } from "./entity/cuota.entity";
@@ -13,6 +14,7 @@ import { Distrito } from "./entity/distrito.entity";
 import { Grupo } from "./entity/grupo.entity";
 import { Rol } from "./entity/rol.entity";
 import { Servicio } from "./entity/servicio.entity";
+import { Timbrado } from "./entity/timbrado.entity";
 import { Usuario } from "./entity/usuario.entity";
 
 export class DTOEntityUtis {
@@ -93,6 +95,21 @@ export class DTOEntityUtis {
         usuario.accesoSistema = usuarioDTO.accesosistema;
         if(usuarioDTO.eliminado != null) usuario.eliminado = usuarioDTO.eliminado;
         return usuario;
+    }
+
+    public static timbradoDtoToEntity(timbradoDTO: TimbradoDTO): Timbrado{
+        const timbrado: Timbrado = new Timbrado();
+        timbrado.id = timbradoDTO.id;
+        timbrado.codEstablecimiento = timbradoDTO.codestablecimiento;
+        timbrado.codPuntoEmision = timbradoDTO.codpuntoemision;
+        timbrado.fechaInicioVigencia = new Date(`${timbradoDTO.fechainicio}T00:00:00`);
+        if(timbradoDTO.fechavencimiento) timbrado.fechaVencimiento = new Date(`${timbradoDTO.fechavencimiento}T00:00:00`);
+        timbrado.nroInicio = timbradoDTO.nroinicio;
+        if(timbradoDTO.nrofin) timbrado.nroFin = timbradoDTO.nrofin;
+        timbrado.nroTimbrado = timbradoDTO.nrotimbrado;
+        timbrado.ultimoNroUsado = timbradoDTO.ultnrousado;
+        timbrado.activo = timbradoDTO.activo;
+        return timbrado;
     }
 
 }

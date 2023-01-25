@@ -1,4 +1,4 @@
-export class Timbrado {
+export class TimbradoDTO {
     id: number | null = null;
     codestablecimiento: number | null = null;
     codpuntoemision: number | null = null;
