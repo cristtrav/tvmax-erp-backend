@@ -21,10 +21,11 @@ export class UsuariosService {
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<UsuarioView> {
-        const { eliminado, sort, offset, limit, search } = queries;
+        const { eliminado, sort, offset, limit, search, idrol } = queries;
         const alias = 'usuario';
         let query = this.usuarioViewRepo.createQueryBuilder(alias);
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (idrol) query = query.andWhere(`${alias}.idrol ${Array.isArray(idrol) ? 'IN (:...idrol)' : '= :idrol'}`, {idrol});
         if (limit) query = query.take(limit);
         if (offset) query = query.skip(offset);
         if (sort) {
