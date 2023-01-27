@@ -5,11 +5,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { DatabaseService } from '../../global/database/database.service';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';
 import { UtilModule } from '@util/util.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Cliente } from '@database/entity/cliente.entity';
+import { ClienteView } from '@database/view/cliente.view';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    UtilModule
+    UtilModule,
+    TypeOrmModule.forFeature([Cliente, ClienteView])
   ],
   providers: [ClientesService, DatabaseService, SuscripcionesService],
   controllers: [ClientesController]

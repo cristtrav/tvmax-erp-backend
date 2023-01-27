@@ -9,11 +9,15 @@ import { ResumenVentasService } from './resumen-ventas/resumen-ventas.service';
 import { ResumenVentasController } from './resumen-ventas/resumen-ventas.controller';
 import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service';
 import { DetallesVentasController } from './detalles-ventas/detalles-ventas.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ClienteView } from '@database/view/cliente.view';
+import { Cliente } from '@database/entity/cliente.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    UtilModule
+    UtilModule,
+    TypeOrmModule.forFeature([Cliente, ClienteView])
   ],
   providers: [VentasService, DatabaseService, ClientesService, ResumenVentasService, DetallesVentasService],
   controllers: [VentasController, ResumenVentasController, DetallesVentasController]

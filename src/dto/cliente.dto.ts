@@ -1,4 +1,4 @@
-export class Cliente {
+export class ClienteDTO {
     id: number | null = null;
     nombres: string | null = null;
     apellidos: string | null = null;
@@ -20,4 +20,5 @@ export class Cliente {
     departamento: string | null = null;
     cantconectados: number = 0;
     cantdesconectados: number = 0;
+    eliminado: boolean | null = false;
 }

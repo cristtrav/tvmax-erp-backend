@@ -1,152 +1,113 @@
-import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@database/database.service';
-import { Cliente } from '@dto/cliente.dto';
-import { WhereParam } from '@util/whereparam';
-import { ISearchField } from '@util/isearchfield.interface';
-import { AuditQueryHelper } from '@util/audit-query-helper';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Cliente } from '@database/entity/cliente.entity';
+import { ClienteView } from '@database/view/cliente.view';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 @Injectable()
 export class ClientesService {
 
     constructor(
-        private dbsrv: DatabaseService
+        @InjectRepository(Cliente)
+        private clienteRepo: Repository<Cliente>,
+        @InjectRepository(ClienteView)
+        private clienteViewRepo: Repository<ClienteView>,
+        private datasource: DataSource
     ) { }
 
-    async findAll(queryParams): Promise<Cliente[]> {
-        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento, sort, offset, limit } = queryParams;
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'razonsocial',
-                fieldValue: search,
-                exactMatch: false
-            },
-            {
-                fieldName: 'ci',
-                fieldValue: search,
-                exactMatch: true
-            },
-            {
-                fieldName: 'id',
-                fieldValue: search,
-                exactMatch: true
-            },
-            {
-                fieldName: 'direccion',
-                fieldValue: search,
-                exactMatch: false
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            {eliminado, idcobrador},
-            { idbarrio, iddistrito, iddepartamento },
-            null,
-            searchQuery,
-            { sort, offset, limit }
+    private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<ClienteView>{
+        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento, sort, offset, limit } = queries;        
+        const alias = 'cliente';
+        let query: SelectQueryBuilder<ClienteView> = this.clienteViewRepo.createQueryBuilder(alias);
+        if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if(idcobrador) query = query.andWhere(`${alias}.idcobrador ${Array.isArray(idcobrador)?'IN (:...idcobrador)':'= :idcobrador'}`, {idcobrador});
+        if(idbarrio) query = query.andWhere(`${alias}.idbarrio ${Array.isArray(idbarrio) ? 'IN (:...idbarrio)' : '= :idbarrio'}`, {idbarrio});
+        if(iddistrito) query = query.andWhere(`${alias}.iddistrito ${Array.isArray(iddistrito) ? 'IN (:...iddistrito)' : '= :iddistrito'}`, {iddistrito});
+        if(iddepartamento) query = query.andWhere(`${alias}.iddepartamento ${Array.isArray(iddepartamento) ? 'IN (:...iddepartamento)' : '= :iddepartamento'}`, {iddepartamento});
+        if(search) query = query.andWhere(
+            new Brackets(qb => {
+                qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombsearch`, { nombsearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellsearch`, {apellsearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`LOWER(${alias}.razonsocial) LIKE :rssearch`, {rssearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`${alias}.ci = :cisearch`, {cisearch: search});
+            })
         );
-        var query: string = `SELECT * FROM public.vw_clientes ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        if(offset) query = query.skip(offset);
+        if(limit) query = query.take(limit);
+        if(sort){
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+        }
+        return query;
     }
 
-    async count(queryParams): Promise<number> {
-        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento } = queryParams;
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'razonsocial',
-                fieldValue: search,
-                exactMatch: false
-            },
-            {
-                fieldName: 'ci',
-                fieldValue: search,
-                exactMatch: true
-            },
-            {
-                fieldName: 'id',
-                fieldValue: search,
-                exactMatch: true
-            },
-            {
-                fieldName: 'direccion',
-                fieldValue: search,
-                exactMatch: false
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            {eliminado, idcobrador},
-            { idbarrio, iddistrito, iddepartamento },
-            null,
-            searchQuery,
-            null
-        );
-        var query: string = `SELECT COUNT(*) FROM public.vw_clientes ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', oldValue: any, newValue: any): EventoAuditoria{
+        const evento = new EventoAuditoria();
+        evento.fechahora = new Date();
+        evento.idtabla = TablasAuditoriaList.CLIENTES.id;
+        evento.operacion = operacion;
+        evento.idusuario = idusuario;
+        evento.estadoanterior = oldValue;
+        evento.estadonuevo = newValue;
+        return evento;
+    }
+
+    findAll(queries: {[name: string]: any}): Promise<ClienteView[]> {
+        return this.getSelectQuery(queries).getMany();
+    }
+
+    count(queries: {[name: string]: any}): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
     }
 
     async create(c: Cliente, idusuario: number) {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `INSERT INTO public.cliente(id, nombres, apellidos, razon_social, telefono1, telefono2, email, idcobrador, ci, dv_ruc, eliminado)
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false)`;
-        const params: any[] = [c.id, c.nombres, c.apellidos, c.razonsocial, c.telefono1, c.telefono2, c.email, c.idcobrador, c.ci, c.dvruc];
-        try{
-            await cli.query('BEGIN');
-            await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.CLIENTES, idusuario, c.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
+        const oldCli = await this.clienteRepo.findOneBy({id: c.id});
+        if(oldCli && !oldCli.eliminado) throw new HttpException({
+            message: `El cliente con código «${c.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(c);
+            await manager.save(this.getEventoAuditoria(idusuario, 'R', oldCli, c));
+        });
     }
 
     async getLastId(): Promise<number> {
-        const query: string = `SELECT MAX(id) FROM public.cliente`;
-        return (await this.dbsrv.execute(query)).rows[0].max;
+        return (await this.clienteRepo.createQueryBuilder('cliente')
+        .select(`MAX(cliente.id)`, 'lastid')
+        .getRawOne()).lastid;
     }
 
-    async findById(id: number): Promise<Cliente> {
-        const query: string = `SELECT * FROM public.vw_clientes WHERE id = $1`;
-        const rows: Cliente[] = (await this.dbsrv.execute(query, [id])).rows;
-        if (rows.length === 0) return null;
-        return rows[0];
+    async findById(id: number): Promise<ClienteView> {
+        return this.clienteViewRepo.findOneByOrFail({id});
     }
 
-    async edit(oldId: number, c: Cliente, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.cliente SET id = $1, nombres = $2, apellidos = $3, razon_social = $4, telefono1 = $5, telefono2 = $6,
-        email = $7, idcobrador = $8, ci = $9, dv_ruc = $10 WHERE id = $11`;
-        const params: any[] = [c.id, c.nombres, c.apellidos, c.razonsocial, c.telefono1, c.telefono2, c.email, c.idcobrador, c.ci, c.dvruc, oldId];
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.CLIENTES, idusuario, oldId);
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.CLIENTES, idevento, c.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount > 0;
+    async edit(oldId: number, c: Cliente, idusuario: number) {
+        const oldCliente = await this.clienteRepo.findOneByOrFail({id: oldId});
+
+        if(oldId != c.id && await this.clienteRepo.findOneBy({id: c.id, eliminado: false})) throw new HttpException({
+            message: `El cliente con código «${c.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(c);
+            await manager.save(this.getEventoAuditoria(idusuario, 'M', oldCliente, c));
+            if(oldId != c.id) await manager.remove(oldCliente);
+        });
     }
 
-    async delete(id: number, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.cliente SET eliminado = true WHERE id = $1`;
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, [id])).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.CLIENTES, idusuario, id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-        }
-        return rowCount > 0;
+    async delete(id: number, idusuario: number) {
+        const cliente = await this.clienteRepo.findOneByOrFail({id: id});
+        const oldCliente = { ...cliente };
+        cliente.eliminado = true;
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(cliente);
+            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldCliente, cliente));
+        });
     }
 
 }

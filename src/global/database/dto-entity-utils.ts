@@ -1,4 +1,5 @@
 import { BarrioDTO } from "@dto/barrio.dto";
+import { ClienteDTO } from "@dto/cliente.dto";
 import { CuotaDTO } from "@dto/cuota.dto";
 import { DepartamentoDTO } from "@dto/departamento.dto";
 import { DistritoDTO } from "@dto/distrito.dto";
@@ -8,6 +9,7 @@ import { ServicioDTO } from "@dto/servicio.dto";
 import { TimbradoDTO } from "@dto/timbrado.dto";
 import { UsuarioDTO } from "@dto/usuario.dto";
 import { Barrio } from "./entity/barrio.entity";
+import { Cliente } from "./entity/cliente.entity";
 import { Cuota } from "./entity/cuota.entity";
 import { Departamento } from "./entity/departamento.entity";
 import { Distrito } from "./entity/distrito.entity";
@@ -110,6 +112,22 @@ export class DTOEntityUtis {
         timbrado.ultimoNroUsado = timbradoDTO.ultnrousado;
         timbrado.activo = timbradoDTO.activo;
         return timbrado;
+    }
+
+    public static clienteDtoToEntity(clienteDto: ClienteDTO): Cliente{
+        const cliente = new Cliente();
+        cliente.id = clienteDto.id;
+        cliente.nombres = clienteDto.nombres;
+        cliente.apellidos = clienteDto.apellidos;
+        cliente.razonSocial = clienteDto.razonsocial;
+        cliente.telefono1 = clienteDto.telefono1;
+        cliente.telefono2 = clienteDto.telefono2;
+        cliente.email = clienteDto.email;
+        cliente.idcobrador = clienteDto.idcobrador;
+        cliente.dvRuc = clienteDto.dvruc;
+        cliente.ci = clienteDto.ci;
+        cliente.eliminado = clienteDto.eliminado;               
+        return cliente;
     }
 
 }
