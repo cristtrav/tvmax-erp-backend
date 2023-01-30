@@ -1,14 +1,17 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { Domicilio } from '@dto/domicilio.dto';
-import { ServerResponseList } from '@dto/server-response-list.dto';
-import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { DomicilioDTO } from '@dto/domicilio.dto';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DomiciliosService } from './domicilios.service';
+import { DomicilioView } from '@database/view/domicilio.view';
+import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
+import { DTOEntityUtis } from '@database/dto-entity-utils';
 
 @Controller('domicilios')
 @UseGuards(AuthGuard)
+@UseFilters(HttpExceptionFilter)
 export class DomiciliosController {
 
     constructor(
@@ -18,150 +21,67 @@ export class DomiciliosController {
 
     @Get()
     @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
-    async findAll(
-        @Query('eliminado') eliminado: boolean,
-        @Query('sort') sort: string,
-        @Query('offset') offset: number,
-        @Query('limit') limit: number,
-        @Query('idcliente') idcliente: number
-    ): Promise<ServerResponseList<Domicilio>>{
-        try{
-            const rows: Domicilio[] = await this.domiciliosSrv.findAll({eliminado, sort, offset, limit, idcliente});
-            const rowCount: number = await this.domiciliosSrv.count({eliminado, idcliente});
-            return new ServerResponseList(rows, rowCount);
-        }catch(e){
-            console.log('Error al consultar domicilios');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request:  'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+    findAll(
+        @Query() queries: {[name: string]: any}
+    ): Promise<DomicilioView[]>{
+        return this.domiciliosSrv.findAll(queries);
+    }
+
+    @Get('total')
+    @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
+    count(
+        @Query() queries: {[name: string]: any}
+    ): Promise<number>{
+        return this.domiciliosSrv.count(queries);
     }
 
     @Get('ultimoid')
     @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
-    async getLastId(){
-        try{
-            return await this.domiciliosSrv.getLastId();
-        }catch(e){
-            console.log('Error al consultar ultimo ID de domicilios');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+    getLastId(): Promise<number>{
+        return this.domiciliosSrv.getLastId();
     }
 
     @Post()
     @RequirePermission(Permissions.DOMICILIOS.REGISTRAR)
     async create(
-        @Body() d: Domicilio,
-        @Req() request: Request
+        @Body() d: DomicilioDTO,
+        @Headers('authorization') auth: string
     ){
-        try{
-            await this.domiciliosSrv.create(d, this.jwtUtil.decodeIdUsuario(request));
-        }catch(e){
-            console.log('Error al registrar domicilio');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'post',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        await this.domiciliosSrv.create(
+            DTOEntityUtis.domicilioDtoToEntity(d),
+            this.jwtUtil.extractJwtSub(auth)
+        );
     }
 
     @Put(':id')
     @RequirePermission(Permissions.DOMICILIOS.EDITAR)
     async edit(
         @Param('id') oldId: number,
-        @Body() d: Domicilio,
-        @Req() request: Request
+        @Body() d: DomicilioDTO,
+        @Headers('authorization') auth: string
     ){
-        try{
-            if(!(await this.domiciliosSrv.edit(oldId, d, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
-                {
-                    request: 'put',
-                    description: `No se encontró el domicilio con código ${oldId}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-        }catch(e){
-            console.log('Error al editar domicilio');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'put',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        await this.domiciliosSrv.edit(
+            oldId,
+            DTOEntityUtis.domicilioDtoToEntity(d),
+            this.jwtUtil.extractJwtSub(auth)
+        );
     }
 
     @Get(':id')
     @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
-    async findById(
+    findById(
         @Param('id') id: number
-    ): Promise<Domicilio> {
-        try{
-            const d: Domicilio | null = (await this.domiciliosSrv.findById(id));
-            if(!d) throw new HttpException(
-                {
-                    request: 'get',
-                    description: `No se encontró el domicilio con código ${id}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-            return d;
-        }catch(e){
-            console.log('Error al consultar domicilio por ID');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+    ): Promise<DomicilioView> {
+        return this.domiciliosSrv.findById(id);
     }
 
     @Delete(':id')
     @RequirePermission(Permissions.DOMICILIOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
-        @Req() request: Request
+        @Headers('authorization') auth: string
     ){
-        try{
-            if(!(await this.domiciliosSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
-                {
-                    request: 'delete',
-                    description: `No se encontró el domicilio con código ${id}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-        }catch(e){
-            console.log('Error al eliminar domicilio');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'delete',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        await this.domiciliosSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
     }
 
 }

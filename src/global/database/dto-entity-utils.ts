@@ -3,6 +3,7 @@ import { ClienteDTO } from "@dto/cliente.dto";
 import { CuotaDTO } from "@dto/cuota.dto";
 import { DepartamentoDTO } from "@dto/departamento.dto";
 import { DistritoDTO } from "@dto/distrito.dto";
+import { DomicilioDTO } from "@dto/domicilio.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
 import { RolDTO } from "@dto/rol.dto";
 import { ServicioDTO } from "@dto/servicio.dto";
@@ -13,6 +14,7 @@ import { Cliente } from "./entity/cliente.entity";
 import { Cuota } from "./entity/cuota.entity";
 import { Departamento } from "./entity/departamento.entity";
 import { Distrito } from "./entity/distrito.entity";
+import { Domicilio } from "./entity/domicilio.entity";
 import { Grupo } from "./entity/grupo.entity";
 import { Rol } from "./entity/rol.entity";
 import { Servicio } from "./entity/servicio.entity";
@@ -128,6 +130,20 @@ export class DTOEntityUtis {
         cliente.ci = clienteDto.ci;
         cliente.eliminado = clienteDto.eliminado;               
         return cliente;
+    }
+
+    public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio{
+        const domicilio = new Domicilio();
+        domicilio.id = domicilioDto.id;
+        domicilio.direccion = domicilioDto.direccion;
+        domicilio.idbarrio = domicilioDto.idbarrio;
+        domicilio.idcliente = domicilioDto.idcliente;
+        domicilio.nroMedidor = domicilioDto.nromedidor;
+        domicilio.observacion = domicilioDto.observacion;
+        domicilio.principal = domicilioDto.principal;
+        domicilio.tipo = domicilioDto.tipo;
+        domicilio.eliminado = domicilioDto.eliminado;
+        return domicilio;
     }
 
 }

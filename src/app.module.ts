@@ -41,6 +41,8 @@ import { Timbrado } from '@database/entity/timbrado.entity';
 import { TimbradoView } from '@database/view/timbrado.view';
 import { Cliente } from '@database/entity/cliente.entity';
 import { ClienteView } from '@database/view/cliente.view';
+import { Domicilio } from '@database/entity/domicilio.entity';
+import { DomicilioView } from '@database/view/domicilio.view';
 
 @Module({
   imports: [
@@ -83,7 +85,8 @@ import { ClienteView } from '@database/view/cliente.view';
         Rol, RolView,
         Sesion,
         Timbrado, TimbradoView,
-        Cliente, ClienteView
+        Cliente, ClienteView,
+        Domicilio, DomicilioView
       ],
     }),
     RolesModule

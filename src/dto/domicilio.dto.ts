@@ -1,4 +1,4 @@
-export class Domicilio {
+export class DomicilioDTO {
     id: number | null = null;
     direccion: string | null = null;
     nromedidor: string | null = null;
@@ -13,4 +13,5 @@ export class Domicilio {
     iddepartamento: number | null = null;
     departamento: string| null = null;
     tipo: string | null = null;
+    eliminado: boolean | null = null;
 }

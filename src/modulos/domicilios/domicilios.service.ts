@@ -1,117 +1,118 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
-import { Domicilio } from '@dto/domicilio.dto';
-import { WhereParam } from '@util/whereparam';
-import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Domicilio } from '@database/entity/domicilio.entity';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { DomicilioView } from '@database/view/domicilio.view';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 @Injectable()
 export class DomiciliosService {
 
     constructor(
-        private dbsrv: DatabaseService
-    ){}
+        @InjectRepository(Domicilio)
+        private domicilioRepo: Repository<Domicilio>,
+        @InjectRepository(DomicilioView)
+        private domicilioViewRepo: Repository<DomicilioView>,
+        private datasource: DataSource
+    ) { }
 
-    async findAll(queryParams): Promise<Domicilio[]>{
-        const { eliminado, idcliente, sort, offset, limit } = queryParams;
-        const wp: WhereParam = new WhereParam(
-            {eliminado, idcliente},
-            null,
-            null,
-            null,
-            { sort, offset, limit }
-        );        
-        const query: string = `SELECT * FROM public.vw_domicilios ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<DomicilioView> {
+        const { eliminado, idcliente, sort, offset, limit } = queries;
+        const alias = 'domicilio';
+        let query = this.domicilioViewRepo.createQueryBuilder(alias);
+        if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (idcliente) query = query.andWhere(`${alias}.idcliente ${Array.isArray(idcliente) ? 'IN (:...idcliente)' : '= :idcliente'}`, { idcliente });
+        if (limit) query = query.take(limit);
+        if (offset) query = query.skip(offset)
+        if (sort) {
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+        }
+        return query;
     }
 
-    async count(queryParams): Promise<number>{
-        const { eliminado, idcliente } = queryParams;
-        const wp: WhereParam = new WhereParam(
-            {eliminado, idcliente},
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.vw_domicilios ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', oldValue: any, newValue: any): EventoAuditoria {
+        const evento = new EventoAuditoria();
+        evento.fechahora = new Date();
+        evento.idtabla = TablasAuditoriaList.DOMICILIOS.id;
+        evento.idusuario = idusuario;
+        evento.operacion = operacion;
+        evento.estadoanterior = oldValue;
+        evento.estadonuevo = newValue;
+        return evento;
     }
 
-    async getLastId(): Promise<number>{
-        const query: string = `SELECT MAX(id) FROM public.domicilio`;
-        return (await this.dbsrv.execute(query)).rows[0].max;
+    findAll(queries: { [name: string]: any }): Promise<DomicilioView[]> {
+        return this.getSelectQuery(queries).getMany();
     }
 
-    async create(d: Domicilio, idusuario: number){
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `INSERT INTO public.domicilio(id, direccion, nro_medidor, idbarrio, observacion, tipo, idcliente, principal, eliminado)
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, false)`;
-        const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.tipo, d.idcliente, d.principal];
-        try{
-            await cli.query('BEGIN');
-            if(d.principal === true){
-                const queryPrincipal: string = `UPDATE public.domicilio SET principal = false WHERE idcliente = $1`;
-                await cli.query(queryPrincipal, [d.idcliente]);
+    count(queries: { [name: string]: any }): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
+    }
+
+    async getLastId(): Promise<number> {
+        return (await this.domicilioRepo.createQueryBuilder('domicilio')
+            .select(`MAX(domicilio.id)`, 'lastid')
+            .getRawOne()).lastid;
+    }
+
+    async create(d: Domicilio, idusuario: number) {
+        const oldDomicilio = await this.domicilioRepo.findOneBy({ id: d.id });
+        if (oldDomicilio) throw new HttpException({
+            message: `El domicilio con código «${d.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.datasource.transaction(async manager => {
+
+            if (d.principal) {
+                const domicilios = await this.domicilioRepo.findBy({ idcliente: d.idcliente, eliminado: false });
+                domicilios.forEach(async domicilio => {
+                    domicilio.principal = false;
+                    await manager.save(domicilio);
+                });
             }
-            await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.DOMICILIOS, idusuario, d.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
+            await manager.save(d);
+            await manager.save(this.getEventoAuditoria(idusuario, 'R', oldDomicilio, d));
+        });
     }
 
-    async edit(oldId: number, d: Domicilio, idusuario: number): Promise<boolean>{
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.domicilio SET id = $1, direccion = $2, nro_medidor = $3, idbarrio = $4, observacion = $5, tipo = $6, idcliente = $7, principal = $8 WHERE id = $9`;
-        const params: any[] = [d.id, d.direccion, d.nromedidor, d.idbarrio, d.observacion, d.tipo, d.idcliente, d.principal, oldId];
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            if(d.principal === true){
-                const queryPrincipal: string = `UPDATE public.domicilio SET principal = false WHERE idcliente = $1`;
-                await cli.query(queryPrincipal, [d.idcliente]);
+    async edit(oldId: number, d: Domicilio, idusuario: number) {
+        const oldDomicilio = await this.domicilioRepo.findOneByOrFail({ id: oldId });
+
+        if (oldId != d.id && await this.domicilioRepo.findOneBy({ id: d.id, eliminado: false })) throw new HttpException({
+            message: `El domicilio con código «${d.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.datasource.transaction(async manager => {
+            if (d.principal) {
+                const domicilios = await this.domicilioRepo.findBy({ idcliente: d.idcliente, eliminado: false });
+                domicilios.forEach(async domicilio => {
+                    domicilio.principal = false;
+                    await manager.save(domicilio);
+                });
             }
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.DOMICILIOS, idusuario, oldId);
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.DOMICILIOS, idevento, d.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount > 0;
+            await manager.save(d);
+            await manager.save(this.getEventoAuditoria(idusuario, 'M', oldDomicilio, d));
+            if(oldId != d.id) await manager.remove(oldDomicilio);
+        });
     }
 
-    async findById(id: number): Promise<Domicilio | null> {
-        const query: string = `SELECT * FROM public.vw_domicilios WHERE id = $1`;
-        const rows: Domicilio[] = (await this.dbsrv.execute(query, [id])).rows;
-        if(rows.length === 0) return null;
-        return rows[0];
+    async findById(id: number): Promise<DomicilioView> {
+        return this.domicilioViewRepo.findOneByOrFail({id});
     }
 
-    async delete(id: number, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.domicilio SET eliminado = true WHERE id = $1`;
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, [id])).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.DOMICILIOS, idusuario, id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount > 0;
+    async delete(id: number, idusuario: number) {
+        const domicilio = await this.domicilioRepo.findOneByOrFail({id});
+        const oldDomicilio = { ...domicilio }
+        domicilio.eliminado = true;
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(domicilio);
+            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldDomicilio, domicilio));
+        });
     }
 
 }
