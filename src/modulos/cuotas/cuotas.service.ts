@@ -22,7 +22,6 @@ export class CuotasService {
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<CuotaView> {
-        console.log(queries);
         const { eliminado, pagado, sort, offset, limit, idservicio, idsuscripcion } = queries;
         const alias: string = "cuota";
         let query: SelectQueryBuilder<CuotaView> = this.cuotaViewRepo.createQueryBuilder(alias);
