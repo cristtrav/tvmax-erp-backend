@@ -1,4 +1,4 @@
-export class Suscripcion{
+export class SuscripcionDTO{
     id: number | null = null;
     idservicio: number | null = null;
     servicio: string | null = null;
@@ -22,4 +22,5 @@ export class Suscripcion{
     monto: number| null = null;
     cuotaspendientes: number = 0;
     deuda: number = 0; 
+    eliminado: boolean | null = false;
 }

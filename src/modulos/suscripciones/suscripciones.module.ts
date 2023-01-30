@@ -11,11 +11,20 @@ import { Servicio } from '@database/entity/servicio.entity';
 import { ServicioView } from '@database/view/servicio.view';
 import { CuotaView } from '@database/view/cuota.view';
 import { Cuota } from '@database/entity/cuota.entity';
+import { Suscripcion } from '@database/entity/suscripcion.entity';
+import { SuscripcionView } from '@database/view/suscripcion.view';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Servicio, ServicioView, Cuota, CuotaView]),
+    TypeOrmModule.forFeature([
+      Servicio,
+      ServicioView,
+      Cuota,
+      CuotaView,
+      Suscripcion,
+      SuscripcionView
+    ]),
     UtilModule
   ],
   providers: [

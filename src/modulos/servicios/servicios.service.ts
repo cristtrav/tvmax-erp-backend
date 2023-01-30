@@ -26,9 +26,9 @@ export class ServiciosService {
         let queryBuilder: SelectQueryBuilder<ServicioView> = this.servicioViewRepo.createQueryBuilder(alias);
 
         if (eliminado != null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
-        if (idgrupo) queryBuilder = queryBuilder.andWhere(`${alias}.idgrupo = ${Array.isArray(idgrupo) ? 'IN (...:idgrupo)' : '= :idgrupo'}`, { idgrupo });
+        if (idgrupo) queryBuilder = queryBuilder.andWhere(`${alias}.idgrupo ${Array.isArray(idgrupo) ? 'IN (:...idgrupo)' : '= :idgrupo'}`, { idgrupo });
         if (suscribible != null) queryBuilder = queryBuilder.andWhere(`${alias}.suscribible = :suscribible`, { suscribible });
-        if (id) queryBuilder = queryBuilder.andWhere(`${alias}.id ${Array.isArray(id) ? 'IN (...:id)' : '= :id'}`, { id });
+        if (id) queryBuilder = queryBuilder.andWhere(`${alias}.id ${Array.isArray(id) ? 'IN (:...id)' : '= :id'}`, { id });
         if (search) {
             queryBuilder = queryBuilder.andWhere(new Brackets((qb) => {
                 qb = qb.orWhere(`LOWER(${alias}.descripcion) LIKE :descsearch`, { descsearch: `%${search.toLowerCase()}%` });

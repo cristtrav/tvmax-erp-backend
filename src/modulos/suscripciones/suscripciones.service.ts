@@ -1,21 +1,29 @@
-import { Suscripcion } from '@dto/suscripcion.dto';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
 import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
-import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Suscripcion } from '@database/entity/suscripcion.entity';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { SuscripcionView } from '@database/view/suscripcion.view';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 @Injectable()
 export class SuscripcionesService {
 
     constructor(
+        @InjectRepository(Suscripcion)
+        private suscripcionRepo: Repository<Suscripcion>,
+        @InjectRepository(SuscripcionView)
+        private suscripcionViewRepo: Repository<SuscripcionView>,
+        private datasource: DataSource,
         private dbsrv: DatabaseService
     ) { }
 
-    async findAll(queryParams) {
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<SuscripcionView> {
         const {
             eliminado,
             idcliente,
@@ -33,216 +41,126 @@ export class SuscripcionesService {
             iddistrito,
             idbarrio,
             search
-        } = queryParams;
+        } = queries;
+        
+        const alias = 'suscripcion';
+        let query = this.suscripcionViewRepo.createQueryBuilder(alias);
 
-        const rangeQuery: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fechasuscripcion::date',
-                    startValue: fechainiciosuscripcion,
-                    endValue: fechafinsuscripcion
-                },
-                {
-                    fieldName: 'cuotaspendientes',
-                    startValue: cuotaspendientesdesde,
-                    endValue: cuotaspendienteshasta
-                }
-            ]
-        };
+        if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
 
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'id',
-                fieldValue: search,
-                exactMatch: true
-            },
-            {
-                fieldName: 'cliente',
-                fieldValue: search,
-                exactMatch: false
-            },
-            {
-                fieldName: 'monto',
-                fieldValue: search,
-                exactMatch: true
-            }
-        ];
+        if (idcliente)
+            if (Array.isArray(idcliente)) query = query.andWhere(`${alias}.idcliente IN (:...idcliente)`, { idcliente });
+            else query = query.andWhere(`${alias}.idcliente = :idcliente`, { idcliente });
 
-        const wp: WhereParam = new WhereParam(
-            { eliminado, idcliente, estado },
-            [
-                { idgrupo, idservicio },
-                { iddepartamento, iddistrito, idbarrio }
-            ],
-            rangeQuery,
-            searchQuery,
-            { sort, offset, limit }
-        );
+        if (idgrupo || idservicio)
+            query = query.andWhere(new Brackets(qb => {
+                if (idgrupo)
+                    if (Array.isArray(idgrupo)) qb = qb.orWhere(`${alias}.idgrupo IN (:...idgrupo)`, { idgrupo });
+                    else qb = qb.andWhere(`${alias}.idgrupo = :idgrupo`, { idgrupo });
+                if (idservicio)
+                    if (Array.isArray(idservicio)) qb = qb.orWhere(`${alias}.idservicio IN (:...idservicio)`, { idservicio });
+                    else qb = qb.orWhere(`${alias}.idservicio = :idservicio`, { idservicio });
+            }));
 
-        var query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+        if (iddepartamento || iddistrito || idbarrio)
+            query = query.andWhere(new Brackets(qb => {
+                if (iddepartamento)
+                    if (Array.isArray(iddepartamento)) qb = qb.orWhere(`${alias}.iddepartamento IN (:...iddepartamento)`, { iddepartamento });
+                    else qb = qb.orWhere(`${alias}.iddepartamento  = :iddepartamento`, { iddepartamento });
+                if (iddistrito)
+                    if (Array.isArray(iddistrito)) qb = qb.orWhere(`${alias}.iddistrito IN (:...iddistrito)`, { iddistrito });
+                    else qb = qb.orWhere(`${alias}.iddistrito = :iddistrito`, { iddistrito });
+                if (idbarrio)
+                    if (Array.isArray(idbarrio)) qb = qb.orWhere(`${alias}.idbarrio IN (:...idbarrio)`, { idbarrio });
+                    else qb = qb.orWhere(`${alias}.idbarrio = :idbarrio`, { idbarrio });
+            }));
+
+        if (estado) query = query.andWhere(`${alias}.estado = :estado`, { estado });
+        if (fechainiciosuscripcion) query = query.andWhere(`${alias}.fechasuscripcion >= :fechainiciosuscripcion`, { fechainiciosuscripcion: new Date(`${fechainiciosuscripcion}T00:00:00`) });
+        if (fechafinsuscripcion) query = query.andWhere(`${alias}.fechasuscripcion <= :fechafinsuscripcion`, { fechafinsuscripcion: new Date(`${fechafinsuscripcion}T00:00:00`) });
+        if (cuotaspendientesdesde) query = query.andWhere(`${alias}.cuotaspendientes >= :cuotaspendientesdesde`, { cuotaspendientesdesde });
+        if (cuotaspendienteshasta) query = query.andWhere(`${alias}.cuotaspendientes <= :cuotaspendienteshasta`, { cuotaspendienteshasta });
+        if (search){
+            query = query.andWhere(new Brackets(qb => {
+                if(Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: search});
+                qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :clisearch`, { clisearch: `%${search.toLowerCase()}%`});
+            }));
+        }
+        if(limit) query = query.take(limit);
+        if(offset) query = query.skip(offset);
+        if(sort) {
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+        }
+        return query;
     }
 
-    async count(queryParams): Promise<number> {
-        const {
-            eliminado,
-            idcliente,
-            idgrupo,
-            idservicio,
-            fechainiciosuscripcion,
-            fechafinsuscripcion,
-            estado,
-            cuotaspendientesdesde,
-            cuotaspendienteshasta,
-            iddepartamento,
-            iddistrito,
-            idbarrio,
-            search
-        } = queryParams;
+    private getEventoAuditoria(idusuario, operacion: 'R' | 'M' | 'E', oldValue: any, newValue: any): EventoAuditoria{
+        const evento = new EventoAuditoria();
+        evento.fechahora = new Date();
+        evento.idtabla = TablasAuditoriaList.SUSCRIPCIONES.id;
+        evento.operacion = operacion;
+        evento.estadoanterior = oldValue;
+        evento.estadonuevo = newValue;
+        evento.idusuario = idusuario;
+        return evento;
+    }
 
-        const rangeQuery: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fechasuscripcion::date',
-                    startValue: fechainiciosuscripcion,
-                    endValue: fechafinsuscripcion
-                },
-                {
-                    fieldName: 'cuotaspendientes',
-                    startValue: cuotaspendientesdesde,
-                    endValue: cuotaspendienteshasta
-                }
-            ]
-        };
+    findAll(queries: {[name: string]: any}): Promise<SuscripcionView[]> {
+        return this.getSelectQuery(queries).getMany();
+    }
 
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'id',
-                fieldValue: search,
-                exactMatch: true
-            },
-            {
-                fieldName: 'cliente',
-                fieldValue: search,
-                exactMatch: false
-            },
-            {
-                fieldName: 'monto',
-                fieldValue: search,
-                exactMatch: true
-            }
-        ];
-
-        const wp: WhereParam = new WhereParam(
-            { eliminado, idcliente, estado },
-            [
-                { idgrupo, idservicio },
-                { iddepartamento, iddistrito, idbarrio }
-            ],
-            rangeQuery,
-            searchQuery,
-            null
-        );
-
-        var query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    count(queries: {[name: string]: any}): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
     }
 
     async getLastId(): Promise<number> {
-        const query: string = `SELECT MAX(id) FROM public.suscripcion`;
-        return (await this.dbsrv.execute(query)).rows[0].max;
+        return (await this.suscripcionViewRepo.createQueryBuilder('suscripcion')
+        .select('MAX(suscripcion.id)', 'lastid')
+        .getRawOne()).lastid;
     }
 
     async create(s: Suscripcion, idusuario: number) {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `INSERT INTO public.suscripcion(id, monto, fecha_suscripcion, idcliente, iddomicilio, idservicio, estado, fecha_cambio_estado, eliminado)
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, false)`;
-        const params: any[] = [s.id, s.monto, s.fechasuscripcion, s.idcliente, s.iddomicilio, s.idservicio, s.estado, s.fechacambioestado];
-        try{
-            await cli.query('BEGIN');
-            await cli.query(query, params);
-            await AuditQueryHelper.auditPostInsert(cli, TablasAuditoriaList.SUSCRIPCIONES, idusuario, s.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }        
-    }
-
-    async findById(id: number): Promise<Suscripcion> {
-        const query: string = `SELECT * FROM public.vw_suscripciones WHERE id = $1`;
-        const rows: Suscripcion[] = (await this.dbsrv.execute(query, [id])).rows;
-        if (rows.length > 0) return rows[0];
-        return null;
-    }
-
-    async edit(oldId: number, s: Suscripcion, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.suscripcion SET id = $1, monto = $2, fecha_suscripcion = $3, idcliente = $4, iddomicilio = $5, idservicio = $6, estado = $7, fecha_cambio_estado = $8 WHERE id = $9`;
-        const params: any[] = [s.id, s.monto, s.fechasuscripcion, s.idcliente, s.iddomicilio, s.idservicio, s.estado, s.fechacambioestado, oldId];
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.SUSCRIPCIONES, idusuario, oldId);
-            rowCount = (await cli.query(query, params)).rowCount;
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.SUSCRIPCIONES, idevento, s.id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount > 0;
-    }
-
-    async delete(id: number, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.suscripcion SET eliminado = true WHERE id = $1`;
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, [id])).rowCount;
-            await AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.SUSCRIPCIONES, idusuario, id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
+        const oldSuscripcion = await this.suscripcionRepo.findOneBy({id: s.id});
         
-        return rowCount > 0;
+        if(oldSuscripcion && !oldSuscripcion.eliminado) throw new HttpException({
+            message: `La suscripción con código «${s.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(s);
+            await manager.save(this.getEventoAuditoria(idusuario, 'R', oldSuscripcion, s));
+        });
     }
 
-    async findSuscripcionesPorCliente(idcliente: number, params): Promise<Suscripcion[]> {
-        const { eliminado, sort, offset, limit } = params;
-        const wp: WhereParam = new WhereParam(
-            { idcliente, eliminado },
-            null,
-            null,
-            null,
-            { sort, offset, limit }
-        );
-        const query: string = `SELECT * FROM public.vw_suscripciones ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    findById(id: number): Promise<SuscripcionView> {
+        return this.suscripcionViewRepo.findOneByOrFail({id});
     }
 
-    async countSuscripcionesPorCliente(idcliente, params): Promise<number> {
-        const { eliminado } = params;
-        const wp: WhereParam = new WhereParam(
-            { eliminado },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.vw_suscripciones ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    async edit(oldId: number, s: Suscripcion, idusuario: number) {
+        const oldSuscripcion = await this.suscripcionRepo.findOneByOrFail({id: oldId});
+
+        if(oldId != s.id && await this.suscripcionRepo.findOneBy({id: s.id, eliminado: false})) throw new HttpException({
+            message: `La suscripción con código «${s.id}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(s);
+            await manager.save(this.getEventoAuditoria(idusuario, 'M', oldSuscripcion, s));
+            if(oldId != s.id) await manager.remove(oldSuscripcion);
+        });
+    }
+
+    async delete(id: number, idusuario: number) {
+        const suscripcion = await this.suscripcionRepo.findOneByOrFail({id});
+        const oldSuscripcion = {...suscripcion};
+        suscripcion.eliminado = true;
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(suscripcion);
+            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldSuscripcion, suscripcion));
+        });
     }
 
     async getResumenSuscCuotasPendientes(params): Promise<ResumenCantMonto[]> {
@@ -540,7 +458,7 @@ export class SuscripcionesService {
         return (this.dbsrv.execute(query, wp.whereParams)).rows;
     }
 
-    async getResumenGruposServicios(params): Promise<ResumenCantMonto[]>{
+    async getResumenGruposServicios(params): Promise<ResumenCantMonto[]> {
         const {
             eliminado,
             idcliente,
@@ -609,16 +527,16 @@ export class SuscripcionesService {
         FROM public.vw_suscripciones ${wp.whereStr}
         GROUP BY idservicio, servicio, idgrupo ORDER BY servicio DESC`;
         const rowsServicios = (await this.dbsrv.execute(queryServicios, wp.whereParams)).rows;
-        rowsGrupos.forEach((rg: ResumenCantMonto)=>{
-            if(!rg.children) rg.children = [];
-            for(let rs of rowsServicios){
-                if(rs.idgrupo == rg.idreferencia) rg.children.push(rs);
+        rowsGrupos.forEach((rg: ResumenCantMonto) => {
+            if (!rg.children) rg.children = [];
+            for (let rs of rowsServicios) {
+                if (rs.idgrupo == rg.idreferencia) rg.children.push(rs);
             }
         });
         return rowsGrupos;
     }
 
-    async getResumenDepartamentosDistritos(params): Promise<ResumenCantMonto[]>{
+    async getResumenDepartamentosDistritos(params): Promise<ResumenCantMonto[]> {
         const {
             eliminado,
             idcliente,
@@ -692,10 +610,10 @@ export class SuscripcionesService {
         const rowsDepart: ResumenCantMonto[] = (await this.dbsrv.execute(queryDepartamentos, wp.whereParams)).rows;
         const rowsDistr = (await this.dbsrv.execute(queryDistritos, wp.whereParams)).rows;
 
-        rowsDepart.forEach((rdep: ResumenCantMonto)=>{
+        rowsDepart.forEach((rdep: ResumenCantMonto) => {
             rdep.children = [];
-            if(Array.isArray(rowsDistr)) rowsDistr.forEach((rdis)=>{
-                if(rdep.idreferencia === rdis.iddepartamento) rdep.children.push(rdis);
+            if (Array.isArray(rowsDistr)) rowsDistr.forEach((rdis) => {
+                if (rdep.idreferencia === rdis.iddepartamento) rdep.children.push(rdis);
             });
         });
         return rowsDepart;

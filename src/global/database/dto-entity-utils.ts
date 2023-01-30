@@ -7,6 +7,7 @@ import { DomicilioDTO } from "@dto/domicilio.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
 import { RolDTO } from "@dto/rol.dto";
 import { ServicioDTO } from "@dto/servicio.dto";
+import { SuscripcionDTO } from "@dto/suscripcion.dto";
 import { TimbradoDTO } from "@dto/timbrado.dto";
 import { UsuarioDTO } from "@dto/usuario.dto";
 import { Barrio } from "./entity/barrio.entity";
@@ -18,6 +19,7 @@ import { Domicilio } from "./entity/domicilio.entity";
 import { Grupo } from "./entity/grupo.entity";
 import { Rol } from "./entity/rol.entity";
 import { Servicio } from "./entity/servicio.entity";
+import { Suscripcion } from "./entity/suscripcion.entity";
 import { Timbrado } from "./entity/timbrado.entity";
 import { Usuario } from "./entity/usuario.entity";
 
@@ -73,20 +75,20 @@ export class DTOEntityUtis {
         cuota.nroCuota = cuotaDTO.nrocuota;
         cuota.observacion = cuotaDTO.observacion;
         cuota.pagado = cuotaDTO.pagado;
-        if(cuotaDTO.fechavencimiento != null)
+        if (cuotaDTO.fechavencimiento != null)
             cuota.fechaVencimiento = new Date(`${cuotaDTO.fechavencimiento}T00:00:00`);
         return cuota;
     }
 
-    public static rolDtoToEntity(rolDTO: RolDTO): Rol{
+    public static rolDtoToEntity(rolDTO: RolDTO): Rol {
         const rol: Rol = new Rol();
         rol.id = rolDTO.id;
         rol.descripcion = rolDTO.descripcion;
-        if(rolDTO.eliminado != null) rol.eliminado = rolDTO.eliminado;
+        if (rolDTO.eliminado != null) rol.eliminado = rolDTO.eliminado;
         return rol;
     }
 
-    public static usuarioDtoToEntity(usuarioDTO: UsuarioDTO): Usuario{
+    public static usuarioDtoToEntity(usuarioDTO: UsuarioDTO): Usuario {
         const usuario: Usuario = new Usuario();
         usuario.id = usuarioDTO.id;
         usuario.nombres = usuarioDTO.nombres;
@@ -97,26 +99,26 @@ export class DTOEntityUtis {
         usuario.idrol = usuarioDTO.idrol;
         usuario.password = usuarioDTO.password;
         usuario.accesoSistema = usuarioDTO.accesosistema;
-        if(usuarioDTO.eliminado != null) usuario.eliminado = usuarioDTO.eliminado;
+        if (usuarioDTO.eliminado != null) usuario.eliminado = usuarioDTO.eliminado;
         return usuario;
     }
 
-    public static timbradoDtoToEntity(timbradoDTO: TimbradoDTO): Timbrado{
+    public static timbradoDtoToEntity(timbradoDTO: TimbradoDTO): Timbrado {
         const timbrado: Timbrado = new Timbrado();
         timbrado.id = timbradoDTO.id;
         timbrado.codEstablecimiento = timbradoDTO.codestablecimiento;
         timbrado.codPuntoEmision = timbradoDTO.codpuntoemision;
         timbrado.fechaInicioVigencia = new Date(`${timbradoDTO.fechainicio}T00:00:00`);
-        if(timbradoDTO.fechavencimiento) timbrado.fechaVencimiento = new Date(`${timbradoDTO.fechavencimiento}T00:00:00`);
+        if (timbradoDTO.fechavencimiento) timbrado.fechaVencimiento = new Date(`${timbradoDTO.fechavencimiento}T00:00:00`);
         timbrado.nroInicio = timbradoDTO.nroinicio;
-        if(timbradoDTO.nrofin) timbrado.nroFin = timbradoDTO.nrofin;
+        if (timbradoDTO.nrofin) timbrado.nroFin = timbradoDTO.nrofin;
         timbrado.nroTimbrado = timbradoDTO.nrotimbrado;
         timbrado.ultimoNroUsado = timbradoDTO.ultnrousado;
         timbrado.activo = timbradoDTO.activo;
         return timbrado;
     }
 
-    public static clienteDtoToEntity(clienteDto: ClienteDTO): Cliente{
+    public static clienteDtoToEntity(clienteDto: ClienteDTO): Cliente {
         const cliente = new Cliente();
         cliente.id = clienteDto.id;
         cliente.nombres = clienteDto.nombres;
@@ -128,11 +130,11 @@ export class DTOEntityUtis {
         cliente.idcobrador = clienteDto.idcobrador;
         cliente.dvRuc = clienteDto.dvruc;
         cliente.ci = clienteDto.ci;
-        cliente.eliminado = clienteDto.eliminado;               
+        cliente.eliminado = clienteDto.eliminado;
         return cliente;
     }
 
-    public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio{
+    public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio {
         const domicilio = new Domicilio();
         domicilio.id = domicilioDto.id;
         domicilio.direccion = domicilioDto.direccion;
@@ -144,6 +146,20 @@ export class DTOEntityUtis {
         domicilio.tipo = domicilioDto.tipo;
         domicilio.eliminado = domicilioDto.eliminado;
         return domicilio;
+    }
+
+    public static suscripcionDtoToEntity(suscripcionDto: SuscripcionDTO): Suscripcion {
+        const suscripcion = new Suscripcion();
+        suscripcion.id = suscripcionDto.id;
+        suscripcion.estado = suscripcionDto.estado;
+        if (suscripcionDto.fechacambioestado) suscripcion.fechaCambioEstado = new Date(`${suscripcionDto.fechacambioestado}T00:00:00`);
+        if (suscripcionDto.fechasuscripcion) suscripcion.fechaSuscripcion = new Date(`${suscripcionDto.fechasuscripcion}T00:00:00`);
+        suscripcion.idcliente = suscripcionDto.idcliente;
+        suscripcion.iddomicilio = suscripcionDto.iddomicilio;
+        suscripcion.idservicio = suscripcionDto.idservicio;
+        suscripcion.monto = suscripcionDto.monto;
+        suscripcion.eliminado = suscripcionDto.eliminado;
+        return suscripcion;
     }
 
 }

@@ -6,11 +6,12 @@ import { ServerResponseList } from '@dto/server-response-list.dto';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';
-import { Suscripcion } from '@dto/suscripcion.dto';
+import { SuscripcionDTO } from '@dto/suscripcion.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { ClienteView } from '@database/view/cliente.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { SuscripcionView } from '@database/view/suscripcion.view';
 
 @Controller('clientes')
 @UseGuards(AuthGuard)
@@ -88,31 +89,22 @@ export class ClientesController {
         await this.clientesSrv.delete(id, this.jwtUtil.extractJwtSub(auth))
     }
 
-    //PENDIENTE DE CONVERTIR A TYPEORM
     @Get(':id/suscripciones')
     @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
-    async findSuscripcionesPorCliente(
+    findSuscripcionesPorCliente(
         @Param('id') idcliente: number,
-        @Query('eliminado') eliminado: boolean,
-        @Query('sort') sort: string,
-        @Query('offset') offset: number,
-        @Query('limit') limit: number
-    ): Promise<ServerResponseList<Suscripcion>> {
-        try {
-            const rows: Suscripcion[] = await this.suscripcionesSrv.findSuscripcionesPorCliente(idcliente, { eliminado, sort, offset, limit });
-            const count: number = await this.suscripcionesSrv.countSuscripcionesPorCliente(idcliente, {eliminado});
-            return new ServerResponseList<Suscripcion>(rows, count);
-        } catch (e) {
-            console.log('Error al consultar suscripciones por cliente');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        @Query() queries: {[name: string]: any}
+    ): Promise<SuscripcionView[]> {        
+        return this.suscripcionesSrv.findAll({...queries, idcliente});
+    }
+
+    @Get(':id/suscripciones/total')
+    @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
+    countSuscripcionesPorCliente(
+        @Param('id') idcliente: number,
+        @Query() queries: {[name: string]: any}
+    ): Promise<number>{
+        return this.suscripcionesSrv.count({...queries, idcliente});
     }
 
 }

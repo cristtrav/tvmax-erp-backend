@@ -8,12 +8,14 @@ import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cliente } from '@database/entity/cliente.entity';
 import { ClienteView } from '@database/view/cliente.view';
+import { Suscripcion } from '@database/entity/suscripcion.entity';
+import { SuscripcionView } from '@database/view/suscripcion.view';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
-    TypeOrmModule.forFeature([Cliente, ClienteView])
+    TypeOrmModule.forFeature([Cliente, ClienteView, Suscripcion, SuscripcionView])
   ],
   providers: [ClientesService, DatabaseService, SuscripcionesService],
   controllers: [ClientesController]

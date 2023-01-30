@@ -1,20 +1,23 @@
-import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { SuscripcionesService } from './suscripciones.service';
 import { ServerResponseList } from '../../dto/server-response-list.dto';
-import { Suscripcion } from '../../dto/suscripcion.dto';
+import { SuscripcionDTO } from '../../dto/suscripcion.dto';
 import { CuotasService } from '../cuotas/cuotas.service';
-import { CuotaDTO } from '@dto/cuota.dto';
 import { ServicioDTO } from '@dto/servicio.dto';
 import { ServiciosService } from '../servicios/servicios.service'
 import { ResumenCantMonto } from '@dto/resumen-cant-monto.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { CuotaView } from '@database/view/cuota.view';
+import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
+import { SuscripcionView } from '@database/view/suscripcion.view';
+import { DTOEntityUtis } from '@database/dto-entity-utils';
 
 @Controller('suscripciones')
 @UseGuards(AuthGuard)
+@UseFilters(HttpExceptionFilter)
 export class SuscripcionesController {
 
     constructor(
@@ -26,245 +29,68 @@ export class SuscripcionesController {
 
     @Get()
     @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
-    async findAll(
-        @Query('eliminado') eliminado: boolean,
-        @Query('sort') sort: string,
-        @Query('offset') offset: number,
-        @Query('limit') limit: number,
-        @Query('idcliente') idcliente: number,
-        @Query('idgrupo') idgrupo: number[] | number,
-        @Query('idservicio') idservicio: number[] | number,
-        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
-        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
-        @Query('estado') estado: string[] | string,
-        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
-        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
-        @Query('iddepartamento') iddepartamento: number | number[],
-        @Query('iddistrito') iddistrito: number | number[],
-        @Query('idbarrio') idbarrio: number | number[],
-        @Query('search') search: string
-    ): Promise<ServerResponseList<Suscripcion>> {
-        try {
-            const rows: Suscripcion[] = await this.suscripcionesSrv.findAll(
-                {
-                    eliminado,
-                    idcliente,
-                    idgrupo,
-                    idservicio,
-                    fechainiciosuscripcion,
-                    fechafinsuscripcion,
-                    estado,
-                    cuotaspendientesdesde,
-                    cuotaspendienteshasta,
-                    iddepartamento,
-                    iddistrito,
-                    idbarrio,
-                    search,
-                    sort,
-                    offset,
-                    limit
-                }
-            );
-            const rowCount: number = await this.suscripcionesSrv.count(
-                {
-                    eliminado,
-                    idcliente,
-                    idgrupo,
-                    idservicio,
-                    fechainiciosuscripcion,
-                    fechafinsuscripcion,
-                    estado,
-                    cuotaspendientesdesde,
-                    cuotaspendienteshasta,
-                    iddepartamento,
-                    iddistrito,
-                    idbarrio,
-                    search
-                }
-            );
-            return new ServerResponseList<Suscripcion>(rows, rowCount);
-        } catch (e) {
-            console.log('Error al consultar Suscripciones');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+    findAll(
+        @Query() queries: {[name: string]: any}
+    ): Promise<SuscripcionView[]> {
+        return this.suscripcionesSrv.findAll(queries);
     }
 
     @Get('ultimoid')
     @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
-    async getLastId(
+    getLastId(
     ): Promise<number> {
-        try {
-            return await this.suscripcionesSrv.getLastId();
-        } catch (e) {
-            console.log('Error al consultar ultimo id');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        return this.suscripcionesSrv.getLastId();
     }
 
-    @Get('count')
+    @Get('total')
     @RequirePermission(Permissions.SUSCRIPCIONES.CONTAR)
-    async count(
-        @Query('eliminado') eliminado: boolean,
-        @Query('idcliente') idcliente: number,
-        @Query('idgrupo') idgrupo: number[] | number,
-        @Query('idservicio') idservicio: number[] | number,
-        @Query('fechainiciosuscripcion') fechainiciosuscripcion: string,
-        @Query('fechafinsuscripcion') fechafinsuscripcion: string,
-        @Query('estado') estado: string[] | string,
-        @Query('cuotaspendientesdesde') cuotaspendientesdesde: number,
-        @Query('cuotaspendienteshasta') cuotaspendienteshasta: number,
-        @Query('iddepartamento') iddepartamento: number | number[],
-        @Query('iddistrito') iddistrito: number | number[],
-        @Query('idbarrio') idbarrio: number | number[],
-        @Query('search') search: string
+    count(
+        @Query() queries: {[name: string]: any}
     ): Promise<number> {
-        try {
-            return await (this.suscripcionesSrv.count(
-                {
-                    eliminado,
-                    idcliente,
-                    idgrupo,
-                    idservicio,
-                    fechainiciosuscripcion,
-                    fechafinsuscripcion,
-                    estado,
-                    cuotaspendientesdesde,
-                    cuotaspendienteshasta,
-                    iddepartamento,
-                    iddistrito,
-                    idbarrio,
-                    search
-                }
-            ));
-        } catch (e) {
-            console.log('Error al contar total de suscripciones');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        return this.suscripcionesSrv.count(queries);
     }
 
     @Post()
     @RequirePermission(Permissions.SUSCRIPCIONES.REGISTRAR)
     async create(
-        @Body() s: Suscripcion,
-        @Req() request: Request
+        @Body() s: SuscripcionDTO,
+        @Headers('authorization') auth: string
     ) {
-        try {
-            await this.suscripcionesSrv.create(s, this.jwtUtil.decodeIdUsuario(request));
-        } catch (e) {
-            console.log('Error al registrar')
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'post',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        await this.suscripcionesSrv.create(
+            DTOEntityUtis.suscripcionDtoToEntity(s),
+            this.jwtUtil.extractJwtSub(auth)
+        );
     }
 
     @Get(':id')
     @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
-    async findById(
+    findById(
         @Param('id') id: number
-    ): Promise<Suscripcion> {
-        try {
-            const s: Suscripcion = await this.suscripcionesSrv.findById(id);
-            if (!s) throw new HttpException(
-                {
-                    request: 'get',
-                    description: `No se encontró la suscripción con código ${id}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-            return s;
-        } catch (e) {
-            console.log('Error al consultar suscripcion por ID');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+    ): Promise<SuscripcionView> {
+        return this.suscripcionesSrv.findById(id);
     }
 
     @Put(':id')
     @RequirePermission(Permissions.SUSCRIPCIONES.EDITAR)
     async edit(
         @Param('id') oldId: number,
-        @Body() s: Suscripcion,
-        @Req() request: Request
+        @Body() s: SuscripcionDTO,
+        @Headers('authorization') auth: string
     ) {
-        try {
-            if (!(await this.suscripcionesSrv.edit(oldId, s, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
-                {
-                    request: 'put',
-                    description: `No se encontró la suscripción con código ${oldId}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-        } catch (e) {
-            console.log('Error al editar suscripcion');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'put',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        await this.suscripcionesSrv.edit(
+            oldId,
+            DTOEntityUtis.suscripcionDtoToEntity(s),
+            this.jwtUtil.extractJwtSub(auth)
+        );
     }
 
     @Delete(':id')
     @RequirePermission(Permissions.SUSCRIPCIONES.ELIMINAR)
     async delete(
         @Param('id') id: number,
-        @Req() request: Request
+        @Headers('authorization') auth: string
     ) {
-        try {
-            if (!(await this.suscripcionesSrv.delete(id, this.jwtUtil.decodeIdUsuario(request)))) throw new HttpException(
-                {
-                    request: 'delete',
-                    description: `No se encontró la suscripción con código ${id}.`
-                },
-                HttpStatus.NOT_FOUND
-            );
-        } catch (e) {
-            console.log('Error al eliminar suscripcion');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'delete',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        await this.suscripcionesSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
     }
 
     @Get(':id/cuotas')
