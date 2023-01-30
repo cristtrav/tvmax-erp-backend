@@ -14,6 +14,7 @@ import { CuotaView } from '@database/view/cuota.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { ServicioView } from '@database/view/servicio.view';
 
 @Controller('suscripciones')
 @UseGuards(AuthGuard)
@@ -114,28 +115,19 @@ export class SuscripcionesController {
     @Get(':id/cuotas/servicios')
     @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
     async getServiciosByCuotas(
-        @Param('id') idsusc: number,
-        @Query('eliminado') eliminado: boolean,
-        @Query('pagado') pagado: boolean,
-        @Query('sort') sort: string,
-        @Query('offset') offset: number,
-        @Query('limit') limit: number
-    ): Promise<ServerResponseList<ServicioDTO>> {
-        try {
-            const data: ServicioDTO[] = await this.serviciosSrv.getServiciosEnCuotas(idsusc, { eliminado, pagado, sort, offset, limit });
-            const count: number = await this.serviciosSrv.countServiciosEnCuotas(idsusc, { eliminado, pagado });
-            return new ServerResponseList<ServicioDTO>(data, count);
-        } catch (e) {
-            console.log('Error al consultar servicios por cuotas');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        @Param('id') idsuscripcion: number,
+        @Query() queries: {[name: string]: any}
+    ): Promise<ServicioView[]> {
+        return this.serviciosSrv.getServiciosEnCuotas(idsuscripcion, queries);
+    }
+
+    @Get(':id/cuotas/servicios/total')
+    @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
+    countServiciosByCuotas(
+        @Param('id') idsuscripcion: number,
+        @Query() queries: {[name: string]: any}
+    ): Promise<number>{
+        return this.serviciosSrv.countServiciosEnCuotas(idsuscripcion, queries);
     }
 
     @Get('resumen/cuotaspendientes')
