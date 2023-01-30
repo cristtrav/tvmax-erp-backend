@@ -10,10 +10,7 @@ export class CuotaView{
     observacion: string;
 
     @ViewColumn()
-    fechavencimiento: string;
-
-    @ViewColumn()
-    fecha_vencimiento: Date;
+    fechavencimiento: Date;
 
     @ViewColumn()
     monto: number;

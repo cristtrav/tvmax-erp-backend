@@ -21,36 +21,31 @@ export class CuotasService {
         private dbsrv: DatabaseService
     ) { }
 
-    private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<CuotaView>{
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<CuotaView> {
+        console.log(queries);
         const { eliminado, pagado, sort, offset, limit, idservicio, idsuscripcion } = queries;
         const alias: string = "cuota";
-        let queryBuilder: SelectQueryBuilder<CuotaView> = this.cuotaViewRepo.createQueryBuilder(alias);
+        let query: SelectQueryBuilder<CuotaView> = this.cuotaViewRepo.createQueryBuilder(alias);
 
-        if(eliminado != null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
-        if(pagado != null) queryBuilder = queryBuilder.andWhere(`${alias}.pagado`, {pagado});
-        if(idsuscripcion != null)
-            queryBuilder = queryBuilder.andWhere(
-            `${alias}.idsuscripcion 
-            ${Array.isArray(idsuscripcion) ? 'IN (...idsuscripcion)' : '= :idsuscripcion'}`,
-            {idsuscripcion}
-        );
-        if(idservicio != null)
-            queryBuilder = queryBuilder.andWhere(
-            `${alias}.idservicio
-            ${Array.isArray(idservicio) ? 'IN (...idservicio)' : '= :idservicio'}`,
-            {idservicio}
-        );
-        if(limit != null) queryBuilder = queryBuilder.take(limit);
-        if(offset != null) queryBuilder = queryBuilder.skip(offset);
-        if(sort){
+        if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (pagado != null) query = query.andWhere(`${alias}.pagado = :pagado`, { pagado });
+        if (idsuscripcion)
+            if (Array.isArray(idsuscripcion)) query = query.andWhere(`${alias}.idsuscripcion IN (:...idsuscripcion)`, { idsuscripcion });
+            else query = query.andWhere(`${alias}.idsuscripcion = :idsuscripcion`, { idsuscripcion });
+        if (idservicio)
+            if (Array.isArray(idservicio)) query = query.andWhere(`${alias}.idservicio IN (:...idservicio)`, { idservicio });
+            else query = query.andWhere(`${alias}.idservicio = :idservicio`, { idservicio });
+        if (limit != null) query = query.take(limit);
+        if (offset != null) query = query.skip(offset);
+        if (sort) {
             const sortColumn: string = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
-            queryBuilder = queryBuilder.orderBy(`${alias}.${sortColumn}`, sortOrder); 
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
-        return queryBuilder;
+        return query;
     }
 
-    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', estadoanterior: any, estadonuevo: any): EventoAuditoria{
+    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', estadoanterior: any, estadonuevo: any): EventoAuditoria {
         const evento: EventoAuditoria = new EventoAuditoria();
         evento.idusuario = idusuario;
         evento.operacion = operacion;
@@ -61,7 +56,7 @@ export class CuotasService {
         return evento;
     }
 
-    async findAll(queries: {[name: string]: any}): Promise<CuotaView[]> {
+    async findAll(queries: { [name: string]: any }): Promise<CuotaView[]> {
         return this.getSelectQuery(queries).getMany();
     }
 
@@ -70,7 +65,7 @@ export class CuotasService {
     }
 
     async findById(id: number): Promise<CuotaView> {
-        return this.cuotaViewRepo.findOneByOrFail({id});
+        return this.cuotaViewRepo.findOneByOrFail({ id });
     }
 
     async create(c: Cuota, idusuario: number) {
@@ -82,16 +77,16 @@ export class CuotasService {
 
     async edit(oldid: number, c: Cuota, idusuario: number) {
         await this.datasource.transaction(async manager => {
-            const oldCuota: Cuota = await this.cuotaRepo.findOneByOrFail({id: oldid});
+            const oldCuota: Cuota = await this.cuotaRepo.findOneByOrFail({ id: oldid });
             await manager.save(c);
-            const newCuota: Cuota = await this.cuotaRepo.findOneByOrFail({id: c.id});
+            const newCuota: Cuota = await this.cuotaRepo.findOneByOrFail({ id: c.id });
             await manager.save(this.getEventoAuditoria(idusuario, "M", oldCuota, newCuota));
-            if(oldid != c.id) await manager.remove(oldCuota);
+            if (oldid != c.id) await manager.remove(oldCuota);
         })
     }
 
     async delete(id: number, idusuario: number) {
-        const cuota: Cuota = await this.cuotaRepo.findOneByOrFail({id});
+        const cuota: Cuota = await this.cuotaRepo.findOneByOrFail({ id });
         const oldCuota: Cuota = { ...cuota };
         cuota.eliminado = true;
         await this.datasource.transaction(async manager => {
@@ -100,9 +95,9 @@ export class CuotasService {
         })
     }
     //FALTA MIGRAR A TYPEORM
-    async findCobro(idcuota: number): Promise<CobroCuota | null>{
+    async findCobro(idcuota: number): Promise<CobroCuota | null> {
         const wp: WhereParam = new WhereParam(
-            {idcuota},
+            { idcuota },
             null,
             null,
             null,
@@ -110,7 +105,7 @@ export class CuotasService {
         );
         const query: string = `SELECT * FROM public.vw_cobro_cuotas ${wp.whereStr}`;
         const rows: CobroCuota[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
-        if(rows.length > 0) return rows[0];
+        if (rows.length > 0) return rows[0];
         return null;
     }
 }
