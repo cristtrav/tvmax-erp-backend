@@ -1,3 +1,4 @@
+import { Permiso } from '@database/entity/permiso.entity';
 import { Servicio } from '@database/entity/servicio.entity';
 import { CuotaView } from '@database/view/cuota.view';
 import { ServicioView } from '@database/view/servicio.view';
@@ -12,7 +13,7 @@ import { ServiciosService } from './servicios.service';
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Servicio, ServicioView, CuotaView])
+    TypeOrmModule.forFeature([Servicio, ServicioView, CuotaView, Permiso])
   ],
   controllers: [ServiciosController],
   providers: [ServiciosService, DatabaseService, JwtUtilsService]

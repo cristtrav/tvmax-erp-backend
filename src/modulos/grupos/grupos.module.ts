@@ -6,11 +6,12 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Grupo } from '@database/entity/grupo.entity';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Grupo])
+    TypeOrmModule.forFeature([Grupo, Permiso])
   ],
   controllers: [GruposController],
   providers: [

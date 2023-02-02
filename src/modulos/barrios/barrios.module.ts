@@ -7,12 +7,13 @@ import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Barrio } from '@database/entity/barrio.entity';
 import { BarrioView } from '@database/view/barrio.view';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
-    TypeOrmModule.forFeature([Barrio, BarrioView])
+    TypeOrmModule.forFeature([Barrio, BarrioView, Permiso])
   ],
   providers: [BarriosService, DatabaseService],
   controllers: [BarriosController]

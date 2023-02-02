@@ -46,6 +46,7 @@ import { DomicilioView } from '@database/view/domicilio.view';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 import { ResumenesSuscripcionesModule } from './modulos/estadisticas/resumenes-suscripciones/resumenes-suscripciones.module';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
@@ -68,6 +69,8 @@ import { ResumenesSuscripcionesModule } from './modulos/estadisticas/resumenes-s
     PermisosModule,
     AuditoriaModule,
     UtilModule,
+    RolesModule,
+    ResumenesSuscripcionesModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.PGHOST,
@@ -90,11 +93,10 @@ import { ResumenesSuscripcionesModule } from './modulos/estadisticas/resumenes-s
         Timbrado, TimbradoView,
         Cliente, ClienteView,
         Domicilio, DomicilioView,
-        Suscripcion, SuscripcionView
-      ],
-    }),
-    RolesModule,
-    ResumenesSuscripcionesModule
+        Suscripcion, SuscripcionView,
+        Permiso
+      ]
+    })
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

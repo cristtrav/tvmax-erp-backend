@@ -10,12 +10,13 @@ import { Cliente } from '@database/entity/cliente.entity';
 import { ClienteView } from '@database/view/cliente.view';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
-    TypeOrmModule.forFeature([Cliente, ClienteView, Suscripcion, SuscripcionView])
+    TypeOrmModule.forFeature([Cliente, ClienteView, Suscripcion, SuscripcionView, Permiso])
   ],
   providers: [ClientesService, DatabaseService, SuscripcionesService],
   controllers: [ClientesController]

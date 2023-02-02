@@ -7,12 +7,13 @@ import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Domicilio } from '@database/entity/domicilio.entity';
 import { DomicilioView } from '@database/view/domicilio.view';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
-    TypeOrmModule.forFeature([Domicilio, DomicilioView])
+    TypeOrmModule.forFeature([Domicilio, DomicilioView, Permiso])
   ],
   providers: [DomiciliosService, DatabaseService],
   controllers: [DomiciliosController]

@@ -7,13 +7,15 @@ import { UtilModule } from '@util/util.module';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 import { DatabaseService } from '@database/database.service';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
     imports: [
         JwtModule.register({}),
         TypeOrmModule.forFeature([
             Suscripcion,
-            SuscripcionView
+            SuscripcionView,
+            Permiso
         ]),
         UtilModule
     ],
