@@ -23,7 +23,7 @@ import { SuscripcionView } from '@database/view/suscripcion.view';
       Cuota,
       CuotaView,
       Suscripcion,
-      SuscripcionView
+      SuscripcionView      
     ]),
     UtilModule
   ],

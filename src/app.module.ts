@@ -45,6 +45,7 @@ import { Domicilio } from '@database/entity/domicilio.entity';
 import { DomicilioView } from '@database/view/domicilio.view';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
+import { ResumenesSuscripcionesModule } from './modulos/estadisticas/resumenes-suscripciones/resumenes-suscripciones.module';
 
 @Module({
   imports: [
@@ -92,7 +93,8 @@ import { SuscripcionView } from '@database/view/suscripcion.view';
         Suscripcion, SuscripcionView
       ],
     }),
-    RolesModule
+    RolesModule,
+    ResumenesSuscripcionesModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],
