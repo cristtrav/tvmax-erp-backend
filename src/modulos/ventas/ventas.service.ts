@@ -1,91 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
-import { Venta } from '@dto/venta.dto';
+import { VentaDTO } from '@dto/venta.dto';
 import { Client } from 'pg';
-import { DetalleVenta } from '@dto/detalle-venta-dto';
+import { DetalleVentaDTO } from '@dto/detalle-venta-dto';
 import { WhereParam } from '@util/whereparam';
 import { ISearchField } from '@util/isearchfield.interface';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { AuditQueryHelper } from '@util/audit-query-helper';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Venta } from '@database/entity/venta.entity';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { DetalleVenta } from '@database/entity/detalle-venta.entity';
+import { VentaView } from '@database/view/venta.view';
+import { DetalleVentaView } from '@database/view/detalle-venta.view';
+import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
+import { Timbrado } from '@database/entity/timbrado.entity';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
+import { Cuota } from '@database/entity/cuota.entity';
+import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 
 @Injectable()
 export class VentasService {
 
     constructor(
+        @InjectRepository(Venta)
+        private ventaRepo: Repository<Venta>,
+        @InjectRepository(VentaView)
+        private ventaViewRepo: Repository<VentaView>,
+        @InjectRepository(DetalleVenta)
+        private detalleVentaRepo: Repository<DetalleVenta>,
+        @InjectRepository(DetalleVentaView)
+        private detalleVentaViewRepo: Repository<DetalleVentaView>,
+        @InjectRepository(Timbrado)
+        private timbradoRepo: Repository<Timbrado>,
+        @InjectRepository(Cuota)
+        private cuotaRepo: Repository<Cuota>,
+        private datasource: DataSource,
         private dbsrv: DatabaseService,
     ) { }
 
-    async create(fv: Venta, registraCobro: boolean, idusu: number): Promise<number> {
-        const dbcli: Client = await this.dbsrv.getDBClient();
-        const queryCabecera: string = `
-        INSERT INTO public.venta (
-            id,
-            idcliente,
-            fecha_factura,
-            pagado, anulado,
-            idtimbrado,
-            nro_factura,
-            fecha_cobro,
-            idcobrador_comision,
-            idusuario_registro_factura,
-            idusuario_registro_cobro,
-            eliminado)
-        VALUES
-            (nextval('public.seq_venta'),
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-            false) RETURNING *`;
-        const paramsCabecera: any[] = [
-            fv.idcliente,
-            fv.fechafactura,
-            fv.pagado,
-            fv.anulado,
-            fv.idtimbrado,
-            fv.nrofactura,
-            fv.fechacobro,
-            fv.idcobradorcomision,
-            fv.idfuncionarioregistrofactura,
-            fv.idfuncionarioregistrocobro];
-        try {
-            await dbcli.query('BEGIN');
-            const res = await dbcli.query(queryCabecera, paramsCabecera);
-        
-            const idgenerado = res.rows[0].id;
-            await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.VENTA, idusu, idgenerado);
-            for (let dv of fv.detalles) {
-                const queryDetalle: string = `INSERT INTO public.detalle_venta(id, idventa, monto, cantidad, subtotal, descripcion, porcentaje_iva, idservicio, idcuota, idsuscripcion, eliminado)
-                VALUES(nextval('public.seq_detalle_venta'), $1, $2, $3, $4, $5, $6, $7, $8, $9, false) RETURNING *`;
-                const paramsDetalle: any[] = [idgenerado, dv.monto, dv.cantidad, dv.subtotal, dv.descripcion, dv.porcentajeiva, dv.idservicio, dv.idcuota, dv.idsuscripcion];
-                const idddetalle = (await dbcli.query(queryDetalle, paramsDetalle)).rows[0].id;
-                await AuditQueryHelper.auditPostInsert(dbcli, TablasAuditoriaList.DETALLEVENTA, idusu, idddetalle);
-            }
-            
-            const queryTimbrado: string = `UPDATE public.timbrado SET ultimo_nro_usado = $1 WHERE id = $2`;
-            const paramsTimbrado: any[] = [fv.nrofactura, fv.idtimbrado];;
-            const idevento = await AuditQueryHelper.auditPreUpdate(dbcli, TablasAuditoriaList.TIMBRADOS, idusu, fv.idtimbrado);
-            await dbcli.query(queryTimbrado, paramsTimbrado);
-            await AuditQueryHelper.auditPostUpdate(dbcli, TablasAuditoriaList.TIMBRADOS, idevento, fv.idtimbrado);
-            
-            /*if (registraCobro) {
-                const clie: Cliente = await this.clienteSrv.findById(fv.idcliente);
-                const queryCobro: String = `INSERT INTO public.cobro(id, idfactura, fecha, cobrado_por, comision_para, anulado, eliminado)
-                VALUES(nextval('public.seq_cobros'), $1, $2, $3, $4, false, false)`;
-                const paramsCobro: any[] = [idgenerado, fv.fechafactura, idusu, clie.idcobrador];
-                await dbcli.query(queryCobro, paramsCobro);
-            }*/
-
-            await dbcli.query('COMMIT');
-            return idgenerado;
-        } catch (e) {
-            await dbcli.query('ROLLBACK');
-            throw e;
-        } finally {
-            dbcli.release();
-        }
-    }
-
-    async findAll(params): Promise<Venta[]> {
-        const { 
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<VentaView> {
+        const {
             eliminado,
             search,
             fechainiciofactura,
@@ -98,165 +54,113 @@ export class VentasService {
             fechafincobro,
             sort,
             offset,
-            limit 
-        } = params;
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'cliente',
-                fieldValue: search,
-                exactMatch: false
-            },
-            {
-                fieldName: 'nrofactura',
-                fieldValue: search,
-                exactMatch: true
-            }
-        ];
-        
-        const rangeQuery: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fechafactura::date',
-                    startValue: fechainiciofactura,
-                    endValue: fechafinfactura
-                },
-                {
-                    fieldName: 'fechacobro::date',
-                    startValue: fechainiciocobro,
-                    endValue: fechafincobro
+            limit
+        } = queries;
+
+        const alias: string = 'venta';
+        let query: SelectQueryBuilder<VentaView> = this.ventaViewRepo.createQueryBuilder(alias);
+
+        if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (pagado != null) query = query.andWhere(`${alias}.pagado = :pagado`, { pagado });
+        if (anulado != null) query = query.andWhere(`${alias}.anulado = :anulado`, { anulado });
+        if (fechainiciofactura) query = query.andWhere(`${alias}.fechafactura >= :fechainiciofactura`, { fechainiciofactura });
+        if (fechafinfactura) query = query.andWhere(`${alias}.fechafactura <= :fechafinfactura`, { fechafinfactura });
+        if (fechainiciocobro) query = query.andWhere(`${alias}.fechacobro >= :fechainiciocobro`, { fechainiciocobro });
+        if (fechafincobro) query = query.andWhere(`${alias}.fechafinfactura <= :fechafinfactura`, { fechafinfactura });
+        if (idcobradorcomision)
+            if (Array.isArray(idcobradorcomision)) query = query.andWhere(`${alias}.idcobradorcomision IN (:...idcobradorcomision)`, { idcobradorcomision });
+            else query = query.andWhere(`${alias}.idcobradorcomision = :idcobradorcomision`, { idcobradorcomision });
+        if (idusuarioregistrocobro)
+            if (Array.isArray(idusuarioregistrocobro)) query = query.andWhere(`${alias}.idusuarioregistrocobro IN (:...idusuarioregistrocobro)`, { idusuarioregistrocobro });
+            else query = query.andWhere(`${alias}.idusuarioregistrocobro = :idusuarioregistrocobro`, { idusuarioregistrocobro });
+        if (search) {
+            query = query.andWhere(new Brackets(qb => {
+                qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :searchcli`, { searchcli: `%${search.toLowerCase()}%` });
+                if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.nrofactura = :searchnrofact`, { searchnrofact: search });
+            }));
+        }
+        if (limit) query = query.take(limit);
+        if (offset) query = query.skip(offset);
+        if (sort) {
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(sortColumn, sortOrder);
+        }
+        return query;
+    }
+
+    async create(venta: Venta, detalles: DetalleVenta[], idusuario: number): Promise<number> {
+        if (await this.ventaRepo.findOneBy({
+            nroFactura: venta.nroFactura,
+            idtimbrado: venta.idtimbrado,
+            eliminado: false,
+            anulado: false
+        })) throw new HttpException({
+            message: `El número de factura «${venta.nroFactura}» ya está registrado.`
+        }, HttpStatus.BAD_REQUEST);
+
+        venta.idusuarioRegistroFactura = idusuario;
+        venta.idusuarioRegistroCobro = idusuario;
+
+        let idventa: number = -1;
+        await this.datasource.transaction(async manager => {
+            idventa = (await manager.save(venta)).id;
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'R', null, venta));
+
+            const timbrado = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado })
+            const oldTimbrado = { ...timbrado };
+            timbrado.ultimoNroUsado = venta.nroFactura;
+            await manager.save(timbrado);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbrado, timbrado));
+
+            for (let detalle of detalles) {
+                detalle.venta = venta;
+                await manager.save(detalle);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaDetalleVenta(idusuario, 'R', null, detalle));
+                if (!venta.anulado && !venta.eliminado && detalle.idcuota) {
+                    const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
+                    const oldCuota = { ...cuota };
+                    cuota.pagado = true;
+                    await manager.save(cuota);
+                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota));
                 }
-            ]
-        }
-        const wp: WhereParam = new WhereParam(
-            {
-                eliminado,
-                pagado,
-                anulado,
-                idcobradorcomision,
-                idusuarioregistrocobro
-            },
-            null,
-            rangeQuery,
-            searchQuery,
-            { sort, offset, limit }
-        );
-        let query: string = `SELECT * FROM public.vw_ventas ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        const rows: Venta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
-        return rows;
-    }
-
-    async count(params): Promise<number> {
-        const { 
-            eliminado,
-            fechainiciofactura,
-            fechafinfactura,
-            search,
-            pagado,
-            anulado,
-            idcobradorcomision,
-            idusuarioregistrocobro,
-            fechainiciocobro,
-            fechafincobro
-        } = params;
-        const searchQuery: ISearchField[] = [
-            {
-                fieldName: 'cliente',
-                fieldValue: search,
-                exactMatch: false
-            },
-            {
-                fieldName: 'nrofactura',
-                fieldValue: search,
-                exactMatch: true
             }
-        ];
-        
-        const rangeQuery: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fechafactura::date',
-                    startValue: fechainiciofactura,
-                    endValue: fechafinfactura
-                },
-                {
-                    fieldName: 'fechacobro::date',
-                    startValue: fechainiciocobro,
-                    endValue: fechafincobro
-                }
-            ]
-        }
-        const wp: WhereParam = new WhereParam(
-            {
-                eliminado,
-                pagado,
-                anulado,
-                idcobradorcomision,
-                idusuarioregistrocobro
-            },
-            null,
-            rangeQuery,
-            searchQuery,
-            null
-        );
-        let query: string = `SELECT COUNT(*) FROM public.vw_ventas ${wp.whereStr}`;        
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+        });
+        return idventa
     }
 
-    async anular(idventa: number, anulado, idusuario: number): Promise<void> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.venta SET anulado = $1 WHERE id = $2`;
-        const params = [anulado, idventa];
-        try{
-            await cli.query('BEGIN');
-            const idevento = await AuditQueryHelper.auditPreUpdate(cli, TablasAuditoriaList.VENTA, idusuario, idventa);
-            await cli.query(query, params);
-            await AuditQueryHelper.auditPostUpdate(cli, TablasAuditoriaList.VENTA, idevento, idventa);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-        }finally{
-            cli.release();
-        }
+    findAll(queries: { [name: string]: any }): Promise<VentaView[]> {
+        return this.getSelectQuery(queries).getMany();
     }
 
-    async delete(id: number, idusuario: number): Promise<boolean> {
-        const cli = await this.dbsrv.getDBClient();
-        const query: string = `UPDATE public.venta SET eliminado = true WHERE id = $1`;
-        let rowCount = 0;
-        try{
-            await cli.query('BEGIN');
-            rowCount = (await cli.query(query, [id])).rowCount;
-            AuditQueryHelper.auditPostDelete(cli, TablasAuditoriaList.VENTA, idusuario, id);
-            await cli.query('COMMIT');
-        }catch(e){
-            await cli.query('ROLLBACK');
-            throw e;
-        }finally{
-            cli.release();
-        }
-        return rowCount > 0;
+    count(queries: { [name: string]: any }): Promise<number> {
+        return this.getSelectQuery(queries).getCount();
     }
 
-    async findById(id: number): Promise<Venta>{
-        const wp: WhereParam = new WhereParam(
-            { id },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT * FROM public.vw_ventas ${wp.whereStr}`;
-        const rows: Venta[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
-        if(rows.length > 0){
-            const fv: Venta = rows[0];
-            const queryDetalle: string = `SELECT * FROM public.vw_detalles_venta WHERE eliminado = false AND idVenta = $1`;
-            const detalles: DetalleVenta[] = (await this.dbsrv.execute(queryDetalle, [fv.id])).rows;
-            fv.detalles = detalles;
-            return fv;
-        };
-        return null;
+    async anular(idventa: number, anulado, idusuario: number) {
+        const venta = await this.ventaRepo.findOneByOrFail({ id: idventa });
+        const oldVenta = { ...venta };
+        venta.anulado = anulado;
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(venta);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'M', oldVenta, venta));
+        });
+    }
+
+    async delete(id: number, idusuario: number) {
+        const venta = await this.ventaRepo.findOneByOrFail({ id });
+        const oldVenta = { ...venta };
+        venta.eliminado = true;
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(venta);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'E', oldVenta, venta));
+        });
+    }
+
+    async findById(id: number): Promise<VentaView> {
+        return this.ventaViewRepo.findOneByOrFail({id});
     }
 
 }

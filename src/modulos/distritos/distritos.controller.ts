@@ -6,7 +6,7 @@ import { AuthGuard } from '../../global/auth/auth.guard';
 import { DistritosService } from './distritos.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DistritoView } from '@database/view/distritos.view';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 
 @Controller('distritos')
 @UseGuards(AuthGuard)

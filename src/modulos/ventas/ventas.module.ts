@@ -13,12 +13,28 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClienteView } from '@database/view/cliente.view';
 import { Cliente } from '@database/entity/cliente.entity';
 import { Permiso } from '@database/entity/permiso.entity';
+import { Venta } from '@database/entity/venta.entity';
+import { DetalleVenta } from '@database/entity/detalle-venta.entity';
+import { VentaView } from '@database/view/venta.view';
+import { DetalleVentaView } from '@database/view/detalle-venta.view';
+import { Timbrado } from '@database/entity/timbrado.entity';
+import { Cuota } from '@database/entity/cuota.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
-    TypeOrmModule.forFeature([Cliente, ClienteView, Permiso])
+    TypeOrmModule.forFeature([
+      Cliente,
+      ClienteView,
+      Permiso,
+      Venta,
+      VentaView,
+      DetalleVenta,
+      DetalleVentaView,
+      Timbrado,
+      Cuota
+    ])
   ],
   providers: [VentasService, DatabaseService, ClientesService, ResumenVentasService, DetallesVentasService],
   controllers: [VentasController, ResumenVentasController, DetallesVentasController]

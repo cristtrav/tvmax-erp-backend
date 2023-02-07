@@ -5,7 +5,7 @@ import { AuthGuard } from './../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { Grupo } from '@database/entity/grupo.entity';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 

@@ -10,7 +10,7 @@ import { SuscripcionDTO } from '@dto/suscripcion.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { ClienteView } from '@database/view/cliente.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 
 @Controller('clientes')

@@ -2,6 +2,7 @@ import { BarrioDTO } from "@dto/barrio.dto";
 import { ClienteDTO } from "@dto/cliente.dto";
 import { CuotaDTO } from "@dto/cuota.dto";
 import { DepartamentoDTO } from "@dto/departamento.dto";
+import { DetalleVentaDTO } from "@dto/detalle-venta-dto";
 import { DistritoDTO } from "@dto/distrito.dto";
 import { DomicilioDTO } from "@dto/domicilio.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
@@ -10,18 +11,21 @@ import { ServicioDTO } from "@dto/servicio.dto";
 import { SuscripcionDTO } from "@dto/suscripcion.dto";
 import { TimbradoDTO } from "@dto/timbrado.dto";
 import { UsuarioDTO } from "@dto/usuario.dto";
-import { Barrio } from "./entity/barrio.entity";
-import { Cliente } from "./entity/cliente.entity";
-import { Cuota } from "./entity/cuota.entity";
-import { Departamento } from "./entity/departamento.entity";
-import { Distrito } from "./entity/distrito.entity";
-import { Domicilio } from "./entity/domicilio.entity";
-import { Grupo } from "./entity/grupo.entity";
-import { Rol } from "./entity/rol.entity";
-import { Servicio } from "./entity/servicio.entity";
-import { Suscripcion } from "./entity/suscripcion.entity";
-import { Timbrado } from "./entity/timbrado.entity";
-import { Usuario } from "./entity/usuario.entity";
+import { VentaDTO } from "@dto/venta.dto";
+import { Barrio } from "../database/entity/barrio.entity";
+import { Cliente } from "../database/entity/cliente.entity";
+import { Cuota } from "../database/entity/cuota.entity";
+import { Departamento } from "../database/entity/departamento.entity";
+import { DetalleVenta } from "../database/entity/detalle-venta.entity";
+import { Distrito } from "../database/entity/distrito.entity";
+import { Domicilio } from "../database/entity/domicilio.entity";
+import { Grupo } from "../database/entity/grupo.entity";
+import { Rol } from "../database/entity/rol.entity";
+import { Servicio } from "../database/entity/servicio.entity";
+import { Suscripcion } from "../database/entity/suscripcion.entity";
+import { Timbrado } from "../database/entity/timbrado.entity";
+import { Usuario } from "../database/entity/usuario.entity";
+import { Venta } from "../database/entity/venta.entity";
 
 export class DTOEntityUtis {
 
@@ -160,6 +164,50 @@ export class DTOEntityUtis {
         suscripcion.monto = suscripcionDto.monto;
         suscripcion.eliminado = suscripcionDto.eliminado;
         return suscripcion;
+    }
+
+    public static ventaDtoToEntity(ventaDto: VentaDTO): Venta{
+        const venta = new Venta();
+        //venta.id = ventaDto.id;
+        venta.anulado = ventaDto.anulado;
+        venta.pagado = ventaDto.pagado;
+        venta.eliminado = ventaDto.eliminado;
+        venta.fechaCobro = ventaDto.fechacobro;
+        venta.fechaFactura = ventaDto.fechafactura;
+        venta.idcliente = ventaDto.idcliente;
+        venta.idcobradorComision = ventaDto.idcobradorcomision;
+        venta.idtimbrado = ventaDto.idtimbrado;
+        venta.idusuarioRegistroCobro = ventaDto.idusuarioregistrocobro;
+        venta.idusuarioRegistroFactura = ventaDto.idusuarioregistrofactura;
+        venta.nroFactura = ventaDto.nrofactura;
+        venta.total = ventaDto.total;
+        venta.totalExentoIva = ventaDto.totalexentoiva;
+        venta.totalGravadoIva10 = ventaDto.totalgravadoiva10;
+        venta.totalGravadoIva5 = ventaDto.totalgravadoiva5;
+        venta.totalIva10 = ventaDto.totaliva10;
+        venta.totalIva5 = ventaDto.totaliva5;
+        /*if(ventaDto.detalles) ventaDto.detalles.forEach(detalleDto => {
+            const detalles: DetalleVenta[] = [];
+            detalles.push(this.detalleVentaDtoToEntity(detalleDto))
+            venta.detalles = detalles;
+        })*/
+        return venta;
+    }
+
+    public static detalleVentaDtoToEntity(detalleVentaDto: DetalleVentaDTO): DetalleVenta{
+        const detalleVenta = new DetalleVenta();
+        //detalleVenta.id = detalleVentaDto.id;
+        detalleVenta.cantidad = detalleVentaDto.cantidad;
+        detalleVenta.descripcion = detalleVentaDto.descripcion;
+        detalleVenta.idcuota = detalleVentaDto.idcuota;
+        detalleVenta.idservicio = detalleVentaDto.idservicio;
+        detalleVenta.idsuscripcion = detalleVentaDto.idservicio;
+        //detalleVenta.idventa = detalleVentaDto.idventa;
+        detalleVenta.monto = detalleVentaDto.monto;
+        detalleVenta.montoIva = detalleVentaDto.montoiva;
+        detalleVenta.porcentajeIva = detalleVentaDto.porcentajeiva;
+        detalleVenta.subtotal = detalleVentaDto.subtotal;
+        return detalleVenta;
     }
 
 }

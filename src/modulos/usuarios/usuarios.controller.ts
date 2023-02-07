@@ -7,7 +7,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { UsuarioDTO } from '@dto/usuario.dto';
 import { UsuarioView } from '@database/view/usuario.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 
 @Controller('usuarios')
 @UseGuards(AuthGuard)

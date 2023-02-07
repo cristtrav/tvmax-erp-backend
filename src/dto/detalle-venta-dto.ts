@@ -1,4 +1,4 @@
-export class DetalleVenta {
+export class DetalleVentaDTO {
     id: number | null = null;
     idventa: number | null = null;
     monto: number | null = null;
@@ -9,6 +9,7 @@ export class DetalleVenta {
     idgrupo: number | null = null;
     grupo: string | null = null;
     porcentajeiva: number | null = null;
+    montoiva: number | null = null;
     idcuota: number | null = null;
     descripcion: string | null = null;
     idsuscripcion: number | null = null;

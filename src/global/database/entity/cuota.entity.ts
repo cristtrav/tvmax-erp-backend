@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { DetalleVenta } from "./detalle-venta.entity";
 
 @Entity()
 export class Cuota{
@@ -41,5 +42,7 @@ export class Cuota{
 
     @Column({name: 'factura_pago'})
     facturaPago: string;
-    
+
+    @OneToMany(() => DetalleVenta, (detalleVenta) => {detalleVenta.cuota})
+    detallesVenta: DetalleVenta
 }

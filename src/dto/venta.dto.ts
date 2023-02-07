@@ -1,6 +1,6 @@
-import { DetalleVenta } from "./detalle-venta-dto";
+import { DetalleVentaDTO } from "./detalle-venta-dto";
 
-export class Venta {
+export class VentaDTO {
     id: number | null = null;
     cliente: string | null = null;
     ci: number | null = null;
@@ -13,20 +13,21 @@ export class Venta {
     totaliva10: number = 0;
     totaliva5: number = 0;
     total: number = 0;
-    fechafactura: string | null = null;
+    fechafactura: Date | null = null;
     idcliente: number | null = null;
     prefijofactura: string | null = null;
     nrofactura: number | null = null;
     idtimbrado: number | null = null;
     timbrado: number | null = null;
-    vencimientotimbrado: string | null = null;
-    iniciovigenciatimbrado: string | null = null;
-    fechacobro: string | null = null;
+    vencimientotimbrado: Date | null = null;
+    iniciovigenciatimbrado: Date | null = null;
+    fechacobro: Date | null = null;
     idcobradorcomision: number | null = null;
     cobrador: string | null = null;
-    idfuncionarioregistrofactura: number | null = null;
-    funcionarioregistrofactura: string | null = null;
-    idfuncionarioregistrocobro: number | null = null;
-    funcionarioregistrocobro: string | null = null;
-    detalles: DetalleVenta [] = [];
+    idusuarioregistrofactura: number | null = null;
+    usuarioregistrofactura: string | null = null;
+    idusuarioregistrocobro: number | null = null;
+    usuariorioregistrocobro: string | null = null;
+    detalles: DetalleVentaDTO [] = [];
+    eliminado: boolean | null = false;
 }

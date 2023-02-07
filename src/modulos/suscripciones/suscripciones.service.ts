@@ -15,8 +15,7 @@ export class SuscripcionesService {
         private suscripcionRepo: Repository<Suscripcion>,
         @InjectRepository(SuscripcionView)
         private suscripcionViewRepo: Repository<SuscripcionView>,
-        private datasource: DataSource,
-        private dbsrv: DatabaseService
+        private datasource: DataSource
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<SuscripcionView> {

@@ -1,7 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { Rol } from '@database/entity/rol.entity';
 import { RolView } from '@database/view/rol.view';
 import { RolDTO } from '@dto/rol.dto';

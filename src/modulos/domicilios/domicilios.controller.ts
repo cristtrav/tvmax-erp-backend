@@ -7,7 +7,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DomiciliosService } from './domicilios.service';
 import { DomicilioView } from '@database/view/domicilio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 
 @Controller('domicilios')
 @UseGuards(AuthGuard)

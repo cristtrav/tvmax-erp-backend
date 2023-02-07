@@ -1,6 +1,6 @@
 import { DatabaseService } from '@database/database.service';
 import { DetalleVentaCobro } from '@dto/detalle-venta-cobro.dto';
-import { DetalleVenta } from '@dto/detalle-venta-dto';
+import { DetalleVentaDTO } from '@dto/detalle-venta-dto';
 import { Injectable } from '@nestjs/common';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { ISearchField } from '@util/isearchfield.interface';
@@ -13,7 +13,7 @@ export class DetallesVentasService {
         private dbsrv: DatabaseService
     ) { }
 
-    async findByIdVenta(idventa: number): Promise<DetalleVenta[]> {
+    async findByIdVenta(idventa: number): Promise<DetalleVentaDTO[]> {
         const eliminado: boolean = false;
         const wp: WhereParam = new WhereParam(
             { idventa, eliminado },

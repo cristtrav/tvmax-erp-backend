@@ -47,6 +47,10 @@ import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 import { ResumenesSuscripcionesModule } from './modulos/estadisticas/resumenes-suscripciones/resumenes-suscripciones.module';
 import { Permiso } from '@database/entity/permiso.entity';
+import { Venta } from '@database/entity/venta.entity';
+import { DetalleVenta } from '@database/entity/detalle-venta.entity';
+import { VentaView } from '@database/view/venta.view';
+import { DetalleVentaView } from '@database/view/detalle-venta.view';
 
 @Module({
   imports: [
@@ -94,7 +98,8 @@ import { Permiso } from '@database/entity/permiso.entity';
         Cliente, ClienteView,
         Domicilio, DomicilioView,
         Suscripcion, SuscripcionView,
-        Permiso
+        Permiso,
+        Venta, DetalleVenta, VentaView, DetalleVentaView
       ]
     })
   ],

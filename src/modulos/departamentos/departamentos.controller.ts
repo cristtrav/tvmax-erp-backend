@@ -6,7 +6,7 @@ import { DepartamentosService } from './departamentos.service';
 import { JwtService } from '@nestjs/jwt';
 import { Departamento } from '@database/entity/departamento.entity';
 import { DepartamentoDTO } from '@dto/departamento.dto';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from 'src/global/filters/http-exception.filter';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 

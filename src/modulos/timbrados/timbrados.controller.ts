@@ -7,7 +7,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { TimbradosService } from './timbrados.service';
 import { TimbradoView } from '@database/view/timbrado.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 
 @Controller('timbrados')
 @UseGuards(AuthGuard)

@@ -8,7 +8,7 @@ import { Request, Body, Controller, Delete, Get, HttpException, HttpStatus, Para
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { CuotasService } from './cuotas.service';
 import { CuotaView } from '@database/view/cuota.view';
-import { DTOEntityUtis } from '@database/dto-entity-utils';
+import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 
 @Controller('cuotas')
