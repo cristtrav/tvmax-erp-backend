@@ -95,7 +95,8 @@ export class Permissions {
         EDITAR: 262,
         ELIMINAR: 263,
         ANULAR: 264,
-        REVERTIRANUL: 265
+        REVERTIRANUL: 265,
+        CONSULTARCOBROS: 266
     }
 
     static readonly PERMISOS = {

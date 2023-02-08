@@ -1,27 +1,13 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { DatabaseService } from '@database/database.service';
-import { VentaDTO } from '@dto/venta.dto';
-import { Client } from 'pg';
-import { DetalleVentaDTO } from '@dto/detalle-venta-dto';
-import { WhereParam } from '@util/whereparam';
-import { ISearchField } from '@util/isearchfield.interface';
-import { IRangeQuery } from '@util/irangequery.interface';
-import { AuditQueryHelper } from '@util/audit-query-helper';
-import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Venta } from '@database/entity/venta.entity';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { DetalleVenta } from '@database/entity/detalle-venta.entity';
 import { VentaView } from '@database/view/venta.view';
-import { DetalleVentaView } from '@database/view/detalle-venta.view';
-import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 import { Timbrado } from '@database/entity/timbrado.entity';
-import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { Cuota } from '@database/entity/cuota.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
-import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { Cobro } from '@database/entity/cobro.entity';
-import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { Cliente } from '@database/entity/cliente.entity';
 
 @Injectable()

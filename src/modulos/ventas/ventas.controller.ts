@@ -12,6 +12,7 @@ import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { VentaView } from '@database/view/venta.view';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
+import { DetalleVentaView } from '@database/view/detalle-venta.view';
 
 @Controller('ventas')
 @UseGuards(AuthGuard)
@@ -115,10 +116,11 @@ export class VentasController {
 
     @Get(':id/detalles')
     @RequirePermission(Permissions.VENTAS.CONSULTAR)
-    async getDetallesVenta(
+    async getDetallesByIdventa(
         @Param('id') id: number
-    ): Promise<ServerResponseList<DetalleVentaDTO>>{
-        try{
+    ): Promise<DetalleVentaView[]>{
+        return this.detallesVentaSrv.findByIdVenta(id);
+        /*try{
             const rows: DetalleVentaDTO[] = await this.detallesVentaSrv.findByIdVenta(id);
             const count: number = await this.detallesVentaSrv.countByIdVenta(id);
             return new ServerResponseList(rows, count)
@@ -132,7 +134,15 @@ export class VentasController {
                 },
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
-        }
+        }*/
+    }
+
+    @Get(':id/detalles/total')
+    @RequirePermission(Permissions.VENTAS.CONSULTAR)
+    countByIdventa(
+        @Param('id') idventa: number
+    ): Promise<number>{
+        return this.detallesVentaSrv.countByIdVenta(idventa);
     }
 
     @Delete(':id')

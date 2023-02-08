@@ -19,6 +19,7 @@ import { VentaView } from '@database/view/venta.view';
 import { Timbrado } from '@database/entity/timbrado.entity';
 import { Cuota } from '@database/entity/cuota.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
+import { DetalleVentaView } from '@database/view/detalle-venta.view';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
       Permiso,
       Venta,
       VentaView,
-      DetalleVenta,
+      DetalleVenta, DetalleVentaView,
       Timbrado,
       Cuota, CobroCuotasView       
     ])

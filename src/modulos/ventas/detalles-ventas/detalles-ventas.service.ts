@@ -1,220 +1,33 @@
 import { DatabaseService } from '@database/database.service';
-import { DetalleVentaCobro } from '@dto/detalle-venta-cobro.dto';
-import { DetalleVentaDTO } from '@dto/detalle-venta-dto';
+import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { Injectable } from '@nestjs/common';
-import { IRangeQuery } from '@util/irangequery.interface';
-import { ISearchField } from '@util/isearchfield.interface';
-import { WhereParam } from '@util/whereparam';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class DetallesVentasService {
 
     constructor(
-        private dbsrv: DatabaseService
+        @InjectRepository(DetalleVentaView)
+        private detalleVentaViewRepo: Repository<DetalleVentaView>
     ) { }
 
-    async findByIdVenta(idventa: number): Promise<DetalleVentaDTO[]> {
-        const eliminado: boolean = false;
-        const wp: WhereParam = new WhereParam(
-            { idventa, eliminado },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT * FROM public.vw_detalles_venta ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<DetalleVentaView> {
+        const { eliminado, idventa } = queries;
+        const alias = 'detalle';
+        let query = this.detalleVentaViewRepo.createQueryBuilder(alias);
+        if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (idventa)
+            if (Array.isArray(idventa)) query = query.andWhere(`${alias}.idventa IN (:...idventa)`, { idventa });
+            else query = query.andWhere(`${alias}.idventa = :idventa`, {idventa});
+        return query;
+    }
+
+    async findByIdVenta(idventa: number): Promise<DetalleVentaView[]> {
+        return this.getSelectQuery({idventa, eliminado: false}).getMany();
     }
 
     async countByIdVenta(idventa: number): Promise<number> {
-        const eliminado: boolean = false;
-        const wp: WhereParam = new WhereParam(
-            { idventa, eliminado },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.vw_detalles_venta ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
-    }
-
-    async findAllDetallesCobros(params): Promise<DetalleVentaCobro[]> {        
-        const {
-            eliminado,
-            pagado,
-            anulado,
-            fechainiciofactura,
-            fechafinfactura,
-            fechainiciocobro,
-            fechafincobro,
-            idfuncionarioregistrocobro,
-            idcobradorcomision,
-            idgrupo,
-            idservicio,
-            search,
-            sort,
-            offset,
-            limit
-        } = params;
-        const range: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fecha_factura',
-                    startValue: fechainiciofactura,
-                    endValue: fechafinfactura
-                },
-                {
-                    fieldName: 'fecha_cobro',
-                    startValue: fechainiciocobro,
-                    endValue: fechafincobro
-                }
-            ]
-
-        }
-        const searches: ISearchField[] = [
-            {
-                fieldName: 'cliente',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'facturacobro',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'ci',
-                exactMatch: true,
-                fieldValue: search
-            },
-            {
-                fieldName: 'servicio',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'grupo',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'cobrador',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'usuario',
-                exactMatch: false,
-                fieldValue: search
-            }
-        ]
-        const wp: WhereParam = new WhereParam(
-            {
-                eliminado,
-                pagado,
-                anulado,
-                idusuario: idfuncionarioregistrocobro,
-                idcobrador: idcobradorcomision,
-            },
-            {
-                idgrupo,
-                idservicio
-            },
-            range,
-            searches,
-            { sort, offset, limit }
-        );
-        const query: string = `SELECT * FROM public.vw_detalles_venta_cobros ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
-    }
-
-    async countDetallesCobros(params): Promise<number> {
-        const {
-            eliminado,
-            pagado,
-            anulado,
-            fechainiciofactura,
-            fechafinfactura,
-            fechainiciocobro,
-            fechafincobro,
-            idfuncionarioregistrocobro,
-            idcobradorcomision,
-            search,
-            idgrupo,
-            idservicio
-        } = params;
-        const range: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fecha_factura',
-                    startValue: fechainiciofactura,
-                    endValue: fechafinfactura
-                },
-                {
-                    fieldName: 'fecha_cobro',
-                    startValue: fechainiciocobro,
-                    endValue: fechafincobro
-                }
-            ]
-
-        }
-        const searches: ISearchField[] = [
-            {
-                fieldName: 'cliente',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'facturacobro',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'ci',
-                exactMatch: true,
-                fieldValue: search
-            },
-            {
-                fieldName: 'servicio',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'grupo',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'cobrador',
-                exactMatch: false,
-                fieldValue: search
-            },
-            {
-                fieldName: 'usuario',
-                exactMatch: false,
-                fieldValue: search
-            }
-        ]
-        const wp: WhereParam = new WhereParam(
-            {
-                eliminado,
-                pagado,
-                anulado,
-                idusuario: idfuncionarioregistrocobro,
-                idcobrador: idcobradorcomision,
-            },
-            {
-                idgrupo,
-                idservicio
-            },
-            range,
-            searches,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.vw_detalles_venta_cobros ${wp.whereStr} ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+        return this.getSelectQuery({idventa, eliminado: false}).getCount();
     }
 }

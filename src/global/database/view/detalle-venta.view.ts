@@ -1,6 +1,6 @@
 import { ViewColumn, ViewEntity } from "typeorm";
 
-@ViewEntity({name: 'vw_detalles_ventas', expression: 'SELECT * FROM public.vw_detalles_ventas'})
+@ViewEntity({name: 'vw_detalles_venta', expression: 'SELECT * FROM public.vw_detalles_ventas'})
 export class DetalleVentaView{
 
     @ViewColumn()
@@ -13,7 +13,7 @@ export class DetalleVentaView{
     monto: number;
 
     @ViewColumn()
-    cantiad: number;
+    cantidad: number;
 
     @ViewColumn()
     subtotal: number;
