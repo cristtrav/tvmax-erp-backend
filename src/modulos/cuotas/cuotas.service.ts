@@ -8,6 +8,7 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { CuotaView } from '@database/view/cuota.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
+import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 
 @Injectable()
 export class CuotasService {
@@ -17,8 +18,9 @@ export class CuotasService {
         private cuotaRepo: Repository<Cuota>,
         @InjectRepository(CuotaView)
         private cuotaViewRepo: Repository<CuotaView>,
-        private datasource: DataSource,
-        private dbsrv: DatabaseService
+        @InjectRepository(CobroCuotasView)
+        private cobroCuotaViewRepo: Repository<CobroCuotasView>,
+        private datasource: DataSource
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<CuotaView> {
@@ -93,18 +95,8 @@ export class CuotasService {
             await manager.save(this.getEventoAuditoria(idusuario, 'E', oldCuota, cuota));
         })
     }
-    //FALTA MIGRAR A TYPEORM
-    async findCobro(idcuota: number): Promise<CobroCuota | null> {
-        const wp: WhereParam = new WhereParam(
-            { idcuota },
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT * FROM public.vw_cobro_cuotas ${wp.whereStr}`;
-        const rows: CobroCuota[] = (await this.dbsrv.execute(query, wp.whereParams)).rows;
-        if (rows.length > 0) return rows[0];
-        return null;
+
+    async findCobro(idcuota: number): Promise<CobroCuotasView> {
+        return this.cobroCuotaViewRepo.findOneByOrFail({ idcuota });
     }
 }

@@ -8,12 +8,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cuota } from '@database/entity/cuota.entity';
 import { CuotaView } from '@database/view/cuota.view';
 import { Permiso } from '@database/entity/permiso.entity';
+import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
-    TypeOrmModule.forFeature([Cuota, CuotaView, Permiso])
+    TypeOrmModule.forFeature([Cuota, CuotaView, CobroCuotasView, Permiso])
   ],
   providers: [CuotasService, DatabaseService],
   controllers: [CuotasController]

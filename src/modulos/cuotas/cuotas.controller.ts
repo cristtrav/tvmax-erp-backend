@@ -10,6 +10,7 @@ import { CuotasService } from './cuotas.service';
 import { CuotaView } from '@database/view/cuota.view';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
+import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 
 @Controller('cuotas')
 @UseGuards(AuthGuard)
@@ -49,30 +50,8 @@ export class CuotasController {
     @RequirePermission(Permissions.CUOTAS.CONSULTAR)
     async findCobroCuota(
         @Param('id') idcuota: number
-    ): Promise<CobroCuota>{
-        let cobroCuota: CobroCuota | null = null;
-        try{
-            cobroCuota = await this.cuotaSrv.findCobro(idcuota);
-            
-        }catch(e){
-            console.log('Error al consultar cobro de cuota');
-            console.log(e);
-            throw new HttpException(
-                {
-                    request: 'get',
-                    description: e.detail ?? e.error ?? e.message
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
-        if(cobroCuota !== null) return cobroCuota;
-        throw new HttpException(
-            {
-                request: 'get',
-                description: `No se encontró cobro para la cuota '${idcuota}'.`
-            },
-            HttpStatus.NOT_FOUND
-        );
+    ): Promise<CobroCuotasView>{
+        return this.cuotaSrv.findCobro(idcuota);
     }
 
     @Post()

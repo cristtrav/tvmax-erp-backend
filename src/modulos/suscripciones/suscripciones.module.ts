@@ -14,6 +14,7 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 import { Permiso } from '@database/entity/permiso.entity';
+import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Permiso } from '@database/entity/permiso.entity';
       ServicioView,
       Cuota,
       CuotaView,
+      CobroCuotasView,
       Suscripcion,
       SuscripcionView,
       Permiso

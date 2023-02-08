@@ -7,7 +7,7 @@ export class CobroCuotasView{
     idcuota: number;
 
     @ViewColumn()
-    fecha_cobro: Date;
+    fechacobro: Date;
 
     @ViewColumn()
     facturacobro: string;
