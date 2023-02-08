@@ -172,12 +172,9 @@ export class DTOEntityUtis {
         venta.anulado = ventaDto.anulado;
         venta.pagado = ventaDto.pagado;
         venta.eliminado = ventaDto.eliminado;
-        venta.fechaCobro = ventaDto.fechacobro;
         venta.fechaFactura = ventaDto.fechafactura;
         venta.idcliente = ventaDto.idcliente;
-        venta.idcobradorComision = ventaDto.idcobradorcomision;
         venta.idtimbrado = ventaDto.idtimbrado;
-        venta.idusuarioRegistroCobro = ventaDto.idusuarioregistrocobro;
         venta.idusuarioRegistroFactura = ventaDto.idusuarioregistrofactura;
         venta.nroFactura = ventaDto.nrofactura;
         venta.total = ventaDto.total;
@@ -186,11 +183,6 @@ export class DTOEntityUtis {
         venta.totalGravadoIva5 = ventaDto.totalgravadoiva5;
         venta.totalIva10 = ventaDto.totaliva10;
         venta.totalIva5 = ventaDto.totaliva5;
-        /*if(ventaDto.detalles) ventaDto.detalles.forEach(detalleDto => {
-            const detalles: DetalleVenta[] = [];
-            detalles.push(this.detalleVentaDtoToEntity(detalleDto))
-            venta.detalles = detalles;
-        })*/
         return venta;
     }
 

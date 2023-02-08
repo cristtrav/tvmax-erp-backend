@@ -19,6 +19,10 @@ import { Timbrado } from '@database/entity/timbrado.entity';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { Cuota } from '@database/entity/cuota.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
+import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
+import { Cobro } from '@database/entity/cobro.entity';
+import { Suscripcion } from '@database/entity/suscripcion.entity';
+import { Cliente } from '@database/entity/cliente.entity';
 
 @Injectable()
 export class VentasService {
@@ -30,14 +34,13 @@ export class VentasService {
         private ventaViewRepo: Repository<VentaView>,
         @InjectRepository(DetalleVenta)
         private detalleVentaRepo: Repository<DetalleVenta>,
-        @InjectRepository(DetalleVentaView)
-        private detalleVentaViewRepo: Repository<DetalleVentaView>,
         @InjectRepository(Timbrado)
         private timbradoRepo: Repository<Timbrado>,
         @InjectRepository(Cuota)
         private cuotaRepo: Repository<Cuota>,
+        @InjectRepository(Cliente)
+        private clienteRepo: Repository<Cliente>,
         private datasource: DataSource,
-        private dbsrv: DatabaseService,
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<VentaView> {
@@ -100,12 +103,15 @@ export class VentasService {
         }, HttpStatus.BAD_REQUEST);
 
         venta.idusuarioRegistroFactura = idusuario;
-        venta.idusuarioRegistroCobro = idusuario;
 
         let idventa: number = -1;
         await this.datasource.transaction(async manager => {
             idventa = (await manager.save(venta)).id;
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'R', null, venta));
+
+            const cobro = await this.createCobro(idventa, venta.idcliente, idusuario);
+            await manager.save(cobro);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'R', null, cobro));
 
             const timbrado = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado })
             const oldTimbrado = { ...timbrado };
@@ -137,30 +143,71 @@ export class VentasService {
         return this.getSelectQuery(queries).getCount();
     }
 
-    async anular(idventa: number, anulado, idusuario: number) {
-        const venta = await this.ventaRepo.findOneByOrFail({ id: idventa });
+    async anular(idventa: number, anulado: boolean, idusuario: number) {
+        const venta = await this.ventaRepo.findOneOrFail({ where: { id: idventa }, relations: { detalles: true } });
         const oldVenta = { ...venta };
         venta.anulado = anulado;
 
         await this.datasource.transaction(async manager => {
             await manager.save(venta);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'M', oldVenta, venta));
+
+            for (let detalle of venta.detalles.filter(deta => deta.idcuota != null)) {
+                const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
+                const oldCuota = { ...cuota }
+                cuota.pagado = !venta.anulado && venta.pagado ? true : await this.pagoCuotaExists(detalle.idcuota, idventa);
+                if (cuota.pagado != oldCuota.pagado) {
+                    await manager.save(cuota);
+                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota))
+                };
+            }
         });
     }
 
     async delete(id: number, idusuario: number) {
-        const venta = await this.ventaRepo.findOneByOrFail({ id });
+        const venta = await this.ventaRepo.findOneOrFail({ where: { id }, relations: { detalles: true } })
         const oldVenta = { ...venta };
         venta.eliminado = true;
 
         await this.datasource.transaction(async manager => {
             await manager.save(venta);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'E', oldVenta, venta));
+            for (let detalle of venta.detalles.filter(deta => deta.idcuota != null)) {
+                const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
+                const oldCuota = { ...cuota }
+                cuota.pagado = await this.pagoCuotaExists(detalle.idcuota, id);
+                if (cuota.pagado != oldCuota.pagado) {
+                    await manager.save(cuota);
+                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota))
+                };
+            }
         });
     }
 
     async findById(id: number): Promise<VentaView> {
-        return this.ventaViewRepo.findOneByOrFail({id});
+        return this.ventaViewRepo.findOneByOrFail({ id });
+    }
+
+    private async createCobro(idventa: number, idcliente: number, idusuario: number): Promise<Cobro> {
+        const cobro = new Cobro();
+        cobro.cobradoPor = idusuario;
+        cobro.fecha = new Date();
+        cobro.idventa = idventa;
+        cobro.comisionPara = (await this.clienteRepo.findOneByOrFail({ id: idcliente })).idcobrador;
+        return cobro;
+    }
+
+    private async pagoCuotaExists(idcuota: number, idventaIgnorar: number): Promise<boolean> {
+        const detalleQuery = this.detalleVentaRepo.createQueryBuilder('detalle')
+            .innerJoin(`detalle.cuota`, 'cuota', 'detalle.eliminado = :dveliminado', { dveliminado: false })
+            .innerJoin(
+                `detalle.venta`,
+                'venta',
+                'venta.eliminado = :veliminada AND venta.anulado = :vanulada AND venta.pagado = :vpagado AND venta.id != :idventaIgnorar',
+                { veliminada: false, vanulada: false, vpagado: true, idventaIgnorar }
+            )
+            .where('detalle.idcuota = :idcuota', { idcuota });
+        return (await detalleQuery.getCount()) != 0;
     }
 
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { DetalleVenta } from "./detalle-venta.entity";
 
 @Entity()
@@ -25,17 +25,8 @@ export class Venta {
     @Column({ nullable: false })
     idtimbrado: number;
 
-    @Column({ name: 'fecha_cobro', type: 'date' })
-    fechaCobro: Date;
-
-    @Column({ name: 'idcobrador_comision', nullable: false })
-    idcobradorComision: number;
-
     @Column({ name: 'idusuario_registro_factura', nullable: false })
     idusuarioRegistroFactura: number;
-
-    @Column({ name: 'idusuario_registro_cobro', nullable: false })
-    idusuarioRegistroCobro: number;
 
     @Column({
         name: 'total_exento_iva',
@@ -99,6 +90,6 @@ export class Venta {
     @Column({ default: false, nullable: false })
     eliminado: boolean;
 
-    @OneToMany(() => DetalleVenta, (detalleVenta) => { detalleVenta.venta })
+    @OneToMany(() => DetalleVenta, (detalle) => detalle.venta)
     detalles: DetalleVenta[];
 }

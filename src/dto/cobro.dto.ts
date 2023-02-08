@@ -1,4 +1,4 @@
-export class Cobro{
+export class CobroDTO{
     id: number | null = null;
     idventa: number | null = null;
     fecha: string | null = null;

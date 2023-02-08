@@ -51,6 +51,8 @@ import { Venta } from '@database/entity/venta.entity';
 import { DetalleVenta } from '@database/entity/detalle-venta.entity';
 import { VentaView } from '@database/view/venta.view';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
+import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
+import { Cobro } from '@database/entity/cobro.entity';
 
 @Module({
   imports: [
@@ -99,7 +101,8 @@ import { DetalleVentaView } from '@database/view/detalle-venta.view';
         Domicilio, DomicilioView,
         Suscripcion, SuscripcionView,
         Permiso,
-        Venta, DetalleVenta, VentaView, DetalleVentaView
+        Venta, DetalleVenta, VentaView, DetalleVentaView,
+        Cobro, CobroCuotasView
       ]
     })
   ],

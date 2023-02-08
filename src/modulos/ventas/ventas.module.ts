@@ -16,9 +16,9 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { DetalleVenta } from '@database/entity/detalle-venta.entity';
 import { VentaView } from '@database/view/venta.view';
-import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { Timbrado } from '@database/entity/timbrado.entity';
 import { Cuota } from '@database/entity/cuota.entity';
+import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 
 @Module({
   imports: [
@@ -31,9 +31,8 @@ import { Cuota } from '@database/entity/cuota.entity';
       Venta,
       VentaView,
       DetalleVenta,
-      DetalleVentaView,
       Timbrado,
-      Cuota
+      Cuota, CobroCuotasView       
     ])
   ],
   providers: [VentasService, DatabaseService, ClientesService, ResumenVentasService, DetallesVentasService],
