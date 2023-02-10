@@ -55,6 +55,8 @@ import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { Cobro } from '@database/entity/cobro.entity';
 import { CobroDetalleVentaView } from '@database/view/cobro-detalle-venta.view';
 import { CobrosModule } from './modulos/cobros/cobros.module';
+import { Funcionalidad } from '@database/entity/funcionalidad.entity';
+import { Modulo } from '@database/entity/modulo.entity';
 
 @Module({
   imports: [
@@ -102,7 +104,7 @@ import { CobrosModule } from './modulos/cobros/cobros.module';
         Cliente, ClienteView,
         Domicilio, DomicilioView,
         Suscripcion, SuscripcionView,
-        Permiso,
+        Permiso, Funcionalidad, Modulo,
         Venta, DetalleVenta, VentaView, DetalleVentaView,
         Cobro, CobroCuotasView, CobroDetalleVentaView
       ]

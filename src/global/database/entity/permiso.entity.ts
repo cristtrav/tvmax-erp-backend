@@ -1,7 +1,7 @@
-import { Entity, PrimaryColumn } from "typeorm";
+import { Entity, ManyToOne, PrimaryColumn } from "typeorm";
 
 @Entity()
-export class Permiso{
+export class Permiso {
 
     @PrimaryColumn()
     idfuncionalidad: number;

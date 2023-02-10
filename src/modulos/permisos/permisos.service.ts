@@ -1,59 +1,98 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@database/database.service';
-import { Modulo } from '@dto/modulo.dto';
-import { Funcionalidad } from '@dto/funcionalidad.dto';
-import { Client } from 'pg';
-import { WhereParam } from '@util/whereparam';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Modulo } from '@database/entity/modulo.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Funcionalidad } from '@database/entity/funcionalidad.entity';
+import { Usuario } from '@database/entity/usuario.entity';
+import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 
 @Injectable()
 export class PermisosService {
     constructor(
-        private dbsrv: DatabaseService
+        @InjectRepository(Modulo)
+        private moduloRepo: Repository<Modulo>,
+        @InjectRepository(Usuario)
+        private usuarioRepo: Repository<Usuario>,
+        @InjectRepository(Funcionalidad)
+        private funcionalidadRepo: Repository<Funcionalidad>,
+        private datasource: DataSource
     ) { }
 
-    async findAllModulos(reqQuery): Promise<Modulo[]> {
-        const { eliminado, sort, offset, limit } = reqQuery;
-        const iwp: WhereParam = new WhereParam(
-            { eliminado },
-            null,
-            null,
-            null,
-            { sort, offset, limit }
-        );
-        const queryModulos: string = `SELECT * FROM public.modulo ${iwp.whereStr} ${iwp.sortOffsetLimitStr}`;
-        const lstModulos: Modulo[] = (await this.dbsrv.execute(queryModulos, iwp.whereParams)).rows;
-        for (let m of lstModulos) {
-            const queryFunc: string = `SELECT * FROM public.funcionalidad WHERE idmodulo = $1 AND eliminado = false ORDER BY descripcion ASC`;
-            const lstFunc: Funcionalidad[] = (await this.dbsrv.execute(queryFunc, [m.id])).rows;
-            m.funcionalidades = lstFunc;
+    private getSelectQueryModulos(queries: { [name: string]: any }): SelectQueryBuilder<Modulo> {
+        const { eliminado, sort, offset, limit } = queries;
+        const alias = 'modulo';
+        let query = this.moduloRepo.createQueryBuilder(alias);
+        if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (limit) query = query.take(limit);
+        if (offset) query = query.skip(offset);
+        if (sort) {
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
-        return lstModulos;
+        query = query.leftJoinAndSelect(`${alias}.funcionalidades`, 'funcionalidades', 'funcionalidades.eliminado = :eliminado', { eliminado: 'false' });
+        return query;
     }
 
-    async findByIdUsuario(idusuario: number, reqQuery): Promise<Funcionalidad[]> {
-        const { eliminado, sort, offset, limit } = reqQuery;
-        const sof: string = new WhereParam(null, null, null, null, {sort, offset, limit}).sortOffsetLimitStr;
-        const queryPermisos: string = `SELECT * FROM public.funcionalidad 
-        WHERE id IN (SELECT idfuncionalidad FROM public.permiso WHERE idfuncionario = $1) ${sof}`;
-        return (await this.dbsrv.execute(queryPermisos, [idusuario])).rows;
+    findAllModulos(queries: { [name: string]: any }): Promise<Modulo[]> {
+        return this.getSelectQueryModulos(queries).getMany();
     }
 
-    async editPermisosUsuario(idusuario: number, idfuncionalidades: number[]): Promise<any> {
-        const dbcli: Client = await this.dbsrv.getDBClient();
-        try{
-            dbcli.query('BEGIN');
-            dbcli.query('DELETE FROM public.permiso WHERE idfuncionario = $1', [idusuario]);
-            for(let idf of idfuncionalidades){
-                dbcli.query(`INSERT INTO public.permiso(idfuncionario, idfuncionalidad) VALUES($1, $2)`, [idusuario, idf]);
-            }
-            dbcli.query('COMMIT');
-        }catch(e){
-            dbcli.query('ROLLBACK');
-            console.log('Error al editar permisos de usuario');
-            console.log(e);
-            throw e;
-        }finally{
-            dbcli.release();
+    countModulos(queries: { [name: string]: any }): Promise<number> {
+        return this.getSelectQueryModulos(queries).getCount();
+    }
+
+    async findPermisosByIdUsuario(idusuario: number, queries: { [name: string]: any }): Promise<Funcionalidad[]> {
+        const { eliminado, sort, offset, limit } = queries;
+        const alias = 'funcionalidad';
+        let query = this.funcionalidadRepo.createQueryBuilder(alias);
+        if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (offset) query = query.skip(offset);
+        if (limit) query = query.take(limit);
+        if (sort) {
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+        }
+        query = query.leftJoinAndSelect(`${alias}.usuarios`, 'usuarios')
+        query = query.andWhere(`usuarios.id = :idusuario`, { idusuario });
+        return query.getMany();
+    }
+
+    async editPermisosUsuario(idusuario: number, idusuarioModificar: number, idfuncionalidades: number[]): Promise<any> {
+        const usuario = await this.usuarioRepo.createQueryBuilder('usuario')
+            .where(`usuario.id = :idusuario`, { idusuario: idusuarioModificar })
+            .leftJoinAndSelect(`usuario.permisos`, 'permisos')
+            .leftJoinAndSelect(`permisos.modulo`, 'modulo')
+            .getOneOrFail();
+        const oldPermisos: IDatosEventoPermiso = this.getPermisosUsuarioEvento(usuario);
+
+        usuario.permisos = await this.funcionalidadRepo
+            .createQueryBuilder('funcionalidad')
+            .where(`funcionalidad.id IN (:...idfuncionalidades)`, { idfuncionalidades })
+            .leftJoinAndSelect(`funcionalidad.modulo`, 'modulo')
+            .getMany();
+        const newPermisos = this.getPermisosUsuarioEvento(usuario);
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(usuario);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaUsuario(idusuario, 'M', oldPermisos, newPermisos))
+        });
+    }
+
+    private getPermisosUsuarioEvento(usuario: Usuario): IDatosEventoPermiso {
+        return {
+            idusuario: usuario.id,
+            nombres: usuario.nombres,
+            apellidos: usuario.apellidos,
+            permisos: usuario.permisos.map(permiso => `${permiso.id}-${permiso.nombre}(${permiso.modulo.id}-${permiso.modulo.descripcion})`).join(', ')
         }
     }
+}
+
+interface IDatosEventoPermiso {
+    idusuario: number;
+    nombres: string;
+    apellidos: string;
+    permisos: string;
 }

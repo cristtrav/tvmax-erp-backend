@@ -1,4 +1,3 @@
-import { DatabaseService } from '@database/database.service';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

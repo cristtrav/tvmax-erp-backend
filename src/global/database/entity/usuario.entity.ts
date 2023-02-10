@@ -1,38 +1,55 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
+import { Funcionalidad } from "./funcionalidad.entity";
 
 @Entity()
-export class Usuario{
+export class Usuario {
 
     @PrimaryColumn()
     id: number;
 
-    @Column({length: 80, nullable: false})
+    @Column({ length: 80, nullable: false })
     nombres: string;
 
-    @Column({length: 80})
+    @Column({ length: 80 })
     apellidos: string;
 
-    @Column({length: 10})
+    @Column({ length: 10 })
     ci: string;
 
-    @Column({length: 120})
+    @Column({ length: 120 })
     password: string;
 
-    @Column({name: 'acceso_sistema', default: true, nullable: false})
+    @Column({ name: 'acceso_sistema', default: true, nullable: false })
     accesoSistema: boolean;
 
-    @Column({length: 120})
+    @Column({ length: 120 })
     email: string;
 
-    @Column({length: 20})
+    @Column({ length: 20 })
     telefono: string;
 
-    @Column({nullable: false})
+    @Column({ nullable: false })
     idrol: number;
 
-    @Column({default: false, nullable: false})
+    @Column({ default: false, nullable: false })
     eliminado: boolean;
 
-    @Column({name: 'solo_lectura', update: false, default: false})
+    @Column({ name: 'solo_lectura', update: false, default: false })
     soloLectura: boolean;
+
+    @ManyToMany(() => Funcionalidad, (funcionalidad) => funcionalidad.usuarios, {
+        cascade: ['update']
+    })
+    @JoinTable({
+        name: 'permiso',
+        joinColumn: {
+            name: 'idusuario',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'idfuncionalidad',
+            referencedColumnName: 'id'
+        }
+    })
+    permisos: Funcionalidad[];
 }

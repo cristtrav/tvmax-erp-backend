@@ -82,4 +82,10 @@ export class TablasAuditoriaList{
         nombre: 'cobros',
         descripcion: 'Cobros'
     }
+
+    public static PERMISOS: TablaAuditoria = {
+        id: 17,
+        nombre: 'permisos',
+        descripcion: 'permisos'
+    }
 }

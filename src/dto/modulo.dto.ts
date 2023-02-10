@@ -1,7 +1,7 @@
-import { Funcionalidad } from "./funcionalidad.dto"
+import { FuncionalidadDTO } from "./funcionalidad.dto"
 
-export class Modulo{
+export class ModuloDTO{
     id: number | null = null;
     descripcion: string | null = null;
-    funcionalidades: Funcionalidad[] = [];
+    funcionalidades: FuncionalidadDTO[] = [];
 }

@@ -5,15 +5,20 @@ import { JwtModule } from '@nestjs/jwt';
 import { DatabaseService } from '@database/database.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Permiso } from '@database/entity/permiso.entity';
+import { Modulo } from '@database/entity/modulo.entity';
+import { Funcionalidad } from '@database/entity/funcionalidad.entity';
+import { Usuario } from '@database/entity/usuario.entity';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Permiso])
+    TypeOrmModule.forFeature([Permiso, Modulo, Funcionalidad, Usuario])
   ],
   providers: [
     PermisosService,
-    DatabaseService
+    DatabaseService,
+    JwtUtilsService
   ],
   controllers: [PermisosController]
 })
