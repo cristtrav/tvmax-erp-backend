@@ -57,6 +57,7 @@ import { CobroDetalleVentaView } from '@database/view/cobro-detalle-venta.view';
 import { CobrosModule } from './modulos/cobros/cobros.module';
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 import { Modulo } from '@database/entity/modulo.entity';
+import { ResumenesVentasModule } from './modulos/estadisticas/resumenes-ventas/resumenes-ventas.module';
 
 @Module({
   imports: [
@@ -109,7 +110,8 @@ import { Modulo } from '@database/entity/modulo.entity';
         Cobro, CobroCuotasView, CobroDetalleVentaView
       ]
     }),
-    CobrosModule
+    CobrosModule,
+    ResumenesVentasModule
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService],

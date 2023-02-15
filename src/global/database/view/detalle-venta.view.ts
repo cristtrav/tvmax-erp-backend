@@ -1,4 +1,5 @@
-import { ViewColumn, ViewEntity } from "typeorm";
+import { JoinColumn, ManyToOne, ViewColumn, ViewEntity } from "typeorm";
+import { VentaView } from "./venta.view";
 
 @ViewEntity({name: 'vw_detalles_venta', expression: 'SELECT * FROM public.vw_detalles_ventas'})
 export class DetalleVentaView{

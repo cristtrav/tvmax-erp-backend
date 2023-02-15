@@ -1,4 +1,5 @@
-import { ViewColumn, ViewEntity } from "typeorm";
+import { OneToMany, ViewColumn, ViewEntity } from "typeorm";
+import { DetalleVentaView } from "./detalle-venta.view";
 
 @ViewEntity({name: 'vw_ventas', expression: 'SELECT * FROM public.vw_ventas'})
 export class VentaView{
@@ -73,16 +74,16 @@ export class VentaView{
     fechacobro: Date;
 
     @ViewColumn()
-    idfuncionarioregistrofactura: number;
+    idusuarioregistrofactura: number;
 
     @ViewColumn()
-    funcionarioregistrofactura: string;
+    usuarioregistrofactura: string;
 
     @ViewColumn()
-    idfuncionarioregistrocobro: number;
+    idusuarioregistrocobro: number;
 
     @ViewColumn()
-    funcionarioregistrocobro: string;
+    usuarioregistrocobro: string;
 
     @ViewColumn()
     eliminado: boolean;
