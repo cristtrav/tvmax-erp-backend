@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DatabaseService } from '@database/database.service'
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Timbrado } from '@database/entity/timbrado.entity';
@@ -15,8 +14,7 @@ export class TimbradosService {
         private timbradoRepo: Repository<Timbrado>,
         @InjectRepository(TimbradoView)
         private timbradoViewRepo: Repository<TimbradoView>,
-        private datasource: DataSource,
-        private dbsrv: DatabaseService
+        private datasource: DataSource
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<TimbradoView> {

@@ -1,132 +1,84 @@
-import { DatabaseService } from '@database/database.service';
+import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
+import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
 import { EventoAuditoriaDTO } from '@dto/evento-auditoria.dto';
-import { TablaAuditoria } from '@dto/tabla-auditoria.dto';
+import { TablaAuditoriaDTO } from '@dto/tabla-auditoria.dto';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { IRangeQuery } from '@util/irangequery.interface';
 import { ISearchField } from '@util/isearchfield.interface';
 import { WhereParam } from '@util/whereparam';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class AuditoriaService {
 
     constructor(
-        private dbsrv: DatabaseService
-    ){}
+        @InjectRepository(EventoAuditoriaView)
+        private eventoAuditoriaViewRepo: Repository<EventoAuditoriaView>,
+        @InjectRepository(TablaAuditoria)
+        private tablaAuditoriaRepo: Repository<TablaAuditoria>
+    ) { }
 
-    async findAllEventos(params): Promise<EventoAuditoriaDTO[]>{
-        const {offset, limit, idusuario, idtabla, fechahoradesde, fechahorahasta, operacion, search } = params;
-        let sort = params.sort;
-        if(sort && sort.includes('fechahora')) sort = `${sort}::timestamp`;
-        const rangeQuery: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fechahora::timestamp',
-                    startValue: fechahoradesde,
-                    endValue: fechahorahasta
-                }
-            ]
+    private getSelectQueryEvento(queries: { [name: string]: any }): SelectQueryBuilder<EventoAuditoriaView> {
+        const alias = 'evento';
+        const { offset, limit, sort, idusuario, idtabla, fechahoradesde, fechahorahasta, operacion, search } = queries;
+        let query = this.eventoAuditoriaViewRepo.createQueryBuilder(alias);
+        if (idusuario)
+            if (Array.isArray(idusuario)) query = query.andWhere(`${alias}.idusuario IN (:...idusuario)`, { idusuario });
+            else query = query.andWhere(`${alias}.idusuario = :idusuario`, { idusuario });
+        if (idtabla)
+            if (Array.isArray(idtabla)) query = query.andWhere(`${alias}.idtabla IN (:...idtabla)`, { idtabla });
+            else query = query.andWhere(`${alias}.idtabla = :idtabla`, { idtabla });
+        if (operacion)
+            if (Array.isArray(operacion)) query = query.andWhere(`${alias}.operacion IN (:...operacion)`, { operacion })
+            else query = query.andWhere(`${alias}.operacion = :operacion`, { operacion });
+        if (fechahoradesde) query = query.andWhere(`${alias}.fechahora >= :fechahoradesde`, { fechahoradesde });
+        if (fechahorahasta) query = query.andWhere(`${alias}.fechahora <= :fechahorahasta`, { fechahorahasta });
+        if (search) {
+            query = query.andWhere(new Brackets(qb => {
+                qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: search });
+                qb = qb.orWhere(`LOWER(${alias}.nombresusuario) LIKE :nombressearch`, { nombressearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.apellidosusuario) LIKE :apellidossearch`, { apellidossearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.tabla) LIKE :tablasearch`, { tablasearch: `%${search.toLowerCase()}%` });
+            }));
         }
-        const searchQuery: ISearchField[] = [
-            {
-                exactMatch: true,
-                fieldName: 'id',
-                fieldValue: search
-            },
-            {
-                exactMatch: false,
-                fieldName: 'nombresusuario',
-                fieldValue: search
-            },
-            {
-                exactMatch: false,
-                fieldName: 'apellidosusuario',
-                fieldValue: search
-            },
-            {
-                exactMatch: false,
-                fieldName: 'tabla',
-                fieldValue: search
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            { idusuario, idtabla, operacion },
-            null,
-            rangeQuery,
-            searchQuery,
-            { sort, offset, limit }
-        );
-        const query: string = `SELECT * FROM public.vw_eventos_auditoria ${wp.whereStr} ${wp.sortOffsetLimitStr}`;        
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
-    }
-
-    async countEventos(params): Promise<number>{
-        const { idusuario, idtabla, fechahoradesde, fechahorahasta, operacion, search } = params;
-        const rangeQuery: IRangeQuery = {
-            joinOperator: 'AND',
-            range: [
-                {
-                    fieldName: 'fechahora::timestamp',
-                    startValue: fechahoradesde,
-                    endValue: fechahorahasta
-                }
-            ]
+        if (offset) query = query.skip(offset);
+        if (limit) query = query.take(limit);
+        if (sort) {
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
-        const searchQuery: ISearchField[] = [
-            {
-                exactMatch: true,
-                fieldName: 'id',
-                fieldValue: search
-            },
-            {
-                exactMatch: false,
-                fieldName: 'nombresusuario',
-                fieldValue: search
-            },
-            {
-                exactMatch: false,
-                fieldName: 'apellidosusuario',
-                fieldValue: search
-            },
-            {
-                exactMatch: false,
-                fieldName: 'tabla',
-                fieldValue: search
-            }
-        ];
-        const wp: WhereParam = new WhereParam(
-            {idusuario, idtabla, operacion},
-            null,
-            rangeQuery,
-            searchQuery,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.vw_eventos_auditoria ${wp.whereStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+        return query;
     }
 
-    async findAllTablas(params): Promise<TablaAuditoria[]> {
-        const {sort, offset, limit} = params;
-        const wp: WhereParam = new WhereParam(
-            null,
-            null,
-            null,
-            null,
-            {sort, offset, limit}
-        );
-        const query: string = `SELECT * FROM public.tabla_auditoria ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows;
+    private getSelectQueryTabla(queries: { [name: string]: any }): SelectQueryBuilder<TablaAuditoria> {
+        const { sort, offset, limit } = queries;
+        const alias = 'tabla'
+        let query = this.tablaAuditoriaRepo.createQueryBuilder(alias);
+        if (offset) query = query.skip(offset);
+        if (limit) query = query.take(limit);
+        if (sort) {
+            const sortColumn = sort.substring(1);
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+        }
+        return query;
     }
 
-    async countTablas(params): Promise<number>{
-        const wp: WhereParam = new WhereParam(
-            null,
-            null,
-            null,
-            null,
-            null
-        );
-        const query: string = `SELECT COUNT(*) FROM public.tabla_auditoria ${wp.sortOffsetLimitStr}`;
-        return (await this.dbsrv.execute(query, wp.whereParams)).rows[0].count;
+    findAllEventos(queries: { [name: string]: any }): Promise<EventoAuditoriaView[]> {
+        return this.getSelectQueryEvento(queries).getMany();
+    }
+
+    countEventos(queries: { [name: string]: any }): Promise<number> {
+        return this.getSelectQueryEvento(queries).getCount();
+    }
+
+    async findAllTablas(queries: { [name: string]: any }): Promise<TablaAuditoria[]> {
+        return this.getSelectQueryTabla(queries).getMany();
+    }
+
+    async countTablas(queries: {[name: string]: any}): Promise<number> {
+        return this.getSelectQueryTabla(queries).getCount();
     }
 }

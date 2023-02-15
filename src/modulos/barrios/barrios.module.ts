@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { BarriosService } from './barrios.service';
 import { BarriosController } from './barrios.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseService } from '../../global/database/database.service';
 import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Barrio } from '@database/entity/barrio.entity';
@@ -15,7 +14,7 @@ import { Permiso } from '@database/entity/permiso.entity';
     UtilModule,
     TypeOrmModule.forFeature([Barrio, BarrioView, Permiso])
   ],
-  providers: [BarriosService, DatabaseService],
+  providers: [BarriosService],
   controllers: [BarriosController]
 })
 export class BarriosModule {}

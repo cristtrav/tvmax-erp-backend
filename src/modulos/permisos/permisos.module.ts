@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { PermisosService } from './permisos.service';
 import { PermisosController } from './permisos.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseService } from '@database/database.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Permiso } from '@database/entity/permiso.entity';
 import { Modulo } from '@database/entity/modulo.entity';
@@ -17,7 +16,6 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
   ],
   providers: [
     PermisosService,
-    DatabaseService,
     JwtUtilsService
   ],
   controllers: [PermisosController]

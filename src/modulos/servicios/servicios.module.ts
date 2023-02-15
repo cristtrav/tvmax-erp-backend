@@ -6,7 +6,6 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseService } from '../../global/database/database.service';
 import { ServiciosController } from './servicios.controller';
 import { ServiciosService } from './servicios.service';
 
@@ -16,6 +15,6 @@ import { ServiciosService } from './servicios.service';
     TypeOrmModule.forFeature([Servicio, ServicioView, CuotaView, Permiso])
   ],
   controllers: [ServiciosController],
-  providers: [ServiciosService, DatabaseService, JwtUtilsService]
+  providers: [ServiciosService, JwtUtilsService]
 })
 export class ServiciosModule {}

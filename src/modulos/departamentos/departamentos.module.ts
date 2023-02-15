@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DepartamentosController } from './departamentos.controller';
 import { DepartamentosService } from './departamentos.service';
-import { DatabaseService } from '../../global/database/database.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Departamento } from '@database/entity/departamento.entity';
@@ -14,6 +13,6 @@ import { Permiso } from '@database/entity/permiso.entity';
     TypeOrmModule.forFeature([Departamento, Permiso])
   ],
   controllers: [DepartamentosController],
-  providers: [DepartamentosService, DatabaseService, JwtUtilsService]
+  providers: [DepartamentosService, JwtUtilsService]
 })
 export class DepartamentosModule {}

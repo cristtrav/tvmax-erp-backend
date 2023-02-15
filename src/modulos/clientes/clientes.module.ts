@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
 import { ClientesController } from './clientes.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseService } from '../../global/database/database.service';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';
 import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -18,7 +17,7 @@ import { Permiso } from '@database/entity/permiso.entity';
     UtilModule,
     TypeOrmModule.forFeature([Cliente, ClienteView, Suscripcion, SuscripcionView, Permiso])
   ],
-  providers: [ClientesService, DatabaseService, SuscripcionesService],
+  providers: [ClientesService, SuscripcionesService],
   controllers: [ClientesController]
 })
 export class ClientesModule {}

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { DistritosService } from './distritos.service';
 import { DistritosController } from './distritos.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseService } from '../../global/database/database.service';
 import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Distrito } from '@database/entity/distrito.entity';
@@ -15,7 +14,7 @@ import { Permiso } from '@database/entity/permiso.entity';
     UtilModule,
     TypeOrmModule.forFeature([Distrito, DistritoView, Permiso])
   ],
-  providers: [DistritosService, DatabaseService],
+  providers: [DistritosService],
   controllers: [DistritosController]
 })
 export class DistritosModule {}

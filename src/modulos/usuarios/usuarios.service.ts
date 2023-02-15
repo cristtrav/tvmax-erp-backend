@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DatabaseService } from '../../global/database/database.service';
 import * as argon2 from "argon2";
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,7 +16,6 @@ export class UsuariosService {
         @InjectRepository(UsuarioView)
         private usuarioViewRepo: Repository<UsuarioView>,
         private datasource: DataSource,
-        private dbsrv: DatabaseService
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<UsuarioView> {

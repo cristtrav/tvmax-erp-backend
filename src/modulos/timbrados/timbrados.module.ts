@@ -1,4 +1,3 @@
-import { DatabaseService } from '@database/database.service';
 import { Permiso } from '@database/entity/permiso.entity';
 import { Timbrado } from '@database/entity/timbrado.entity';
 import { TimbradoView } from '@database/view/timbrado.view';
@@ -16,6 +15,6 @@ import { TimbradosService } from './timbrados.service';
         TypeOrmModule.forFeature([Timbrado, TimbradoView, Permiso])
     ],
     controllers: [TimbradosController],
-    providers: [TimbradosService, DatabaseService]
+    providers: [TimbradosService]
 })
 export class TimbradosModule { }

@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GruposModule } from './modulos/grupos/grupos.module';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseService } from './global/database/database.service';
 import { SesionModule } from './modulos/sesion/sesion.module';
 import { ServiciosModule } from './modulos/servicios/servicios.module';
 import { DepartamentosModule } from './modulos/departamentos/departamentos.module';
@@ -58,6 +57,8 @@ import { CobrosModule } from './modulos/cobros/cobros.module';
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 import { Modulo } from '@database/entity/modulo.entity';
 import { ResumenesVentasModule } from './modulos/estadisticas/resumenes-ventas/resumenes-ventas.module';
+import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
+import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
 
 @Module({
   imports: [
@@ -96,7 +97,7 @@ import { ResumenesVentasModule } from './modulos/estadisticas/resumenes-ventas/r
         Barrio, BarrioView,
         Grupo,
         Servicio, ServicioView,
-        EventoAuditoria,
+        EventoAuditoria, EventoAuditoriaView, TablaAuditoria,
         Cuota, CuotaView,
         Usuario, UsuarioView,
         Rol, RolView,
@@ -114,6 +115,6 @@ import { ResumenesVentasModule } from './modulos/estadisticas/resumenes-ventas/r
     ResumenesVentasModule
   ],
   controllers: [AppController],
-  providers: [AppService, DatabaseService],
+  providers: [AppService],
 })
 export class AppModule {}

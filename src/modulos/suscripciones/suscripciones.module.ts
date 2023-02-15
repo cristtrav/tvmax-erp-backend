@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SuscripcionesService } from './suscripciones.service';
 import { SuscripcionesController } from './suscripciones.controller';
-import { DatabaseService } from '../../global/database/database.service';
 import { JwtModule } from '@nestjs/jwt';
 import { CuotasService } from '../cuotas/cuotas.service';
 import { ServiciosService } from '../servicios/servicios.service';
@@ -32,8 +31,7 @@ import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
     UtilModule
   ],
   providers: [
-    SuscripcionesService,
-    DatabaseService,
+    SuscripcionesService,    
     CuotasService,
     ServiciosService
   ],

@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@database/database.service';
-import { WhereParam } from '@util/whereparam';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
-import { CobroCuota } from '@dto/cobro-cuota.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cuota } from '@database/entity/cuota.entity';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
