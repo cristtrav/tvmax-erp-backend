@@ -71,7 +71,10 @@ export class ResumenesSuscripcionesService {
                     else qb = qb.orWhere(`${alias}.idbarrio = :idbarrio`, { idbarrio });
             }));
 
-        if (estado) queryBuilder = queryBuilder.andWhere(`${alias}.estado = :estado`, { estado });
+        if (estado)
+            if(Array.isArray(estado)) queryBuilder = queryBuilder.andWhere(`${alias}.estado IN (:...estado)`, { estado });
+            else queryBuilder = queryBuilder.andWhere(`${alias}.estado = :estado`, { estado });
+            
         if (fechainiciosuscripcion) queryBuilder = queryBuilder.andWhere(`${alias}.fechasuscripcion >= :fechainiciosuscripcion`, { fechainiciosuscripcion: new Date(`${fechainiciosuscripcion}T00:00:00`) });
         if (fechafinsuscripcion) queryBuilder = queryBuilder.andWhere(`${alias}.fechasuscripcion <= :fechafinsuscripcion`, { fechafinsuscripcion: new Date(`${fechafinsuscripcion}T00:00:00`) });
         if (cuotaspendientesdesde) queryBuilder = queryBuilder.andWhere(`${alias}.cuotaspendientes >= :cuotaspendientesdesde`, { cuotaspendientesdesde });
