@@ -15,12 +15,6 @@ export class EventoAuditoria {
     @Column()
     idusuario: number;
 
-    @Column({
-        name: 'pk_referencia',
-        length: 100
-    })
-    pkreferencia: string;
-
     @Column()
     idtabla: number;
 
