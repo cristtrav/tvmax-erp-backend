@@ -18,7 +18,7 @@ export class ClientesService {
     ) { }
 
     private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<ClienteView>{
-        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento, sort, offset, limit } = queries;        
+        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento, sort, offset, limit, ci } = queries;        
         const alias = 'cliente';
         let query: SelectQueryBuilder<ClienteView> = this.clienteViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
@@ -26,6 +26,7 @@ export class ClientesService {
         if(idbarrio) query = query.andWhere(`${alias}.idbarrio ${Array.isArray(idbarrio) ? 'IN (:...idbarrio)' : '= :idbarrio'}`, {idbarrio});
         if(iddistrito) query = query.andWhere(`${alias}.iddistrito ${Array.isArray(iddistrito) ? 'IN (:...iddistrito)' : '= :iddistrito'}`, {iddistrito});
         if(iddepartamento) query = query.andWhere(`${alias}.iddepartamento ${Array.isArray(iddepartamento) ? 'IN (:...iddepartamento)' : '= :iddepartamento'}`, {iddepartamento});
+        if(ci) query = query.andWhere(`${alias}.ci = :ci`, {ci});
         if(search) query = query.andWhere(
             new Brackets(qb => {
                 qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombsearch`, { nombsearch: `%${search.toLowerCase()}%`});
