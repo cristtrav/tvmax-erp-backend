@@ -37,6 +37,9 @@ export class TimbradoView{
     activo: boolean;
 
     @ViewColumn()
+    idformatofactura: number;
+
+    @ViewColumn()
     eliminado: boolean;
 
 }

@@ -88,4 +88,10 @@ export class TablasAuditoriaList{
         nombre: 'permisos',
         descripcion: 'permisos'
     }
+
+    public static FORMATOSFACTURAS: TablaAuditoriaDTO = {
+        id: 18,
+        nombre: 'formato_factura',
+        descripcion: 'Formatos Facturas'
+    }
 }

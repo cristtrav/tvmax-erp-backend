@@ -59,6 +59,8 @@ import { Modulo } from '@database/entity/modulo.entity';
 import { ResumenesVentasModule } from './modulos/estadisticas/resumenes-ventas/resumenes-ventas.module';
 import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
+import { FormatoFacturasModule } from './modulos/formato-facturas/formato-facturas.module';
+import { FormatoFactura } from '@database/entity/formato-factura.entity';
 
 @Module({
   imports: [
@@ -108,11 +110,13 @@ import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
         Suscripcion, SuscripcionView,
         Permiso, Funcionalidad, Modulo,
         Venta, DetalleVenta, VentaView, DetalleVentaView,
-        Cobro, CobroCuotasView, CobroDetalleVentaView
+        Cobro, CobroCuotasView, CobroDetalleVentaView,
+        FormatoFactura
       ]
     }),
     CobrosModule,
-    ResumenesVentasModule
+    ResumenesVentasModule,
+    FormatoFacturasModule
   ],
   controllers: [AppController],
   providers: [AppService],

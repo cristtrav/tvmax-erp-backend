@@ -9,4 +9,5 @@ export class TimbradoDTO {
     fechavencimiento: string | null = null;
     ultnrousado: number | null = null;
     activo: boolean | null = true;
+    idformatofactura: number | null = null;
 }

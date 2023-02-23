@@ -8,6 +8,7 @@ import { TimbradosService } from './timbrados.service';
 import { TimbradoView } from '@database/view/timbrado.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
+import { FormatoFactura } from '@database/entity/formato-factura.entity';
 
 @Controller('timbrados')
 @UseGuards(AuthGuard)
@@ -53,6 +54,14 @@ export class TimbradosController {
     getLastId(): Promise<number>
     {
         return this.timbradosSrv.getLastId();
+    }
+
+    @Get(':id/formatoimpresion')
+    @RequirePermission(Permissions.FORMATOFACTURA.CONSULTAR)
+    findFormatoByIdtimbrado(
+        @Param('id') idtimbrado: number
+    ): Promise<FormatoFactura>{
+        return this.timbradosSrv.findFormatoByIdtimbrado(idtimbrado)
     }
 
     @Get(':id')

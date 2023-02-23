@@ -78,4 +78,13 @@ export class EventoAuditoriaUtil{
         return this.getEventoAuditoria(TablasAuditoriaList.PERMISOS.id, idusuario, operacion, oldValue, newValue);
     };
 
+    public static getEventoAuditoriaFormatosFacturas(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.FORMATOSFACTURAS.id, idusuario, operacion, oldValue, newValue);
+    }
+
 }

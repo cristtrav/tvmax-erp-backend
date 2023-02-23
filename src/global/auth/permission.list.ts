@@ -113,4 +113,11 @@ export class Permissions {
     static readonly AUDITORIA = {
         CONSULTAREVENTOS: 320
     }
+
+    static readonly FORMATOFACTURA = {
+        CONSULTAR: 340,
+        REGISTRAR: 341,
+        EDITAR: 342,
+        ELIMINAR: 343
+    }
 }

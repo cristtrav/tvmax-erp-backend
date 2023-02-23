@@ -1,3 +1,4 @@
+import { FormatoFactura } from "@database/entity/formato-factura.entity";
 import { BarrioDTO } from "@dto/barrio.dto";
 import { ClienteDTO } from "@dto/cliente.dto";
 import { CuotaDTO } from "@dto/cuota.dto";
@@ -5,6 +6,7 @@ import { DepartamentoDTO } from "@dto/departamento.dto";
 import { DetalleVentaDTO } from "@dto/detalle-venta-dto";
 import { DistritoDTO } from "@dto/distrito.dto";
 import { DomicilioDTO } from "@dto/domicilio.dto";
+import { FormatoFacturaDTO } from "@dto/formato-factura.dto";
 import { GrupoDTO } from "@dto/grupo.dto";
 import { RolDTO } from "@dto/rol.dto";
 import { ServicioDTO } from "@dto/servicio.dto";
@@ -119,6 +121,7 @@ export class DTOEntityUtis {
         timbrado.nroTimbrado = timbradoDTO.nrotimbrado;
         timbrado.ultimoNroUsado = timbradoDTO.ultnrousado;
         timbrado.activo = timbradoDTO.activo;
+        timbrado.idformatoFactura = timbradoDTO.idformatofactura;
         return timbrado;
     }
 
@@ -200,6 +203,16 @@ export class DTOEntityUtis {
         detalleVenta.porcentajeIva = detalleVentaDto.porcentajeiva;
         detalleVenta.subtotal = detalleVentaDto.subtotal;
         return detalleVenta;
+    }
+
+    public static formatoFacturaDtoToEntity(formatoFacturaDto: FormatoFacturaDTO): FormatoFactura{
+        const formatoFactura = new FormatoFactura();
+        formatoFactura.descripcion = formatoFacturaDto.descripcion;
+        formatoFactura.parametros = formatoFacturaDto.parametros;
+        formatoFactura.plantilla = formatoFacturaDto.plantilla;
+        formatoFactura.tipoFactura = formatoFacturaDto.tipoFactura;
+        formatoFactura.eliminado = formatoFacturaDto.eliminado;
+        return formatoFactura;
     }
 
 }

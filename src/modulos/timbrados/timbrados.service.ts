@@ -5,6 +5,7 @@ import { Timbrado } from '@database/entity/timbrado.entity';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { TimbradoView } from '@database/view/timbrado.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
+import { FormatoFactura } from '@database/entity/formato-factura.entity';
 
 @Injectable()
 export class TimbradosService {
@@ -97,5 +98,16 @@ export class TimbradosService {
             await manager.save(timbrado);
             await manager.save(this.getEventoAuditoria(idusuario, 'E', oldTimbrado, timbrado));
         });
+    }
+
+    async findFormatoByIdtimbrado(idtimbrado: number): Promise<FormatoFactura>{
+        return (await this.timbradoRepo.findOne({
+            where: {id: idtimbrado},
+            relations: {formato: true}
+        })).formato;
+        /*if(formato == null) throw new HttpException({
+            message: 'No se encontró el formato de impresón'
+        }, HttpStatus.NOT_FOUND);
+        return formato;*/
     }
 }

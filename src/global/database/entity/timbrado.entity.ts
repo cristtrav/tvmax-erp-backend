@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { FormatoFactura } from "./formato-factura.entity";
 
 @Entity()
 export class Timbrado{
@@ -72,4 +73,12 @@ export class Timbrado{
     @Column({nullable: false, default: false})
     eliminado: boolean;
 
+    @Column({name: 'idformato_factura'})
+    idformatoFactura: number;
+
+    @ManyToOne(() => FormatoFactura, (formato) => formato.timbrados)
+    @JoinColumn({
+        name: 'idformato_factura'
+    })
+    formato: FormatoFactura;
 }
