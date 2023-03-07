@@ -75,4 +75,7 @@ export class SuscripcionView{
     @ViewColumn()
     eliminado: boolean;
 
+    @ViewColumn()
+    gentileza: boolean;
+
 }

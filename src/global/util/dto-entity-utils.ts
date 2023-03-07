@@ -166,6 +166,7 @@ export class DTOEntityUtis {
         suscripcion.idservicio = suscripcionDto.idservicio;
         suscripcion.monto = suscripcionDto.monto;
         suscripcion.eliminado = suscripcionDto.eliminado;
+        suscripcion.gentileza = suscripcionDto.gentileza;
         return suscripcion;
     }
 

@@ -30,4 +30,7 @@ export class Suscripcion{
     @Column({default: false, nullable: false})
     eliminado: boolean;
 
+    @Column({default: false, nullable: false})
+    gentileza: boolean;
+
 }

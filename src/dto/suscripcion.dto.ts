@@ -23,4 +23,5 @@ export class SuscripcionDTO{
     cuotaspendientes: number = 0;
     deuda: number = 0; 
     eliminado: boolean | null = false;
+    gentileza: boolean | null = false;
 }

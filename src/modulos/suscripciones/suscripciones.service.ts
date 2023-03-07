@@ -34,13 +34,14 @@ export class SuscripcionesService {
             iddepartamento,
             iddistrito,
             idbarrio,
-            search
+            search,
+            gentileza
         } = queries;        
         const alias = 'suscripcion';
         let query = this.suscripcionViewRepo.createQueryBuilder(alias);
 
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
-
+        if (gentileza != null) query = query.andWhere(`${alias}.gentileza = :gentileza`, { gentileza });
         if (idcliente)
             if (Array.isArray(idcliente)) query = query.andWhere(`${alias}.idcliente IN (:...idcliente)`, { idcliente });
             else query = query.andWhere(`${alias}.idcliente = :idcliente`, { idcliente });
