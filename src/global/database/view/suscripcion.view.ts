@@ -78,4 +78,10 @@ export class SuscripcionView{
     @ViewColumn()
     gentileza: boolean;
 
+    @ViewColumn()
+    idcobrador: number;
+
+    @ViewColumn()
+    cobrador: string;
+
 }

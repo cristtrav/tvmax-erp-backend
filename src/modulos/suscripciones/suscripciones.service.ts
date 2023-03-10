@@ -35,8 +35,9 @@ export class SuscripcionesService {
             iddistrito,
             idbarrio,
             search,
-            gentileza
-        } = queries;        
+            gentileza,
+            idcobrador
+        } = queries;
         const alias = 'suscripcion';
         let query = this.suscripcionViewRepo.createQueryBuilder(alias);
 
@@ -77,6 +78,7 @@ export class SuscripcionesService {
         if (fechafinsuscripcion) query = query.andWhere(`${alias}.fechasuscripcion <= :fechafinsuscripcion`, { fechafinsuscripcion: new Date(`${fechafinsuscripcion}T00:00:00`) });
         if (cuotaspendientesdesde) query = query.andWhere(`${alias}.cuotaspendientes >= :cuotaspendientesdesde`, { cuotaspendientesdesde });
         if (cuotaspendienteshasta) query = query.andWhere(`${alias}.cuotaspendientes <= :cuotaspendienteshasta`, { cuotaspendienteshasta });
+        if (idcobrador) query = query.andWhere(`${alias}.idcobrador = :idcobrador`, { idcobrador });
         if (search) {
             query = query.andWhere(new Brackets(qb => {
                 if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: search });
