@@ -84,4 +84,7 @@ export class SuscripcionView{
     @ViewColumn()
     cobrador: string;
 
+    @ViewColumn()
+    observacion: string;
+
 }

@@ -33,4 +33,7 @@ export class Suscripcion{
     @Column({default: false, nullable: false})
     gentileza: boolean;
 
+    @Column({length: 100})
+    observacion: string;
+
 }

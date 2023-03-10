@@ -24,4 +24,5 @@ export class SuscripcionDTO{
     deuda: number = 0; 
     eliminado: boolean | null = false;
     gentileza: boolean | null = false;
+    observacion: string | null = null;
 }
