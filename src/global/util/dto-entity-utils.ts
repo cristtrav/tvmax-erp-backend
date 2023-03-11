@@ -173,7 +173,7 @@ export class DTOEntityUtis {
 
     public static ventaDtoToEntity(ventaDto: VentaDTO): Venta{
         const venta = new Venta();
-        //venta.id = ventaDto.id;
+        if(ventaDto.id != null) venta.id = ventaDto.id;
         venta.anulado = ventaDto.anulado;
         venta.pagado = ventaDto.pagado;
         venta.eliminado = ventaDto.eliminado;
@@ -193,7 +193,7 @@ export class DTOEntityUtis {
 
     public static detalleVentaDtoToEntity(detalleVentaDto: DetalleVentaDTO): DetalleVenta{
         const detalleVenta = new DetalleVenta();
-        //detalleVenta.id = detalleVentaDto.id;
+        if(detalleVentaDto.id != null) detalleVenta.id = detalleVentaDto.id;
         detalleVenta.cantidad = detalleVentaDto.cantidad;
         detalleVenta.descripcion = detalleVentaDto.descripcion;
         detalleVenta.idcuota = detalleVentaDto.idcuota;

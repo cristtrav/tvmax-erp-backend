@@ -2,7 +2,7 @@ import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { VentaDTO } from '@dto/venta.dto';
-import { Body, Controller, Delete, Get, Headers, Param, Post, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
 import { VentasService } from './ventas.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service';
@@ -37,6 +37,19 @@ export class VentasController {
         @Headers('authorization') auth: string
     ): Promise<number>{
         return this.ventasSrv.create(
+            DTOEntityUtis.ventaDtoToEntity(fv),
+            fv.detalles.map(dv => DTOEntityUtis.detalleVentaDtoToEntity(dv)),
+            this.jwtUtil.extractJwtSub(auth)
+        );
+    }
+
+    @Put()
+    @RequirePermission(Permissions.VENTAS.EDITAR)
+    async edit(
+        @Body() fv: VentaDTO,
+        @Headers('authorization') auth: string
+    ){
+        await this.ventasSrv.edit(
             DTOEntityUtis.ventaDtoToEntity(fv),
             fv.detalles.map(dv => DTOEntityUtis.detalleVentaDtoToEntity(dv)),
             this.jwtUtil.extractJwtSub(auth)

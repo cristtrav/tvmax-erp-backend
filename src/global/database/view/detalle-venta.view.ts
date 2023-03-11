@@ -52,4 +52,7 @@ export class DetalleVentaView{
     @ViewColumn()
     eliminado: boolean;
 
+    @ViewColumn()
+    montoiva: number;
+
 }

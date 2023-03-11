@@ -26,6 +26,8 @@ export class VentasService {
         private cuotaRepo: Repository<Cuota>,
         @InjectRepository(Cliente)
         private clienteRepo: Repository<Cliente>,
+        @InjectRepository(Cobro)
+        private cobroRepo: Repository<Cobro>,
         private datasource: DataSource,
     ) { }
 
@@ -119,6 +121,95 @@ export class VentasService {
             }
         });
         return idventa
+    }
+
+    async edit(venta: Venta, detalleVenta: DetalleVenta[], idusuario: number) {
+        const oldVenta = await this.ventaRepo.findOne({ where: { id: venta.id, eliminado: false }, relations: { detalles: true } });
+        const oldCobro = await this.cobroRepo.findOneBy({ idventa: venta.id, eliminado: false });
+
+        await this.datasource.transaction(async manager => {
+            //Se guarda la venta y el evento en auditoria
+            await manager.save(venta);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'M', oldVenta, venta));
+
+            //Se edita el estado del cobro y se guarda el evento de auditoria
+            const cobro = await this.createCobro(venta.id, venta.idcliente, oldCobro.cobradoPor);
+            cobro.id = oldCobro.id;
+            await manager.save(cobro);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'M', oldCobro, cobro));
+
+            //Se ubican los detalles eliminados y se marcan como eliminados, y las cuotas se marcan como pendientes
+            for (let detalle of oldVenta.detalles.filter(oldDv => !detalleVenta.find(dv => dv.id == oldDv.id))) {
+                if (detalle.idcuota != null) {
+                    const cuota = await this.cuotaRepo.findOneBy({ id: detalle.idcuota });
+                    const oldCuota = { ...cuota };
+                    cuota.pagado = false;
+                    await manager.save(cuota);
+                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota));
+                }
+                const oldDetalle = { ...detalle };
+                detalle.eliminado = true;
+                await manager.save(detalle);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaDetalleVenta(idusuario, 'E', oldDetalle, detalle));
+            }
+
+            //Se marca como pagadas las cuotas en los detalles nuevos agregados
+            for (let detalle of detalleVenta.filter(dv => dv.id == null && dv.idcuota != null)) {
+                const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
+                const oldCuota = { ...cuota };
+                cuota.pagado = true;
+                await manager.save(cuota);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota));
+            }
+
+            //Se guardan los nuevos detalles de la venta y el evento de auditoria
+            for (let detalle of detalleVenta) {
+                detalle.venta = venta;
+                const oldDetalle = await this.detalleVentaRepo.findOneBy({ id: detalle.id });
+                await manager.save(detalle);
+                if (oldDetalle) await manager.save(EventoAuditoriaUtil.getEventoAuditoriaDetalleVenta(idusuario, 'M', oldDetalle, detalle));
+                else await manager.save(EventoAuditoriaUtil.getEventoAuditoriaDetalleVenta(idusuario, 'R', null, detalle));
+            }
+
+            //Se marcan las cuotas nuevas en el detalles como pagadas y se registran sus eventos de auditoria
+            for (
+                let detalle of
+                detalleVenta.filter(dv => dv.idcuota != null && !oldVenta.detalles.find(olddv => olddv.idcuota == dv.idcuota))
+            ) {
+                const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
+                const oldCuota = { ...cuota };
+                cuota.pagado = true;
+                await manager.save(cuota);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota));
+            }
+
+            //Se actualiza el numero utilizado de los timbrados, el anterior y el nuevo;
+            const ventaRepository = manager.getRepository(Venta);
+            let ventaNroFacturaQuery = ventaRepository.createQueryBuilder('venta')
+                .select('MAX(venta.nroFactura)', 'ultimonro')
+                .where('venta.eliminado = false')
+                .andWhere('venta.anulado = false')
+                .andWhere('venta.idtimbrado = :idtimbrado');
+            ventaNroFacturaQuery.setParameter('idtimbrado', venta.idtimbrado);
+            const ultimoNroTimbradoActual = (await ventaNroFacturaQuery.getRawOne()).ultimonro;
+
+            const timbradoActual = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado });
+            const oldTimbradoActual = { ...timbradoActual };
+            timbradoActual.ultimoNroUsado = ultimoNroTimbradoActual;
+            await manager.save(timbradoActual);
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbradoActual, timbradoActual));
+
+            if (venta.idtimbrado != oldVenta.idtimbrado) {
+                ventaNroFacturaQuery.setParameter('idtimbrado', oldVenta.idtimbrado);
+                const ultimoNroTimbradoAnterior = (await ventaNroFacturaQuery.getRawOne()).ultimonro;
+                const timbradoAnterior = await this.timbradoRepo.findOneByOrFail({ id: oldVenta.idtimbrado });
+                const oldTimbradoAnterior = { ...timbradoAnterior };
+                timbradoAnterior.ultimoNroUsado = ultimoNroTimbradoAnterior;
+                await manager.save(timbradoAnterior);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbradoAnterior, timbradoAnterior));
+            }
+        })
+
     }
 
     findAll(queries: { [name: string]: any }): Promise<VentaView[]> {
