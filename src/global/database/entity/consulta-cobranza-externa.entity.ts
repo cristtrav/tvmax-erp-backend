@@ -28,6 +28,9 @@ export class ConsultaCobranzaExterna{
     @Column({length: 20, nullable: false})
     usuario: string;
 
+    @Column({nullable: false})
+    idcliente: number;
+
     @OneToMany(() => DetalleConsultaCobranzaExterna, (detalle) => detalle.consulta,{
         cascade: ['insert']
     })

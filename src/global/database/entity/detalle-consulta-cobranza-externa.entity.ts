@@ -28,10 +28,10 @@ export class DetalleConsultaCobranzaExterna{
     @Column({name: 'idconsulta_cobranza_externa', nullable: false})
     idconsultaCobranzaExterna: number;
 
-    @Column({name: 'cod_transaccion_pago'})
+    @Column({name: 'cod_transaccion_pago', type: 'bigint'})
     codTransaccionPago: number;
 
-    @Column({name: 'cod_transaccion_anulacion'})
+    @Column({name: 'cod_transaccion_anulacion', type: 'bigint'})
     codTransaccionAnulacion: number;
 
     @Column({name: 'direccion_domicilio', length: 100})
