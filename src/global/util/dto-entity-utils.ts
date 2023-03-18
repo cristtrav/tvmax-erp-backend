@@ -1,3 +1,4 @@
+import { ConsultaCobranzaExterna } from "@database/entity/consulta-cobranza-externa.entity";
 import { FormatoFactura } from "@database/entity/formato-factura.entity";
 import { BarrioDTO } from "@dto/barrio.dto";
 import { ClienteDTO } from "@dto/cliente.dto";

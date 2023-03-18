@@ -61,6 +61,9 @@ import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
 import { FormatoFacturasModule } from './modulos/formato-facturas/formato-facturas.module';
 import { FormatoFactura } from '@database/entity/formato-factura.entity';
+import { CobranzaExternaModule } from './modulos/cobranza-externa/cobranza-externa.module';
+import { ConsultaCobranzaExterna } from '@database/entity/consulta-cobranza-externa.entity';
+import { DetalleConsultaCobranzaExterna } from '@database/entity/detalle-consulta-cobranza-externa.entity';
 
 @Module({
   imports: [
@@ -111,12 +114,14 @@ import { FormatoFactura } from '@database/entity/formato-factura.entity';
         Permiso, Funcionalidad, Modulo,
         Venta, DetalleVenta, VentaView, DetalleVentaView,
         Cobro, CobroCuotasView, CobroDetalleVentaView,
-        FormatoFactura
+        FormatoFactura,
+        ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna
       ]
     }),
     CobrosModule,
     ResumenesVentasModule,
-    FormatoFacturasModule
+    FormatoFacturasModule,
+    CobranzaExternaModule
   ],
   controllers: [AppController],
   providers: [AppService],
