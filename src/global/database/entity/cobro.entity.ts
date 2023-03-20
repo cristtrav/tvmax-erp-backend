@@ -27,4 +27,7 @@ export class Cobro {
     @Column({ default: false, nullable: false })
     eliminado: boolean;
 
+    @Column({name: 'cod_transaccion_cobranza_externa', type: 'bigint'})
+    codTransaccionCobranzaExterna: number;
+
 }

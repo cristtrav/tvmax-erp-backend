@@ -18,6 +18,7 @@ import { DetalleVenta } from '@database/entity/detalle-venta.entity';
 import { Cuota } from '@database/entity/cuota.entity';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Usuario } from '@database/entity/usuario.entity';
+import { AnulacionRequestDTO } from './dto/anulacion-request.dto';
 
 @Injectable()
 export class CobranzaExternaService {
@@ -35,10 +36,14 @@ export class CobranzaExternaService {
         private detalleConsultaCobranzaRepo: Repository<DetalleConsultaCobranzaExterna>,
         @InjectRepository(Usuario)
         private usuarioRepo: Repository<Usuario>,
+        @InjectRepository(Cobro)
+        private cobroRepo: Repository<Cobro>,
+        @InjectRepository(Venta)
+        private ventaRepo: Repository<Venta>,
         private datasource: DataSource
     ) { }
 
-    async consulta(request: ConsultaRequestDTO): Promise<GenericoResponseDTO | ConsultaResponseDTO> {
+    async consultar(request: ConsultaRequestDTO): Promise<GenericoResponseDTO | ConsultaResponseDTO> {
         const suscripcionesActivas = await this.getSuscripcionesActivas(request.nroDocumento);
         const suscripcionesInactivas = await this.getSuscripcionesInactivas(request.nroDocumento);
 
@@ -93,7 +98,7 @@ export class CobranzaExternaService {
         return this.consultaCobranzaToDTO(consultaCobranza, detallesConsultaCobranza);
     }
 
-    async pago(request: PagoRequestDTO): Promise<GenericoResponseDTO> {
+    async pagar(request: PagoRequestDTO): Promise<GenericoResponseDTO> {
         const detalleCobranza = await this.detalleConsultaCobranzaRepo.findOne({
             where: { nroOperacion: request.nroOperacion },
             relations: { consulta: true }
@@ -138,6 +143,7 @@ export class CobranzaExternaService {
             await manager.save(detalle);
 
             const cobro = this.getCobro(venta, usuarioCobranza, cobrador);
+            cobro.codTransaccionCobranzaExterna = request.codTransaccion;
             await manager.save(cobro);
         });
 
@@ -146,6 +152,56 @@ export class CobranzaExternaService {
             codRetorno: '000',
             desRetorno: 'PAGO EXITOSO',
             tipoTrx: 3
+        }
+    }
+
+    async anular(anularReq: AnulacionRequestDTO): Promise<GenericoResponseDTO>{
+        const detalleCobranza = await this.detalleConsultaCobranzaRepo.findOneBy({nroOperacion: anularReq.nroOperacion});
+        if(!detalleCobranza) return {
+            codServicio: '00001',
+            codRetorno: '999',
+            desRetorno: 'NO SE ENCONTRO OPERACION',
+            tipoTrx: 4
+        }
+
+        if(detalleCobranza.codTransaccionAnulacion) return {
+            codServicio: '00001',
+            codRetorno: '999',
+            desRetorno: 'OPERACION YA ANULADA',
+            tipoTrx: 4
+        }
+
+        const importeRequest = `${anularReq.importe.substring(0, 13)}.${anularReq.importe.substring(13)}`;
+        if(Number(importeRequest) != Number(detalleCobranza.totalDetalle)) return {
+            codServicio: '00001',
+            codRetorno: '999',
+            desRetorno: 'MONTO INCORRECTO',
+            tipoTrx: 4
+        }
+
+        const cobro = await this.cobroRepo.findOneByOrFail({ codTransaccionCobranzaExterna: anularReq.codTransaccionAnular});
+        const venta = await this.ventaRepo.findOneByOrFail({ id: cobro.idventa });
+        const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalleCobranza.idcuota });
+
+        await this.datasource.transaction(async manager => {
+            cobro.anulado = true;
+            await manager.save(cobro);
+
+            venta.anulado = true;
+            await manager.save(venta);
+
+            cuota.pagado = false;
+            await manager.save(cuota);
+
+            detalleCobranza.codTransaccionAnulacion = anularReq.codTransaccion;
+            await manager.save(detalleCobranza);
+        })
+
+        return {
+            codServicio: '00001',
+            codRetorno: '000',
+            desRetorno: 'ANULACIÓN EXITOSA',
+            tipoTrx: 4
         }
     }
 

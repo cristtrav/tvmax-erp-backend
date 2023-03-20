@@ -11,6 +11,8 @@ import { SuscripcionView } from '@database/view/suscripcion.view';
 import { ClienteView } from '@database/view/cliente.view';
 import { DetalleConsultaCobranzaExterna } from '@database/entity/detalle-consulta-cobranza-externa.entity';
 import { ConsultaCobranzaExterna } from '@database/entity/consulta-cobranza-externa.entity';
+import { Cobro } from '@database/entity/cobro.entity';
+import { Venta } from '@database/entity/venta.entity';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { ConsultaCobranzaExterna } from '@database/entity/consulta-cobranza-exte
       CuotaView,
       Cuota,
       DetalleConsultaCobranzaExterna,
-      ConsultaCobranzaExterna
+      ConsultaCobranzaExterna,
+      Cobro,
+      Venta
     ])
   ],
   providers: [CobranzaExternaService],
