@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cuota } from '@database/entity/cuota.entity';
@@ -6,6 +6,8 @@ import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { CuotaView } from '@database/view/cuota.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 @Injectable()
 export class CuotasService {
@@ -67,6 +69,19 @@ export class CuotasService {
     }
 
     async create(c: Cuota, idusuario: number) {
+        const cuotaExistente =
+            await this.cuotaViewRepo.createQueryBuilder('cuota')
+                .where(`EXTRACT(month FROM cuota.fechaVencimiento) = :mes`, { mes: (c.fechaVencimiento.getMonth() + 1) })
+                .andWhere(`EXTRACT(year FROM cuota.fechaVencimiento) = :anio`, { anio: c.fechaVencimiento.getFullYear() })
+                .andWhere(`cuota.idsuscripcion = :idsuscripcion`, { idsuscripcion: c.idsuscripcion })
+                .andWhere(`cuota.idservicio = :idservicio`, {idservicio: c.idservicio})
+                .andWhere(`cuota.eliminado = FALSE`)
+                .getOne();
+                console.log(cuotaExistente);
+        if(cuotaExistente) throw new HttpException({
+            message: `La cuota para el servicio «${cuotaExistente.servicio}» del mes «${format(c.fechaVencimiento, "MMMM yyyy", { locale: es })}» ya existe.`
+        }, HttpStatus.BAD_REQUEST);
+
         await this.datasource.transaction(async manager => {
             await manager.save(c);
             await manager.save(this.getEventoAuditoria(idusuario, 'R', null, c));
