@@ -46,6 +46,7 @@ export class CuotasScheduleService {
                     .where(`EXTRACT(month FROM cuota.fechaVencimiento) = :mes`, { mes: (fechaHoraActual.getMonth() + 1) })
                     .andWhere(`EXTRACT(year FROM cuota.fechaVencimiento) = :anio`, { anio: fechaHoraActual.getFullYear() })
                     .andWhere(`cuota.idsuscripcion = :idsuscripcion`, { idsuscripcion: suscripcion.id })
+                    .andWhere(`cuota.idservicio = :idservicio`, {idservicio: suscripcion.idservicio})
                     .andWhere(`cuota.eliminado = FALSE`)
                     .getOne();
             if (!cuotaExistente) {
