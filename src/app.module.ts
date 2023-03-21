@@ -64,9 +64,13 @@ import { FormatoFactura } from '@database/entity/formato-factura.entity';
 import { CobranzaExternaModule } from './modulos/cobranza-externa/cobranza-externa.module';
 import { ConsultaCobranzaExterna } from '@database/entity/consulta-cobranza-externa.entity';
 import { DetalleConsultaCobranzaExterna } from '@database/entity/detalle-consulta-cobranza-externa.entity';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksModule } from './global/tasks/tasks.module';
+import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true
     }),
@@ -88,6 +92,10 @@ import { DetalleConsultaCobranzaExterna } from '@database/entity/detalle-consult
     UtilModule,
     RolesModule,
     ResumenesSuscripcionesModule,
+    CobrosModule,
+    ResumenesVentasModule,
+    FormatoFacturasModule,
+    CobranzaExternaModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.PGHOST,
@@ -115,13 +123,11 @@ import { DetalleConsultaCobranzaExterna } from '@database/entity/detalle-consult
         Venta, DetalleVenta, VentaView, DetalleVentaView,
         Cobro, CobroCuotasView, CobroDetalleVentaView,
         FormatoFactura,
-        ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna
+        ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
+        GeneracionCuotas
       ]
     }),
-    CobrosModule,
-    ResumenesVentasModule,
-    FormatoFacturasModule,
-    CobranzaExternaModule
+    TasksModule
   ],
   controllers: [AppController],
   providers: [AppService],
