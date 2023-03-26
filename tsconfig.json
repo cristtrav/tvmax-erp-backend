@@ -31,7 +31,7 @@
         "./src/global/filters/*"
       ],
       "@modulos/*":[
-        "./src/global/modulos/*"
+        "./src/modulos/*"
       ]
     }
   }
