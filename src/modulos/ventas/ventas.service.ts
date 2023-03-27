@@ -70,12 +70,17 @@ export class VentasService {
                 if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.nrofactura = :searchnrofact`, { searchnrofact: search });
             }));
         }
+        
         if (limit) query = query.take(limit);
         if (offset) query = query.skip(offset);
+
         if (sort) {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
-            query = query.orderBy(sortColumn, sortOrder);
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+            if(sortColumn === 'fechafactura' || sortColumn === 'fechacobro'){
+                query = query.addOrderBy(`${alias}.id`, sortOrder);
+            }
         }
         return query;
     }

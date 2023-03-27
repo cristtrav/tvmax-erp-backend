@@ -23,7 +23,7 @@ export class CobranzaExternaGuard implements CanActivate {
   }
 
   private async login(usuario: string, password: string): Promise<boolean> {
-    const usr = await this.usuarioRepo.findOneBy({ ci: usuario });
+    const usr = await this.usuarioRepo.findOneBy({ id: Number(usuario) });
     if (
       usr != null &&
       usr.idrol == 5 &&
