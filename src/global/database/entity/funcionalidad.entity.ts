@@ -2,7 +2,11 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryCo
 import { Modulo } from "./modulo.entity";
 import { Usuario } from "./usuario.entity";
 
-@Entity()
+@Entity({
+    orderBy: {
+        nombre: 'ASC'
+    }
+})
 export class Funcionalidad {
 
     @PrimaryColumn()

@@ -16,7 +16,7 @@ export class CobrosController {
     ){}
 
     @Get('detalles')
-    @RequirePermission(Permissions.VENTAS.CONSULTARCOBROS)
+    @RequirePermission(Permissions.COBROS.CONSULTAR)
     findAllDetalles(
         @Query() queries: {[name: string]: any}
     ): Promise<CobroDetalleVentaView[]>{
@@ -24,7 +24,7 @@ export class CobrosController {
     }
 
     @Get('detalles/total')
-    @RequirePermission(Permissions.VENTAS.CONSULTARCOBROS)
+    @RequirePermission(Permissions.COBROS.CONSULTAR)
     countDetalles(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{

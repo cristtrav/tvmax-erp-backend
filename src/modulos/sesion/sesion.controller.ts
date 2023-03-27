@@ -1,7 +1,10 @@
-import { Controller, Post, Body, UseFilters } from '@nestjs/common';
+import { Controller, Post, Body, UseFilters, Param, Get, Query } from '@nestjs/common';
 import { SesionService } from './sesion.service';
 import { TokenSesionDTO } from './../../dto/token-sesion.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
+import { FuncionalidadDTO } from '@dto/funcionalidad.dto';
+import { PermisosService } from '@modulos/permisos/permisos.service';
+import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 
 @Controller('sesion')
 @UseFilters(HttpExceptionFilter)
@@ -9,7 +12,16 @@ export class SesionController {
 
     constructor(
         private sesionSrv: SesionService,
+        private permisosSrv: PermisosService
     ) { }
+
+    @Get('permisos/:idusuario')
+    findPermisos(
+        @Param('idusuario') idusuario: number,
+        @Query() queries: {[name: string]: any}
+    ): Promise<Funcionalidad[]>{
+        return this.permisosSrv.findPermisosByIdUsuario(idusuario, queries);
+    }
 
     @Post('login')
     login(

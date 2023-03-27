@@ -18,6 +18,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
     PermisosService,
     JwtUtilsService
   ],
-  controllers: [PermisosController]
+  controllers: [PermisosController],
+  exports: [PermisosService]
 })
 export class PermisosModule {}

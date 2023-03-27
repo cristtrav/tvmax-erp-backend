@@ -8,7 +8,7 @@ import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 
 @Injectable()
 export class PermisosService {
-    constructor(
+  constructor(
         @InjectRepository(Modulo)
         private moduloRepo: Repository<Modulo>,
         @InjectRepository(Usuario)
