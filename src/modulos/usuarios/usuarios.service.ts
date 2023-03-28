@@ -23,7 +23,7 @@ export class UsuariosService {
         const alias = 'usuario';
         let query = this.usuarioViewRepo.createQueryBuilder(alias);
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
-        if (idrol) query = query.andWhere(`${alias}.idrol ${Array.isArray(idrol) ? 'IN (:...idrol)' : '= :idrol'}`, {idrol});
+        if (idrol) query = query.andWhere(`${alias}.idrol ${Array.isArray(idrol) ? 'IN (:...idrol)' : '= :idrol'}`, { idrol });
         if (limit) query = query.take(limit);
         if (offset) query = query.skip(offset);
         if (sort) {
@@ -35,9 +35,9 @@ export class UsuariosService {
             new Brackets(qb => {
                 if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :id`, { id: Number(search) });
                 qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombressearch`, { nombressearch: `%${search.toLowerCase()}%` });
-                qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellidossearch`, { apellidossearch: `%${search.toLowerCase()}%`});
-                qb = qb.orWhere(`${alias}.ci = :cisearch`, { cisearch: search});
-                qb = qb.orWhere(`LOWER(${alias}.rol) LIKE :rolsearch`, { rolsearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellidossearch`, { apellidossearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`${alias}.ci = :cisearch`, { cisearch: search });
+                qb = qb.orWhere(`LOWER(${alias}.rol) LIKE :rolsearch`, { rolsearch: `%${search.toLowerCase()}%` });
             })
         );
 
@@ -111,4 +111,15 @@ export class UsuariosService {
             .getRawOne()).lastid;
     }
 
+    public async changePassword(idusuario: number, oldPass: string, newPass: string) {
+        const usuario = await this.usuarioRepo.findOneByOrFail({ id: idusuario });
+        if (await argon2.verify(usuario.password, oldPass)) {
+            usuario.password = await argon2.hash(newPass);
+            await this.usuarioRepo.save(usuario);
+        } else {
+            throw new HttpException({
+                message: 'La contraseña antigua es incorrecta'
+            }, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

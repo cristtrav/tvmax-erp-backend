@@ -53,6 +53,15 @@ export class UsuariosController {
         );
     }
 
+    @Post(':id/password')
+    @RequirePermission(Permissions.USUARIOS.CAMBIARPASS)
+    async changePassword(
+        @Param('id') id: number,
+        @Body() passwords: { oldPass: string, newPass: string }
+    ){
+        await this.usuarioSrv.changePassword(id, passwords.oldPass, passwords.newPass);
+    }
+
     @Get(':id')
     @RequirePermission(Permissions.USUARIOS.CONSULTAR)
     async findById(

@@ -51,7 +51,8 @@ export class Permissions {
         REGISTRAR: 121,
         EDITAR: 122,
         ELIMINAR: 123,
-        ACCESOMODULO: 124
+        ACCESOMODULO: 124,
+        CAMBIARPASS: 125
     }
 
     static readonly ROLES = {
