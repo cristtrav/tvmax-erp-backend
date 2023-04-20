@@ -18,7 +18,7 @@ export class GruposService {
         const { eliminado, id, search, sort, offset, limit } = queries;
         const alias: string = 'grupo';
         let queryBuilder: SelectQueryBuilder<Grupo> = this.grupoRepo.createQueryBuilder(alias);
-        if (eliminado !== null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if (eliminado != null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
         if (id) queryBuilder = queryBuilder.andWhere(`${alias}.id ${Array.isArray(id) ? 'IN (:...id)' : '= :id'}`, { id });
         if (offset) queryBuilder = queryBuilder.skip(offset);
         if (limit) queryBuilder = queryBuilder.take(limit);
