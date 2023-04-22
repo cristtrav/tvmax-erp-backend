@@ -21,8 +21,8 @@ export class CobrosService {
             fechafinfactura,
             fechainiciocobro,
             fechafincobro,
-            idusuario,
-            idcobrador,
+            idusuarioregistrocobro,
+            idcobradorcomision,
             idgrupo,
             idservicio,
             search,
@@ -40,12 +40,12 @@ export class CobrosService {
         if (fechafincobro) query = query.andWhere(`${alias}.fechacobro <= :fechafincobro`, { fechafincobro });
         if (pagado) query = query.andWhere(`${alias}.pagado = :pagado`, { pagado });
         if (anulado) query = query.andWhere(`${alias}.anulado = :anulado`, { anulado });
-        if (idusuario)
-            if (Array.isArray(idusuario)) query = query.andWhere(`${alias}.idusuario IN (:...idusuario)`, { idusuario });
-            else query = query.andWhere(`${alias}.idusuario = :idusuario`, { idusuario });
-        if (idcobrador)
-            if (Array.isArray(idcobrador)) query = query.andWhere(`${alias}.idcobrador IN (:...idcobrador)`, { idcobrador });
-            else query = query.andWhere(`${alias}.idcobrador = :idcobrador`, { idcobrador });
+        if (idusuarioregistrocobro)
+            if (Array.isArray(idusuarioregistrocobro)) query = query.andWhere(`${alias}.idusuarioregistrocobro IN (:...idusuarioregistrocobro)`, { idusuarioregistrocobro });
+            else query = query.andWhere(`${alias}.idusuarioregistrocobro = :idusuarioregistrocobro`, { idusuarioregistrocobro });
+        if (idcobradorcomision)
+            if (Array.isArray(idcobradorcomision)) query = query.andWhere(`${alias}.idcobrador IN (:...idcobradorcomision)`, { idcobradorcomision });
+            else query = query.andWhere(`${alias}.idcobradorcomision = :idcobradorcomision`, { idcobradorcomision });
         if (idgrupo || idservicio) {
             query = query.andWhere(new Brackets(qb => {
                 if (idgrupo)

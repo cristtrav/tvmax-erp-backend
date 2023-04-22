@@ -7,7 +7,16 @@ export class CobroDetalleVentaView{
     iddetalleventa: number;
 
     @ViewColumn()
+    idventa: number;
+
+    @ViewColumn()
+    idsuscripcion: number;
+
+    @ViewColumn()
     monto: number;
+
+    @ViewColumn()
+    descripcion: string;
 
     @ViewColumn()
     idservicio: number;
@@ -52,16 +61,16 @@ export class CobroDetalleVentaView{
     fechacobro: Date;
 
     @ViewColumn()
-    idcobrador: number;
+    idcobradorcomision: number;
 
     @ViewColumn()
     cobrador: string;
 
     @ViewColumn()
-    idusuario: number;
+    idusuarioregistrocobro: number;
 
     @ViewColumn()
-    usuario: string;
+    usuarioregistrocobro: string;
 
     @ViewColumn()
     eliminado: boolean;
