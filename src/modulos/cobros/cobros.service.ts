@@ -59,11 +59,12 @@ export class CobrosService {
         if (search) query = query.andWhere(new Brackets(qb => {
             qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :searchcli`, { searchcli: `%${search.toLowerCase()}%` });
             qb = qb.orWhere(`${alias}.facturacobro LIKE :searchfactura`, { searchfactura: search })
-            qb = qb.orWhere(`${alias}.ci = :searchci`, {searchci: search});
-            qb = qb.orWhere(`LOWER(${alias}.servicio) LIKE :searchservicio`, {searchservicio: `%${search.toLowerCase()}%`});
+            if(!Number.isNaN(Number(search)))
+                qb = qb.orWhere(`${alias}.ci = :searchci`, {searchci: Number(search)});
+            /*qb = qb.orWhere(`LOWER(${alias}.servicio) LIKE :searchservicio`, {searchservicio: `%${search.toLowerCase()}%`});
             qb = qb.orWhere(`LOWER(${alias}.grupo) LIKE :searchgrupo`, {searchgrupo: `%${search.toLowerCase()}%`});
             qb = qb.orWhere(`LOWER(${alias}.cobrador) LIKE :searchcobrador`, { searchcobrador: `%${search.toLowerCase()}%`});
-            qb = qb.orWhere(`LOWER(${alias}.usuario) LIKE :searchusuario`, { searchusuario: `%${search.toLowerCase()}%`});
+            qb = qb.orWhere(`LOWER(${alias}.usuario) LIKE :searchusuario`, { searchusuario: `%${search.toLowerCase()}%`});*/
         }));
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
