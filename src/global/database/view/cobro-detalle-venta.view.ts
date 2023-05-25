@@ -35,6 +35,9 @@ export class CobroDetalleVentaView{
 
     @ViewColumn()
     idcuota: number;
+    
+    @ViewColumn()
+    idcliente: number;
 
     @ViewColumn()
     cliente: string;

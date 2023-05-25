@@ -14,6 +14,8 @@ export class CobrosService {
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<CobroDetalleVentaView> {
         const {
+            idcliente,
+            idsuscripcion,
             eliminado,
             pagado,
             anulado,
@@ -56,19 +58,27 @@ export class CobrosService {
                     else qb.orWhere(`${alias}.idservicio = :idservicio`, { idservicio });
             }));
         }
+        if (idcliente) {
+            if (Array.isArray(idcliente)) query = query.andWhere(`${alias}.idcliente IN (:...idcliente)`, { idcliente });
+            else query = query.andWhere(`${alias}.idcliente = :idcliente`, { idcliente })
+        }
+        if(idsuscripcion){
+            if(Array.isArray(idsuscripcion)) query = query.andWhere(`${alias}.idsuscripcion IN (:...idsuscripcion)`, {idsuscripcion});
+            else query = query.andWhere(`${alias}.idsuscripcion = :idsuscripcion`, {idsuscripcion});
+        }
         if (search) query = query.andWhere(new Brackets(qb => {
             qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :searchcli`, { searchcli: `%${search.toLowerCase()}%` });
             qb = qb.orWhere(`${alias}.facturacobro LIKE :searchfactura`, { searchfactura: search })
-            if(!Number.isNaN(Number(search)))
-                qb = qb.orWhere(`${alias}.ci = :searchci`, {searchci: Number(search)});
+            if (!Number.isNaN(Number(search)))
+                qb = qb.orWhere(`${alias}.ci = :searchci`, { searchci: Number(search) });
             /*qb = qb.orWhere(`LOWER(${alias}.servicio) LIKE :searchservicio`, {searchservicio: `%${search.toLowerCase()}%`});
             qb = qb.orWhere(`LOWER(${alias}.grupo) LIKE :searchgrupo`, {searchgrupo: `%${search.toLowerCase()}%`});
             qb = qb.orWhere(`LOWER(${alias}.cobrador) LIKE :searchcobrador`, { searchcobrador: `%${search.toLowerCase()}%`});
             qb = qb.orWhere(`LOWER(${alias}.usuario) LIKE :searchusuario`, { searchusuario: `%${search.toLowerCase()}%`});*/
         }));
-        if(limit) query = query.take(limit);
-        if(offset) query = query.skip(offset);
-        if(sort){
+        if (limit) query = query.take(limit);
+        if (offset) query = query.skip(offset);
+        if (sort) {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
             query = query.orderBy(sortColumn, sortOrder);
@@ -76,12 +86,12 @@ export class CobrosService {
         return query;
     }
 
-    findAllDetalles(queries: {[name: string]: any}): Promise<CobroDetalleVentaView[]>{
+    findAllDetalles(queries: { [name: string]: any }): Promise<CobroDetalleVentaView[]> {
         return this.getSelectQuery(queries).getMany();
     }
 
-    countDetalles(queries: {[name: string]: any}): Promise<number>{
+    countDetalles(queries: { [name: string]: any }): Promise<number> {
         return this.getSelectQuery(queries).getCount();
-    } 
+    }
 
 }
