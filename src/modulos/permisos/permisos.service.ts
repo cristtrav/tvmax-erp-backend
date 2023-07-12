@@ -31,6 +31,7 @@ export class PermisosService {
             query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
         query = query.leftJoinAndSelect(`${alias}.funcionalidades`, 'funcionalidades', 'funcionalidades.eliminado = :eliminado', { eliminado: 'false' });
+        query = query.leftJoinAndSelect(`funcionalidades.dependencias`, 'dependencias');
         return query;
     }
 
@@ -55,6 +56,7 @@ export class PermisosService {
             query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
         query = query.leftJoinAndSelect(`${alias}.usuarios`, 'usuarios')
+        query = query.leftJoinAndSelect(`${alias}.dependencias`, 'dependencias');
         query = query.andWhere(`usuarios.id = :idusuario`, { idusuario });
         return query.getMany();
     }
@@ -67,11 +69,12 @@ export class PermisosService {
             .getOneOrFail();
         const oldPermisos: IDatosEventoPermiso = this.getPermisosUsuarioEvento(usuario);
 
-        usuario.permisos = await this.funcionalidadRepo
+        if(idfuncionalidades.length > 0) usuario.permisos = await this.funcionalidadRepo
             .createQueryBuilder('funcionalidad')
             .where(`funcionalidad.id IN (:...idfuncionalidades)`, { idfuncionalidades })
             .leftJoinAndSelect(`funcionalidad.modulo`, 'modulo')
             .getMany();
+        else usuario.permisos = [];
         const newPermisos = this.getPermisosUsuarioEvento(usuario);
 
         await this.datasource.transaction(async manager => {
