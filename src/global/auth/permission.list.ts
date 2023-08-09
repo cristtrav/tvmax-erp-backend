@@ -41,7 +41,8 @@ export class Permissions {
         EDITAR: 82,
         ELIMINAR: 83,
         ACCESOMODULO: 84,
-        CONSULTARULTIMOID: 85
+        CONSULTARULTIMOID: 85,
+        ACCESOFORMULARIO: 86
     }
 
     static readonly TIPOSDOMICILIOS = {
