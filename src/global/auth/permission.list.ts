@@ -31,7 +31,8 @@ export class Permissions {
         REGISTRAR: 61,
         EDITAR: 62,
         ELIMINAR: 63,
-        ACCESOMODULO: 64
+        ACCESOMODULO: 64,
+        ACCESOFORMULARIO: 65
     }
 
     static readonly BARRIOS = {
