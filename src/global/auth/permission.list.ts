@@ -58,7 +58,8 @@ export class Permissions {
         EDITAR: 122,
         ELIMINAR: 123,
         ACCESOMODULO: 124,
-        CAMBIARPASS: 125
+        CAMBIARPASS: 125,
+        ACCESOFORMULARIO: 126
     }
 
     static readonly ROLES = {
