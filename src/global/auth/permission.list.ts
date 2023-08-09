@@ -5,7 +5,8 @@ export class Permissions {
         EDITAR: 3,
         ELIMINAR: 4,
         ACCESOMODULO: 5,
-        ACCESOFORMULARIO: 6
+        ACCESOFORMULARIO: 6,
+        CONSULTARULTIMOID: 7
     }
 
     static readonly SERVICIOS = {

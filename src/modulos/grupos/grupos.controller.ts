@@ -36,7 +36,7 @@ export class GruposController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.GRUPOS.CONSULTAR)
+    @RequirePermission(Permissions.GRUPOS.CONSULTARULTIMOID)
     async getLastId(): Promise<number> {
         return this.gruposSrv.getLastId();
     }
