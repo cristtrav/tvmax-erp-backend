@@ -62,7 +62,7 @@ export class ServiciosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
+    @RequirePermission(Permissions.SERVICIOS.CONSULTARULTIMOID)
     async getLastId(): Promise<number> {
         return this.serviciosSrv.getLastId();
     }
