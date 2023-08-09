@@ -36,7 +36,7 @@ export class BarriosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.BARRIOS.CONSULTAR)
+    @RequirePermission(Permissions.BARRIOS.CONSULTARULTIMOID)
     async getLastId(): Promise<number> {
         try {
             return await this.barriosSrv.getLastId();

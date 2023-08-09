@@ -4,7 +4,8 @@ export class Permissions {
         REGISTRAR: 2,
         EDITAR: 3,
         ELIMINAR: 4,
-        ACCESOMODULO: 5
+        ACCESOMODULO: 5,
+        ACCESOFORMULARIO: 6
     }
 
     static readonly SERVICIOS = {
@@ -36,7 +37,8 @@ export class Permissions {
         REGISTRAR: 81,
         EDITAR: 82,
         ELIMINAR: 83,
-        ACCESOMODULO: 84
+        ACCESOMODULO: 84,
+        CONSULTARULTIMOID: 85
     }
 
     static readonly TIPOSDOMICILIOS = {
