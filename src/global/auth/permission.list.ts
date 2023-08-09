@@ -77,7 +77,8 @@ export class Permissions {
         EDITAR: 162,
         ELIMINAR: 163,
         CONTAR: 164,
-        ACCESOMODULO: 165
+        ACCESOMODULO: 165,
+        ACCESOFORMULARIO: 166
     }
 
     static readonly CLIENTES = {
