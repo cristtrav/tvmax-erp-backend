@@ -86,7 +86,8 @@ export class Permissions {
         REGISTRAR: 181,
         EDITAR: 182,
         ELIMINAR: 183,
-        ACCESOMODULO: 184
+        ACCESOMODULO: 184,
+        ACCESOFORMULARIO: 185
     }
 
     static readonly DOMICILIOS = {
