@@ -126,7 +126,8 @@ export class Permissions {
     static readonly PERMISOS = {
         CONSULTARMODULOSFUNCIONALIDADES: 280,
         CONSULTARPERMISOSUSUARIO: 281,
-        EDITARPERMISOSUSUARIO: 282
+        EDITARPERMISOSUSUARIO: 282,
+        ACCESOFORMULARIO: 283
     }
 
     static readonly ESTADISTICAS = {
