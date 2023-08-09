@@ -145,7 +145,8 @@ export class Permissions {
         REGISTRAR: 341,
         EDITAR: 342,
         ELIMINAR: 343,
-        ACCESOMODULO: 344
+        ACCESOMODULO: 344,
+        ACCESOFORMULARIO: 345
     }
 
     static readonly COBROS = {
