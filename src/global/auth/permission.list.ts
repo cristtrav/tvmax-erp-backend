@@ -13,7 +13,8 @@ export class Permissions {
         REGISTRAR: 21,
         EDITAR: 22,
         ELIMINAR: 23,
-        ACCESOMODULO: 24
+        ACCESOMODULO: 24,
+        ACCESOFORMULARIO: 25
     }
 
     static readonly DEPARTAMENTOS = {
