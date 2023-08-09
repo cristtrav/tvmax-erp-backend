@@ -22,7 +22,8 @@ export class Permissions {
         REGISTRAR: 41,
         EDITAR: 42, 
         ELIMINAR: 43,
-        ACCESOMODULO: 44
+        ACCESOMODULO: 44,
+        ACCESOFORMULARIO: 45
     }
 
     static readonly DISTRITOS = {
