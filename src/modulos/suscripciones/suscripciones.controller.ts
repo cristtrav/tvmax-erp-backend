@@ -34,7 +34,7 @@ export class SuscripcionesController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
+    @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTARULTIMOID)
     getLastId(
     ): Promise<number> {
         return this.suscripcionesSrv.getLastId();
