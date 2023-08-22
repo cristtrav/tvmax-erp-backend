@@ -80,7 +80,8 @@ export class Permissions {
         ELIMINAR: 163,
         CONTAR: 164,
         ACCESOMODULO: 165,
-        ACCESOFORMULARIO: 166
+        ACCESOFORMULARIO: 166,
+        CONSULTARULTIMOID: 167
     }
 
     static readonly CLIENTES = {
@@ -89,7 +90,8 @@ export class Permissions {
         EDITAR: 182,
         ELIMINAR: 183,
         ACCESOMODULO: 184,
-        ACCESOFORMULARIO: 185
+        ACCESOFORMULARIO: 185,
+        CONSULTARULTIMOID: 186
     }
 
     static readonly DOMICILIOS = {
@@ -97,14 +99,16 @@ export class Permissions {
         REGISTRAR: 201,
         EDITAR: 202,
         ELIMINAR: 203,
-        ACCESOFORMULARIO: 204
+        ACCESOFORMULARIO: 204,
+        CONSULTARULTIMOID: 205
     }
     static readonly CUOTAS = {
         CONSULTAR: 220,
         REGISTRAR: 221,
         EDITAR: 222,
         ELIMINAR: 223,
-        ACCESOFORMULARIO: 224
+        ACCESOFORMULARIO: 224,
+        ACCESOMODULO: 225
     }
     static readonly TIMBRADOS = {
         CONSULTAR: 240,
