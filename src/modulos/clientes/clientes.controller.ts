@@ -2,11 +2,9 @@ import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { ClienteDTO } from '@dto/cliente.dto';
-import { ServerResponseList } from '@dto/server-response-list.dto';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';
-import { SuscripcionDTO } from '@dto/suscripcion.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { ClienteView } from '@database/view/cliente.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
@@ -53,7 +51,7 @@ export class ClientesController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.CLIENTES.CONSULTAR)
+    @RequirePermission(Permissions.CLIENTES.CONSULTARULTIMOID)
     getLastId(): Promise<number> {
         return this.clientesSrv.getLastId();
     }
