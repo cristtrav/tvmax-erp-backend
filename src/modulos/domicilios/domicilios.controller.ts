@@ -36,7 +36,7 @@ export class DomiciliosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
+    @RequirePermission(Permissions.DOMICILIOS.CONSULTARULTIMOID)
     getLastId(): Promise<number>{
         return this.domiciliosSrv.getLastId();
     }
