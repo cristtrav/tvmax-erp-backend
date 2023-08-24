@@ -50,7 +50,7 @@ export class TimbradosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.TIMBRADOS.CONSULTAR)
+    @RequirePermission(Permissions.TIMBRADOS.CONSULTARULTIMOID)
     getLastId(): Promise<number>
     {
         return this.timbradosSrv.getLastId();

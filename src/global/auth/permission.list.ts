@@ -117,7 +117,8 @@ export class Permissions {
         EDITAR: 242,
         ELIMINAR: 243,
         ACCESOMODULO: 244,
-        ACCESOFORMULARIO: 245
+        ACCESOFORMULARIO: 245,
+        CONSULTARULTIMOID: 246
     }
 
     static readonly VENTAS = {
