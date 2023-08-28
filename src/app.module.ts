@@ -67,9 +67,14 @@ import { DetalleConsultaCobranzaExterna } from '@database/entity/detalle-consult
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './global/tasks/tasks.module';
 import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client')
+    }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true
