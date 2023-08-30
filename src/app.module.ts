@@ -77,6 +77,7 @@ import { join } from 'path';
     }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
+      envFilePath: join(__dirname, '..', '.env'),
       isGlobal: true
     }),
     GruposModule,
