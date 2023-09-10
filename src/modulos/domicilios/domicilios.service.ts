@@ -68,10 +68,10 @@ export class DomiciliosService {
 
             if (d.principal) {
                 const domicilios = await this.domicilioRepo.findBy({ idcliente: d.idcliente, eliminado: false });
-                domicilios.forEach(async domicilio => {
+                for(let domicilio of domicilios) {
                     domicilio.principal = false;
                     await manager.save(domicilio);
-                });
+                };
             }
             await manager.save(d);
             await manager.save(this.getEventoAuditoria(idusuario, 'R', oldDomicilio, d));
@@ -88,10 +88,10 @@ export class DomiciliosService {
         await this.datasource.transaction(async manager => {
             if (d.principal) {
                 const domicilios = await this.domicilioRepo.findBy({ idcliente: d.idcliente, eliminado: false });
-                domicilios.forEach(async domicilio => {
+                for(let domicilio of domicilios) {
                     domicilio.principal = false;
                     await manager.save(domicilio);
-                });
+                }
             }
             await manager.save(d);
             await manager.save(this.getEventoAuditoria(idusuario, 'M', oldDomicilio, d));
