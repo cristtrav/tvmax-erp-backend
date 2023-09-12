@@ -82,6 +82,7 @@ export class SuscripcionesService {
         if (search) {
             query = query.andWhere(new Brackets(qb => {
                 if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: search });
+                if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.ci = :idsearch`, { idsearch: search });
                 qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :clisearch`, { clisearch: `%${search.toLowerCase()}%` });
             }));
         }
