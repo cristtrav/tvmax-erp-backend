@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Domicilio } from '@database/entity/domicilio.entity';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { DomicilioView } from '@database/view/domicilio.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
@@ -18,13 +18,21 @@ export class DomiciliosService {
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<DomicilioView> {
-        const { eliminado, idcliente, sort, offset, limit } = queries;
+        const { eliminado, idcliente, sort, offset, limit, search } = queries;
         const alias = 'domicilio';
         let query = this.domicilioViewRepo.createQueryBuilder(alias);
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
         if (idcliente) query = query.andWhere(`${alias}.idcliente ${Array.isArray(idcliente) ? 'IN (:...idcliente)' : '= :idcliente'}`, { idcliente });
         if (limit) query = query.take(limit);
-        if (offset) query = query.skip(offset)
+        if (offset) query = query.skip(offset);
+        if (search) query = query.andWhere(
+            new Brackets(qb => {
+                qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :clisearch`, { clisearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.direccion) LIKE :diresearch`, { diresearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.barrio) LIKE :barriosearch`, { barriosearch: `%${search.toLowerCase()}%` });
+                qb = qb.orWhere(`LOWER(${alias}.nromedidor) LIKE :medidorsearch`, { medidorsearch: `%${search.toLowerCase()}%` });
+            })
+        );
         if (sort) {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
