@@ -104,7 +104,7 @@ export class VentasService {
             idventa = (await manager.save(venta)).id;
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'R', null, venta));
 
-            const cobro = await this.createCobro(idventa, venta.idcliente, idusuario);
+            const cobro = await this.createCobro(venta, idusuario);
             await manager.save(cobro);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'R', null, cobro));
 
@@ -140,7 +140,7 @@ export class VentasService {
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'M', oldVenta, venta));
 
             //Se edita el estado del cobro y se guarda el evento de auditoria
-            const cobro = await this.createCobro(venta.id, venta.idcliente, oldCobro.cobradoPor);
+            const cobro = await this.createCobro(venta, oldCobro.cobradoPor);
             cobro.id = oldCobro.id;
             await manager.save(cobro);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'M', oldCobro, cobro));
@@ -272,12 +272,12 @@ export class VentasService {
         return this.ventaViewRepo.findOneByOrFail({ id });
     }
 
-    private async createCobro(idventa: number, idcliente: number, idusuario: number): Promise<Cobro> {
+    private async createCobro(venta: Venta, idusuario: number): Promise<Cobro> {
         const cobro = new Cobro();
         cobro.cobradoPor = idusuario;
-        cobro.fecha = new Date();
-        cobro.idventa = idventa;
-        cobro.comisionPara = (await this.clienteRepo.findOneByOrFail({ id: idcliente })).idcobrador;
+        cobro.fecha = venta.fechaFactura;
+        cobro.idventa = venta.id;
+        cobro.comisionPara = (await this.clienteRepo.findOneByOrFail({ id: venta.idcliente })).idcobrador;
         return cobro;
     }
 
