@@ -81,7 +81,8 @@ export class CobrosService {
         if (sort) {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
-            query = query.orderBy(sortColumn, sortOrder);
+            query = query.orderBy(sortColumn, sortOrder); 
+            if(sortColumn !== 'iddetalleventa') query = query.addOrderBy(`${alias}.iddetalleventa`, sortOrder);
         }
         return query;
     }

@@ -82,9 +82,7 @@ export class VentasService {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
             query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
-            if(sortColumn === 'fechafactura' || sortColumn === 'fechacobro'){
-                query = query.addOrderBy(`${alias}.id`, sortOrder);
-            }
+            if(sortColumn !== 'id') query = query.addOrderBy(`${alias}.id`, sortOrder);
         }
         return query;
     }
