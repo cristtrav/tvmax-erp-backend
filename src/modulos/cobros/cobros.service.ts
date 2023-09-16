@@ -77,7 +77,7 @@ export class CobrosService {
         }
         if (search) query = query.andWhere(new Brackets(qb => {
             qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :searchcli`, { searchcli: `%${search.toLowerCase()}%` });
-            qb = qb.orWhere(`${alias}.facturacobro LIKE :searchfactura`, { searchfactura: search })
+            qb = qb.orWhere(`${alias}.facturacobro LIKE :searchfactura`, { searchfactura: `%${search}%` })
             if (!Number.isNaN(Number(search)))
                 qb = qb.orWhere(`${alias}.ci = :searchci`, { searchci: Number(search) });
             /*qb = qb.orWhere(`LOWER(${alias}.servicio) LIKE :searchservicio`, {searchservicio: `%${search.toLowerCase()}%`});
