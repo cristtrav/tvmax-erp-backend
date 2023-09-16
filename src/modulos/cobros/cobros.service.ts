@@ -3,6 +3,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
+const appendIdDetalleOnSort: string[] = [
+    "fechafactura",
+    "fechacobro",
+    "ci",
+    "cliente",
+    "monto",
+    "descripcion"
+]
+
 @Injectable()
 export class CobrosService {
 
@@ -81,8 +90,8 @@ export class CobrosService {
         if (sort) {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
-            query = query.orderBy(sortColumn, sortOrder); 
-            if(sortColumn !== 'iddetalleventa') query = query.addOrderBy(`${alias}.iddetalleventa`, sortOrder);
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder); 
+            if(appendIdDetalleOnSort.includes(sortColumn)) query = query.addOrderBy(`${alias}.iddetalleventa`, sortOrder);
         }
         return query;
     }

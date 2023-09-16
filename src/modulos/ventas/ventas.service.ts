@@ -10,6 +10,14 @@ import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Cliente } from '@database/entity/cliente.entity';
 
+const appendIdOnSort: string[] = [
+    "fechafactura",
+    "fechacobro",
+    "ci",
+    "cliente",
+    "total"
+]
+
 @Injectable()
 export class VentasService {
 
@@ -81,8 +89,11 @@ export class VentasService {
         if (sort) {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
-            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
-            if(sortColumn !== 'id') query = query.addOrderBy(`${alias}.id`, sortOrder);
+            if(sortColumn === 'nrofactura'){
+                query = query.orderBy(`${alias}.prefijofactura`, sortOrder);
+                query = query.addOrderBy(`${alias}.nrofactura`, sortOrder);
+            }else query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+            if(appendIdOnSort.includes(sortColumn)) query = query.addOrderBy(`${alias}.id`, sortOrder);
         }
         return query;
     }
@@ -292,6 +303,6 @@ export class VentasService {
             )
             .where('detalle.idcuota = :idcuota', { idcuota });
         return (await detalleQuery.getCount()) != 0;
-    }
+    }    
 
 }
