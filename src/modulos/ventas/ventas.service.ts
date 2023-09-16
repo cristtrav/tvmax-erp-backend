@@ -142,8 +142,16 @@ export class VentasService {
     }
 
     async edit(venta: Venta, detalleVenta: DetalleVenta[], idusuario: number) {
-        const oldVenta = await this.ventaRepo.findOne({ where: { id: venta.id, eliminado: false }, relations: { detalles: true } });
+        const oldVenta = await this.ventaRepo.createQueryBuilder('venta')
+        .where(`venta.id = :id`, {id: venta.id})
+        .andWhere(`venta.eliminado = FALSE`)
+        .leftJoinAndSelect(`venta.detalles`, 'detalles', 'detalles.eliminado = FALSE')
+        .getOne();
         const oldCobro = await this.cobroRepo.findOneBy({ idventa: venta.id, eliminado: false });
+
+        if(!oldVenta) throw new HttpException({
+            message: `No se encuentra la venta con código «${venta.id}».`
+        }, HttpStatus.NOT_FOUND);
 
         await this.datasource.transaction(async manager => {
             //Se guarda la venta y el evento en auditoria
