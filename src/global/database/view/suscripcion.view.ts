@@ -37,6 +37,9 @@ export class SuscripcionView{
     direccion: string;
 
     @ViewColumn()
+    obsdomicilio: string;
+
+    @ViewColumn()
     nromedidor: string;
 
     @ViewColumn()

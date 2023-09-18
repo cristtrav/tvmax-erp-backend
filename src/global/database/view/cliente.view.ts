@@ -43,6 +43,9 @@ export class ClienteView{
     direccion: string;
 
     @ViewColumn()
+    obsdomicilio: string;
+
+    @ViewColumn()
     idbarrio: number;
 
     @ViewColumn()
