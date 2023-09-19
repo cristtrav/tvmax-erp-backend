@@ -156,15 +156,20 @@ export class CobranzaExternaService {
     }
 
     async anular(anularReq: AnulacionRequestDTO): Promise<GenericoResponseDTO>{
-        const detalleCobranza = await this.detalleConsultaCobranzaRepo.findOneBy({nroOperacion: anularReq.nroOperacion});
-        if(!detalleCobranza) return {
+        const detallesCobranza = await this.detalleConsultaCobranzaRepo.findBy({codTransaccionPago: anularReq.codTransaccionAnular});
+        if(detallesCobranza.length === 0) return {
             codServicio: '00001',
             codRetorno: '999',
             desRetorno: 'NO SE ENCONTRO OPERACION',
             tipoTrx: 4
         }
+        
+        const detallesAnular = detallesCobranza.filter(detalle => detalle.codTransaccionAnulacion == null);
+        const montoTotalAnular = detallesAnular
+            .map(detalle => Number(detalle.totalDetalle))
+            .reduce((suma, monto) => suma += monto, 0);        
 
-        if(detalleCobranza.codTransaccionAnulacion) return {
+        if(detallesAnular.length === 0) return {
             codServicio: '00001',
             codRetorno: '999',
             desRetorno: 'OPERACION YA ANULADA',
@@ -172,7 +177,7 @@ export class CobranzaExternaService {
         }
 
         const importeRequest = `${anularReq.importe.substring(0, 13)}.${anularReq.importe.substring(13)}`;
-        if(Number(importeRequest) != Number(detalleCobranza.totalDetalle)) return {
+        if(Number(importeRequest) != montoTotalAnular) return {
             codServicio: '00001',
             codRetorno: '999',
             desRetorno: 'MONTO INCORRECTO',
@@ -181,7 +186,6 @@ export class CobranzaExternaService {
 
         const cobro = await this.cobroRepo.findOneByOrFail({ codTransaccionCobranzaExterna: anularReq.codTransaccionAnular});
         const venta = await this.ventaRepo.findOneByOrFail({ id: cobro.idventa });
-        const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalleCobranza.idcuota });
 
         await this.datasource.transaction(async manager => {
             cobro.anulado = true;
@@ -189,12 +193,16 @@ export class CobranzaExternaService {
 
             venta.anulado = true;
             await manager.save(venta);
+            
+            for(let detalle of detallesAnular){
+                const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
 
-            cuota.pagado = false;
-            await manager.save(cuota);
+                cuota.pagado = false;
+                await manager.save(cuota);
 
-            detalleCobranza.codTransaccionAnulacion = anularReq.codTransaccion;
-            await manager.save(detalleCobranza);
+                detalle.codTransaccionAnulacion = anularReq.codTransaccion;
+                await manager.save(detalle);
+            }
         })
 
         return {
