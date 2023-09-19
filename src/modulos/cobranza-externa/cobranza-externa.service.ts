@@ -127,7 +127,7 @@ export class CobranzaExternaService {
         
         const cuota = await this.cuotaRepo.findOneByOrFail({id: detalleCobranza.idcuota});
         const cuotaView = await this.cuotaViewRepo.findOneByOrFail({id: detalleCobranza.idcuota});
-        const usuarioCobranza = await this.usuarioRepo.findOneByOrFail({ci: request.usuario});
+        const usuarioCobranza = await this.usuarioRepo.findOneByOrFail({id: Number(request.usuario)});
         const suscripcionView = await this.suscripcionViewRepo.findOneByOrFail({id: cuota.idsuscripcion});
         const cobrador = await this.usuarioRepo.findOneByOrFail({id: suscripcionView.idcobrador });
 
