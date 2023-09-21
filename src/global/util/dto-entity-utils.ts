@@ -199,7 +199,7 @@ export class DTOEntityUtis {
         detalleVenta.descripcion = detalleVentaDto.descripcion;
         detalleVenta.idcuota = detalleVentaDto.idcuota;
         detalleVenta.idservicio = detalleVentaDto.idservicio;
-        detalleVenta.idsuscripcion = detalleVentaDto.idservicio;
+        detalleVenta.idsuscripcion = detalleVentaDto.idsuscripcion;
         //detalleVenta.idventa = detalleVentaDto.idventa;
         detalleVenta.monto = detalleVentaDto.monto;
         detalleVenta.montoIva = detalleVentaDto.montoiva;
