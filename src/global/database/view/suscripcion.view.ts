@@ -31,6 +31,12 @@ export class SuscripcionView{
     dvruc: number;
 
     @ViewColumn()
+    telefono1: string;
+
+    @ViewColumn()
+    telefono2: string;
+
+    @ViewColumn()
     iddomicilio: number;
 
     @ViewColumn()
