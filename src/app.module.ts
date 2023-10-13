@@ -69,6 +69,8 @@ import { TasksModule } from './global/tasks/tasks.module';
 import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-materiales.module';
+import { TipoMaterial } from '@database/entity/tipo-material.entity';
 
 @Module({
   imports: [
@@ -130,10 +132,12 @@ import { join } from 'path';
         Cobro, CobroCuotasView, CobroDetalleVentaView,
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
-        GeneracionCuotas
+        GeneracionCuotas,
+        TipoMaterial
       ]
     }),
-    TasksModule
+    TasksModule,
+    TiposMaterialesModule
   ],
   controllers: [AppController],
   providers: [AppService],
