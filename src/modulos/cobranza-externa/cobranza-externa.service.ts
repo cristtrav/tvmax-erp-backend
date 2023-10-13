@@ -60,9 +60,9 @@ export class CobranzaExternaService {
         const consultaCobranza: ConsultaCobranzaExterna = new ConsultaCobranzaExterna();
         consultaCobranza.codServicio = '00001';
         consultaCobranza.codRetorno = '000';
-        consultaCobranza.desRetorno = cliente.razonsocial.toUpperCase();
+        consultaCobranza.desRetorno = 'CUOTAS';
         consultaCobranza.moneda = '1';
-        consultaCobranza.nombreApellido = cliente.razonsocial;
+        consultaCobranza.nombreApellido = cliente.razonsocial.toUpperCase();
         consultaCobranza.nroDocumento = request.nroDocumento;
         consultaCobranza.usuario = request.usuario;
         consultaCobranza.idcliente = cliente.id;
@@ -94,7 +94,7 @@ export class CobranzaExternaService {
             await manager.save(consultaCobranza);
             for (let detalle of detallesConsultaCobranza) await manager.save(detalle);
         });
-
+        console.log(consultaCobranza)
         return this.consultaCobranzaToDTO(consultaCobranza, detallesConsultaCobranza);
     }
 
@@ -301,6 +301,7 @@ export class CobranzaExternaService {
             codRetorno: consulta.codRetorno,
             desRetorno: consulta.desRetorno,
             cantFilas: detallesConsulta.length,
+            nombreApellido: consulta.nombreApellido,
             detalles: detalles
         }
     }
