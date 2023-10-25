@@ -94,4 +94,10 @@ export class TablasAuditoriaList{
         nombre: 'formato_factura',
         descripcion: 'Formatos Facturas'
     }
+
+    public static TIPOMATERIAL: TablaAuditoriaDTO = {
+        id: 19,
+        nombre: 'tipo_material',
+        descripcion: 'Tipos de Materiales'
+    }
 }

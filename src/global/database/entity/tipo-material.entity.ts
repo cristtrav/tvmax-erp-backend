@@ -8,6 +8,9 @@ export class TipoMaterial {
     @Column({length: 45, nullable: false})
     descripcion: string;
 
+    @Column({name: 'solo_lectura', nullable: false, default: false})
+    soloLectura: boolean;
+
     @Column({nullable: false, default: false})
-    eliminado: false;
+    eliminado: boolean;
 }

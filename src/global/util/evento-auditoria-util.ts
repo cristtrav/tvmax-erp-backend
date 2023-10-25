@@ -87,4 +87,13 @@ export class EventoAuditoriaUtil{
         return this.getEventoAuditoria(TablasAuditoriaList.FORMATOSFACTURAS.id, idusuario, operacion, oldValue, newValue);
     }
 
+    public static getEventoAuditoriaTiposMateriales(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.TIPOMATERIAL.id, idusuario, operacion, oldValue, newValue)
+    }
+
 }

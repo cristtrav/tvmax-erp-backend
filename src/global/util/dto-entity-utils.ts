@@ -29,6 +29,8 @@ import { Suscripcion } from "../database/entity/suscripcion.entity";
 import { Timbrado } from "../database/entity/timbrado.entity";
 import { Usuario } from "../database/entity/usuario.entity";
 import { Venta } from "../database/entity/venta.entity";
+import { TipoMaterial } from "@database/entity/tipo-material.entity";
+import { TipoMaterialDTO } from "@dto/tipo-material.dto";
 
 export class DTOEntityUtis {
 
@@ -216,6 +218,14 @@ export class DTOEntityUtis {
         formatoFactura.tipoFactura = formatoFacturaDto.tipoFactura;
         formatoFactura.eliminado = formatoFacturaDto.eliminado;
         return formatoFactura;
+    }
+
+    public static tipoMaterialDTOtoEntity(tmDto: TipoMaterialDTO): TipoMaterial{
+        const tipoMaterial = new TipoMaterial();
+        tipoMaterial.id = tmDto.id;
+        tipoMaterial.descripcion = tmDto.descripcion;
+        tipoMaterial.eliminado = false;
+        return tipoMaterial;
     }
 
 }
