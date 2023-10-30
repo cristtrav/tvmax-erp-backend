@@ -31,6 +31,8 @@ import { Usuario } from "../database/entity/usuario.entity";
 import { Venta } from "../database/entity/venta.entity";
 import { TipoMaterial } from "@database/entity/tipo-material.entity";
 import { TipoMaterialDTO } from "@dto/tipo-material.dto";
+import { MaterialDTO } from "@dto/material.dto";
+import { Material } from "@database/entity/material.entity";
 
 export class DTOEntityUtis {
 
@@ -226,6 +228,17 @@ export class DTOEntityUtis {
         tipoMaterial.descripcion = tmDto.descripcion;
         tipoMaterial.eliminado = false;
         return tipoMaterial;
+    }
+
+    public static materialDTOtoEntity(m: MaterialDTO): Material{
+        const material = new Material()
+        material.id = m.id;
+        material.descripcion = m.descripcion;
+        material.unidadMedida = m.unidadmedida;
+        material.idtipoMaterial = m.idtipomaterial;
+        material.soloLectura = m.sololectura;
+        material.eliminado = m.eliminado;
+        return material;
     }
 
 }

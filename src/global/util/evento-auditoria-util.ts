@@ -93,7 +93,16 @@ export class EventoAuditoriaUtil{
         oldValue: any,
         newValue: any
     ){
-        return this.getEventoAuditoria(TablasAuditoriaList.TIPOMATERIAL.id, idusuario, operacion, oldValue, newValue)
+        return this.getEventoAuditoria(TablasAuditoriaList.TIPOMATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaMaterial(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.MATERIAL.id, idusuario, operacion, oldValue, newValue);
     }
 
 }

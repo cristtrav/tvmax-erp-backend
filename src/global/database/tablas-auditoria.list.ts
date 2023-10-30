@@ -100,4 +100,10 @@ export class TablasAuditoriaList{
         nombre: 'tipo_material',
         descripcion: 'Tipos de Materiales'
     }
+
+    public static MATERIAL: TablaAuditoriaDTO = {
+        id: 20,
+        nombre: 'material',
+        descripcion: 'Materiales'
+    }
 }

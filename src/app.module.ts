@@ -71,6 +71,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-materiales.module';
 import { TipoMaterial } from '@database/entity/tipo-material.entity';
+import { MaterialesModule } from './modulos/materiales/materiales.module';
+import { Material } from '@database/entity/material.entity';
+import { MaterialView } from '@database/view/material.view';
 
 @Module({
   imports: [
@@ -133,11 +136,12 @@ import { TipoMaterial } from '@database/entity/tipo-material.entity';
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
-        TipoMaterial
+        TipoMaterial, Material, MaterialView
       ]
     }),
     TasksModule,
-    TiposMaterialesModule
+    TiposMaterialesModule,
+    MaterialesModule
   ],
   controllers: [AppController],
   providers: [AppService],
