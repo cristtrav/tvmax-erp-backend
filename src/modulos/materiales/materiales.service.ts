@@ -3,7 +3,7 @@ import { MaterialView } from '@database/view/material.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class MaterialesService {
@@ -17,12 +17,16 @@ export class MaterialesService {
     ){}
 
     private getSelectQuery(params: {[name:string]: any}): SelectQueryBuilder<MaterialView>{
-        const { sort, offset, limit, eliminado } = params;
+        const { sort, offset, limit, eliminado, search } = params;
         const alias = 'material';
         let query: SelectQueryBuilder<MaterialView> = this.materialViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
+        if(search) query = query.andWhere(new Brackets(qb => {
+            qb.orWhere(`LOWER(${alias}.descripcion) LIKE :dessearch`, {dessearch: `%${search.toLowerCase()}%`});
+            if(Number.isInteger(Number(search))) qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
+        }));
         if(sort){
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
