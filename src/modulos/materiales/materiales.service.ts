@@ -1,3 +1,4 @@
+import { Existencia } from '@database/entity/existencia.entity';
 import { Material } from '@database/entity/material.entity';
 import { MaterialView } from '@database/view/material.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
@@ -13,6 +14,8 @@ export class MaterialesService {
         private materialRepo: Repository<Material>,
         @InjectRepository(MaterialView)
         private materialViewRepo: Repository<MaterialView>,
+        @InjectRepository(Existencia)
+        private existenciaRepo: Repository<Existencia>,
         private datasource: DataSource
     ){}
 
@@ -50,13 +53,13 @@ export class MaterialesService {
 
     async create(material: Material, idusuario: number){
         const oldMaterial = await this.materialRepo.findOneBy({id: material.id, eliminado: false});
-        console.log(oldMaterial);
         if(oldMaterial) throw new HttpException({
             message: `El material con código «${material.id}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
 
         await this.datasource.transaction(async manager => {
             await manager.save(material);
+            await manager.save(this.getExistenciaPorDefecto(material.id));
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaMaterial(idusuario, 'R', oldMaterial, material));
         });
     }
@@ -91,6 +94,14 @@ export class MaterialesService {
             .select(`MAX(material.id)`, 'max')
             .getRawOne()
         ).max;
+    }
+
+    private getExistenciaPorDefecto(idmaterial: number): Existencia{
+        const existenciaPorDefecto = new Existencia();
+        existenciaPorDefecto.iddeposito = 1;
+        existenciaPorDefecto.idmaterial = idmaterial;
+        existenciaPorDefecto.cantidad = '0.0';
+        return existenciaPorDefecto;
     }
 
 }

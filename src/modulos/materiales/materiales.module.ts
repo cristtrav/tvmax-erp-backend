@@ -6,13 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UtilModule } from '@util/util.module';
 import { Material } from '@database/entity/material.entity';
 import { MaterialView } from '@database/view/material.view';
+import { Existencia } from '@database/entity/existencia.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
     TypeOrmModule.forFeature([
-      Material, MaterialView
+      Material, MaterialView, Existencia
     ])
   ],
   providers: [MaterialesService],

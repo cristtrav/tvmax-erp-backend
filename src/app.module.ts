@@ -74,6 +74,12 @@ import { TipoMaterial } from '@database/entity/tipo-material.entity';
 import { MaterialesModule } from './modulos/materiales/materiales.module';
 import { Material } from '@database/entity/material.entity';
 import { MaterialView } from '@database/view/material.view';
+import { Existencia } from '@database/entity/existencia.entity';
+import { MovimientosMaterialesModule } from './modulos/movimientos-materiales/movimientos-materiales.module';
+import { MovimientoMaterial } from '@database/entity/movimiento-material.entity';
+import { DetalleMovimientoMaterial } from '@database/entity/detalle-movimiento-material.entity';
+import { MovimientoMaterialView } from '@database/view/movimiento-material.view';
+import { DetalleMovimientoMaterialView } from '@database/view/detalle-movimiento-material.view';
 
 @Module({
   imports: [
@@ -136,12 +142,14 @@ import { MaterialView } from '@database/view/material.view';
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
-        TipoMaterial, Material, MaterialView
+        TipoMaterial, Material, Existencia, MovimientoMaterial, DetalleMovimientoMaterial,
+        MovimientoMaterialView, MaterialView, DetalleMovimientoMaterialView
       ]
     }),
     TasksModule,
     TiposMaterialesModule,
-    MaterialesModule
+    MaterialesModule,
+    MovimientosMaterialesModule
   ],
   controllers: [AppController],
   providers: [AppService],

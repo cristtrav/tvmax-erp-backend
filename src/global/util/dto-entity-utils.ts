@@ -33,6 +33,10 @@ import { TipoMaterial } from "@database/entity/tipo-material.entity";
 import { TipoMaterialDTO } from "@dto/tipo-material.dto";
 import { MaterialDTO } from "@dto/material.dto";
 import { Material } from "@database/entity/material.entity";
+import { MovimientoMaterialDTO } from "@dto/movimiento-material.dto";
+import { MovimientoMaterial } from "@database/entity/movimiento-material.entity";
+import { DetalleMovimientoMaterialDTO } from "@dto/detalle-movimiento-material.dto";
+import { DetalleMovimientoMaterial } from "@database/entity/detalle-movimiento-material.entity";
 
 export class DTOEntityUtis {
 
@@ -239,6 +243,33 @@ export class DTOEntityUtis {
         material.soloLectura = m.sololectura;
         material.eliminado = m.eliminado;
         return material;
+    }
+
+    public static movimientoMaterialDTOtoEntity(m: MovimientoMaterialDTO): MovimientoMaterial{
+        const movimiento = new MovimientoMaterial();
+        movimiento.id = m.id;
+        movimiento.fecha = m.fecha;
+        movimiento.idmovimientoReferencia = m.idmovimientoreferencia;
+        movimiento.idusuarioEntrega = m.idusuarioentrega;
+        movimiento.idusuarioResponsable = m.idusuarioresponsable;
+        movimiento.observacion = m.observacion;
+        movimiento.tipoMovimiento = m.tipomovimiento;        
+        movimiento.eliminado = false;
+        movimiento.devuelto = m.devuelto;
+        return movimiento;
+    }
+
+    public static detalleMovimientoMaterialDTOtoEntity(d: DetalleMovimientoMaterialDTO): DetalleMovimientoMaterial{
+        const detalle = new DetalleMovimientoMaterial();
+        detalle.id = d.id;
+        detalle.cantidad = d.cantidad;
+        detalle.cantidadAnterior = d.cantidadanterior;
+        detalle.idmovimientoMaterial = d.idmovimiento;
+        detalle.idmaterial = d.idmaterial;
+        detalle.descripcion = d.descripcion;
+        detalle.iddetalleMovimientoReferencia = d.iddetallemovimientoreferencia;
+        detalle.eliminado = d.eliminado;
+        return detalle;
     }
 
 }

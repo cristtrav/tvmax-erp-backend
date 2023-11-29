@@ -21,5 +21,8 @@ export class MaterialView {
     tipomaterial: string;
 
     @ViewColumn()
+    cantidad: number;
+
+    @ViewColumn()
     eliminado: boolean;
 }
