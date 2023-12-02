@@ -106,4 +106,22 @@ export class TablasAuditoriaList{
         nombre: 'material',
         descripcion: 'Materiales'
     }
+
+    public static MOVIMIENTOMATERIAL = {
+        id: 21,
+        nombre: 'movimiento_material',
+        descripcion: 'Movimientos de Materiales'
+    }
+
+    public static DETALLEMOVIMIENTOMATERIAL = {
+        id: 22,
+        nombre: 'detalle_movimiento_material',
+        descripcion: 'Detalles de Movimientos de Materiales'
+    }
+
+    public static EXISTENCIA = {
+        id: 23,
+        nombre: 'existencia',
+        descripcion: 'Existencias de Materiales'
+    }
 }

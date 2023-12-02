@@ -2,6 +2,7 @@ import { DetalleMovimientoMaterial } from '@database/entity/detalle-movimiento-m
 import { Existencia } from '@database/entity/existencia.entity';
 import { MovimientoMaterial } from '@database/entity/movimiento-material.entity';
 import { MovimientoMaterialView } from '@database/view/movimiento-material.view';
+import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
@@ -57,30 +58,40 @@ export class MovimientosMaterialesService {
         await this.datasource.transaction(async manager => {
             movimiento.devuelto = false;
             idmovimiento = (await manager.save(movimiento)).id;
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaMovimientoMaterial(idusuario, 'R', null, movimiento));
+
             if(movimiento.tipoMovimiento == 'DE'){
                 const movimientoReferencia = await this.movimientoMaterialRepo.findOneByOrFail({id: movimiento.idmovimientoReferencia});
+                const oldMovimientoReferencia = {...movimientoReferencia};
                 movimientoReferencia.devuelto = true;
                 movimientoReferencia.idmovimientoReferencia = idmovimiento;
                 await manager.save(movimientoReferencia);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaMovimientoMaterial(3, 'M', oldMovimientoReferencia, movimientoReferencia));
             }
             for(let detalle of detalles){
                 delete detalle.id
                 detalle.movimiento = movimiento;
 
                 const existencia = await this.existenciaRepo.findOneByOrFail({idmaterial: detalle.idmaterial});
-                
+                const oldExistencia = {...existencia};
+
                 detalle.cantidadAnterior = existencia.cantidad;
                 const iddetalle = (await manager.save(detalle)).id;
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaDetalleMovimientoMaterial(idusuario, 'R', null, detalle));
 
                 if(movimiento.tipoMovimiento === 'EN' || movimiento.tipoMovimiento === 'DE') existencia.cantidad = `${Number(existencia.cantidad) + Number(detalle.cantidad)}`;
                 if(movimiento.tipoMovimiento === 'SA') existencia.cantidad = `${Number(existencia.cantidad) - Number(detalle.cantidad)}`;
                 if(movimiento.tipoMovimiento === 'AJ') existencia.cantidad = `${detalle.cantidad}`;
 
                 await manager.save(existencia);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaExistencia(3, 'M', oldExistencia, existencia));
+                
                 if(movimiento.tipoMovimiento == 'DE'){
                     const detalleReferencia = await this.detalleMovimientoMaterialRepo.findOneByOrFail({id: detalle.iddetalleMovimientoReferencia});
+                    const oldDetalleReferencia = {...detalleReferencia};
                     detalleReferencia.iddetalleMovimientoReferencia = iddetalle;
                     await manager.save(detalleReferencia);
+                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaDetalleMovimientoMaterial(3, 'M', oldDetalleReferencia, detalleReferencia));
                 }
             }
         });
@@ -88,25 +99,41 @@ export class MovimientosMaterialesService {
     }
 
     async update(movimiento: MovimientoMaterial, detalles: DetalleMovimientoMaterial[], idusuario: number){
-        const mov = await this.movimientoMaterialRepo.findOneByOrFail({id: movimiento.id});
+        const oldMovimiento = await this.movimientoMaterialRepo.findOneByOrFail({id: movimiento.id});
         if(movimiento.tipoMovimiento == 'AJ') delete movimiento.idusuarioEntrega;
 
         await this.datasource.transaction(async manager => {
             await manager.save(movimiento);
-            for(let deta of detalles){
-                const existencia = await this.existenciaRepo.findOneByOrFail({idmaterial: deta.idmaterial});
-                const detaAnterior = await this.detalleMovimientoMaterialRepo.findOneByOrFail({id: deta.id});
-                deta.cantidadAnterior = existencia.cantidad;
+            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaMovimientoMaterial(idusuario, 'M', oldMovimiento, movimiento));
+            for(let detalle of detalles){
+                const existencia = await this.existenciaRepo.findOneByOrFail({idmaterial: detalle.idmaterial});
+                const oldExistencia = {...existencia};
+
+                const oldDetalle = await this.detalleMovimientoMaterialRepo.findOneBy({id: detalle.id});
+                detalle.cantidadAnterior = existencia.cantidad;
                 
+                if(oldDetalle){
+                    if(movimiento.tipoMovimiento == 'EN' || movimiento.tipoMovimiento == 'DE')
+                        existencia.cantidad = `${Number(existencia.cantidad) - Number(oldDetalle.cantidad)}`;
+                    if(movimiento.tipoMovimiento == 'SA')
+                        existencia.cantidad = `${Number(existencia.cantidad) + Number(oldDetalle.cantidad)}`;
+                }else{
+                    delete detalle.id;
+                    detalle.idmovimientoMaterial = movimiento.id;
+                }
+
                 if(movimiento.tipoMovimiento == 'EN' || movimiento.tipoMovimiento == 'DE')
-                    existencia.cantidad = `${(Number(existencia.cantidad) - Number(detaAnterior.cantidad) + Number(deta.cantidad))}`;
+                    existencia.cantidad = `${(Number(existencia.cantidad) + Number(detalle.cantidad))}`;
                 if(movimiento.tipoMovimiento == 'SA')
-                    existencia.cantidad = `${(Number(existencia.cantidad) + Number(detaAnterior.cantidad) - Number(deta.cantidad))}`;
+                    existencia.cantidad = `${(Number(existencia.cantidad) - Number(detalle.cantidad))}`;
                 if(movimiento.tipoMovimiento == 'AJ')
-                    existencia.cantidad = deta.cantidad;
+                    existencia.cantidad = detalle.cantidad;
                 
                 await manager.save(existencia);
-                await manager.save(deta);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaExistencia(3, 'M', oldExistencia, existencia));
+                
+                await manager.save(detalle);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaDetalleMovimientoMaterial(idusuario, 'M', oldDetalle, detalle));
             }
         })
     }

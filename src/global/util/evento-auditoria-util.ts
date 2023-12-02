@@ -3,7 +3,7 @@ import { TablasAuditoriaList } from "@database/tablas-auditoria.list";
 
 export class EventoAuditoriaUtil{
 
-    public static getEventoAuditoria(
+    private static getEventoAuditoria(
         idtabla: number,
         idusuario: number,
         operacion: 'R' | 'M' | 'E',
@@ -103,6 +103,33 @@ export class EventoAuditoriaUtil{
         newValue: any
     ){
         return this.getEventoAuditoria(TablasAuditoriaList.MATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaMovimientoMaterial(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.MOVIMIENTOMATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaDetalleMovimientoMaterial(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.DETALLEMOVIMIENTOMATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaExistencia(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.EXISTENCIA.id, idusuario, operacion, oldValue, newValue);
     }
 
 }
