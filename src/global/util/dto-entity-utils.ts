@@ -29,6 +29,8 @@ import { Suscripcion } from "../database/entity/suscripcion.entity";
 import { Timbrado } from "../database/entity/timbrado.entity";
 import { Usuario } from "../database/entity/usuario.entity";
 import { Venta } from "../database/entity/venta.entity";
+import { SorteoDTO } from "@dto/sorteo.dto";
+import { Sorteo } from "@database/entity/sorteo.entity";
 
 export class DTOEntityUtis {
 
@@ -216,6 +218,14 @@ export class DTOEntityUtis {
         formatoFactura.tipoFactura = formatoFacturaDto.tipoFactura;
         formatoFactura.eliminado = formatoFacturaDto.eliminado;
         return formatoFactura;
+    }
+
+    public static sorteoDtoToEntity(sorteoDto: SorteoDTO): Sorteo{
+        const sorteo = new Sorteo();
+        sorteo.id = sorteoDto.id;
+        sorteo.descripcion = sorteoDto.descripcion;
+        sorteo.eliminado = sorteoDto.eliminado;
+        return sorteo;
     }
 
 }

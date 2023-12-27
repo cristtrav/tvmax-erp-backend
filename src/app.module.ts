@@ -69,6 +69,9 @@ import { TasksModule } from './global/tasks/tasks.module';
 import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { SorteosModule } from './modulos/sorteos/sorteos.module';
+import { Sorteo } from '@database/entity/sorteo.entity';
+import { Premio } from '@database/entity/premio.entity';
 
 @Module({
   imports: [
@@ -130,10 +133,12 @@ import { join } from 'path';
         Cobro, CobroCuotasView, CobroDetalleVentaView,
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
-        GeneracionCuotas
+        GeneracionCuotas,
+        Sorteo, Premio
       ]
     }),
-    TasksModule
+    TasksModule,
+    SorteosModule
   ],
   controllers: [AppController],
   providers: [AppService],

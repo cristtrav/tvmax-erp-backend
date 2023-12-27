@@ -161,4 +161,8 @@ export class Permissions {
         CONSULTAR: 360,
         ACCESOMODULO: 361
     }
+
+    static readonly SORTEOS = {
+        ACCESOMODULO: 400 
+    }
 }

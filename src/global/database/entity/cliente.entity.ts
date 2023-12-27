@@ -35,4 +35,7 @@ export class Cliente{
 
     @Column({default: false, nullable: false})
     eliminado: boolean;
+
+    @Column({name: 'excluido_sorteo', default: false, nullable: false})
+    excluidoSorteo: boolean;
 }

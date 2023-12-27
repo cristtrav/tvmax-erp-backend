@@ -94,4 +94,10 @@ export class TablasAuditoriaList{
         nombre: 'formato_factura',
         descripcion: 'Formatos Facturas'
     }
+
+    public static SORTEOS: TablaAuditoriaDTO = {
+        id: 20,
+        nombre: 'sorteo',
+        descripcion: 'Sorteos'
+    }
 }
