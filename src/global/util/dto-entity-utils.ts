@@ -30,7 +30,9 @@ import { Timbrado } from "../database/entity/timbrado.entity";
 import { Usuario } from "../database/entity/usuario.entity";
 import { Venta } from "../database/entity/venta.entity";
 import { SorteoDTO } from "@dto/sorteo.dto";
-import { Sorteo } from "@database/entity/sorteo.entity";
+import { Sorteo } from "@database/entity/sorteos/sorteo.entity";
+import { PremioDTO } from "@dto/premio.dto";
+import { Premio } from "@database/entity/sorteos/premio.entity";
 
 export class DTOEntityUtis {
 
@@ -226,6 +228,16 @@ export class DTOEntityUtis {
         sorteo.descripcion = sorteoDto.descripcion;
         sorteo.eliminado = sorteoDto.eliminado;
         return sorteo;
+    }
+
+    public static premioDtoToEntity(premioDto: PremioDTO): Premio{
+        const premio = new Premio();
+        premio.id = premioDto.id;
+        premio.descripcion = premioDto.descripcion;
+        premio.nroPremio = premioDto.nropremio;
+        premio.idsorteo = premioDto.idsorteo;
+        premio.eliminado = premioDto.eliminado;
+        return premio;
     }
 
 }

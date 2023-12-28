@@ -100,4 +100,10 @@ export class TablasAuditoriaList{
         nombre: 'sorteo',
         descripcion: 'Sorteos'
     }
+
+    public static PREMIOS: TablaAuditoriaDTO = {
+        id: 21,
+        nombre: 'premio',
+        descripcion: 'Premios'
+    }
 }

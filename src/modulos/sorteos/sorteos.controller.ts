@@ -2,9 +2,11 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters } from '@nestjs/common';
 import { SorteosService } from './sorteos.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
-import { Sorteo } from '@database/entity/sorteo.entity';
+import { Sorteo } from '@database/entity/sorteos/sorteo.entity';
 import { SorteoDTO } from '@dto/sorteo.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
+import { PremioView } from '@database/view/sorteos/premio.view';
+import { PremiosService } from '@modulos/premios/premios.service';
 
 @Controller('sorteos')
 @UseFilters(HttpExceptionFilter)
@@ -12,7 +14,8 @@ export class SorteosController {
 
     constructor(
         private jwtUtil: JwtUtilsService,
-        private sorteosSrv: SorteosService
+        private sorteosSrv: SorteosService,
+        private premiosSrv: PremiosService
     ){}
 
     @Get()
@@ -39,6 +42,22 @@ export class SorteosController {
         @Param('id') id: number
     ): Promise<Sorteo>{
         return this.sorteosSrv.findById(id);
+    }
+
+    @Get(':id/premios')
+    findPremiosBySorteo(
+        @Param('id') idsorteo: number,
+        @Query() queries: QueriesType
+    ): Promise<PremioView[]>{
+        return this.premiosSrv.findAll({...queries, idsorteo});
+    }
+
+    @Get(':id/premios/total')
+    countPremiosBySorteo(
+        @Param('id') idsorteo: number,
+        @Query() queries: QueriesType
+    ): Promise<number>{
+        return this.premiosSrv.count({...queries, idsorteo});
     }
 
     @Post()

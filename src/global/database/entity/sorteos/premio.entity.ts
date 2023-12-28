@@ -9,8 +9,8 @@ export class Premio{
     @Column({length: 100, nullable: false})
     descripcion: string;
 
-    @Column()
-    nro_premio: number;
+    @Column({name: 'nro_premio', type: 'smallint'})
+    nroPremio: number;
 
     @Column({nullable: false})
     idsorteo: number;

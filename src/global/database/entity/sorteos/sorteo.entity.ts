@@ -1,5 +1,5 @@
 import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
-import { Cliente } from "./cliente.entity";
+import { Cliente } from "../cliente.entity";
 
 @Entity({schema: 'sorteos'})
 export class Sorteo{

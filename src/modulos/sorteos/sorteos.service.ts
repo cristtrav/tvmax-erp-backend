@@ -1,4 +1,4 @@
-import { Sorteo } from '@database/entity/sorteo.entity';
+import { Sorteo } from '@database/entity/sorteos/sorteo.entity';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';

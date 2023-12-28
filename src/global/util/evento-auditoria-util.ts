@@ -96,6 +96,15 @@ export class EventoAuditoriaUtil{
         return this.getEventoAuditoria(TablasAuditoriaList.SORTEOS.id, idusuario, operacion, oldValue, newValue);
     }
 
+    public static getEventoAuditoriaPremios(
+        idusuario: number,
+        operacion: OperacionType,
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.PREMIOS.id, idusuario, operacion, oldValue, newValue);
+    }
+
 }
 
 type OperacionType = 'R' | 'M' | 'E';
