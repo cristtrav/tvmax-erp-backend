@@ -9,6 +9,7 @@ import { PremioView } from '@database/view/sorteos/premio.view';
 import { PremiosService } from '@modulos/premios/premios.service';
 import { Cliente } from '@database/entity/cliente.entity';
 import { ParticipanteView } from '@database/view/sorteos/participante.view';
+import { SorteoView } from '@database/view/sorteos/sorteo.view';
 
 @Controller('sorteos')
 @UseFilters(HttpExceptionFilter)
@@ -23,7 +24,7 @@ export class SorteosController {
     @Get()
     findAll(
         @Query() queries: QueriesType
-    ): Promise<Sorteo[]>{
+    ): Promise<SorteoView[]>{
         return this.sorteosSrv.findAll(queries);
     }
 

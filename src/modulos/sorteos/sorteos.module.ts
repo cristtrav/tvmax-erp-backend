@@ -12,13 +12,21 @@ import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { Cliente } from '@database/entity/cliente.entity';
 import { ParticipanteView } from '@database/view/sorteos/participante.view';
 import { Participante } from '@database/entity/sorteos/participante.entity';
+import { SorteoView } from '@database/view/sorteos/sorteo.view';
 
 @Module({
   imports: [
     UtilModule,
     JwtModule.register({}),
     TypeOrmModule.forFeature([
-      Sorteo, Premio, PremioView, Suscripcion, Cliente, ParticipanteView, Participante
+      Sorteo,
+      Premio,
+      PremioView,
+      Suscripcion,
+      ParticipanteView,
+      Participante,
+      SorteoView,
+      Cliente
     ])
   ],
   controllers: [SorteosController],

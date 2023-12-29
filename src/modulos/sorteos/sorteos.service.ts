@@ -4,6 +4,7 @@ import { Sorteo } from '@database/entity/sorteos/sorteo.entity';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { ParticipanteView } from '@database/view/sorteos/participante.view';
+import { SorteoView } from '@database/view/sorteos/sorteo.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,6 +16,8 @@ export class SorteosService {
     constructor(
         @InjectRepository(Sorteo)
         private sorteoRepo: Repository<Sorteo>,
+        @InjectRepository(SorteoView)
+        private sorteoViewRepo: Repository<SorteoView>,
         @InjectRepository(Suscripcion)
         private suscripcionRepo: Repository<Suscripcion>,
         @InjectRepository(Cliente)
@@ -24,10 +27,10 @@ export class SorteosService {
         private datasource: DataSource
     ){}
 
-    private getSelectQuery(queries: QueriesType): SelectQueryBuilder<Sorteo>{
+    private getSelectQuery(queries: QueriesType): SelectQueryBuilder<SorteoView>{
         const { eliminado, sort, offset, limit } = queries;
         const alias = 'sorteo';
-        let query = this.sorteoRepo.createQueryBuilder(alias);
+        let query = this.sorteoViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
@@ -59,7 +62,7 @@ export class SorteosService {
         return query;
     }
 
-    findAll(queries: QueriesType): Promise<Sorteo[]>{
+    findAll(queries: QueriesType): Promise<SorteoView[]>{
         return this.getSelectQuery(queries).getMany();
     }
 
