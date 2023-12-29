@@ -25,6 +25,9 @@ export class PremioView{
     clienteganador: string;
 
     @ViewColumn()
+    ciclienteganador: string;
+
+    @ViewColumn()
     eliminado: boolean;
 
 }

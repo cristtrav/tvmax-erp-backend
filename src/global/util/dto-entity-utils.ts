@@ -236,6 +236,7 @@ export class DTOEntityUtis {
         premio.descripcion = premioDto.descripcion;
         premio.nroPremio = premioDto.nropremio;
         premio.idsorteo = premioDto.idsorteo;
+        premio.idclienteGanador = premioDto.idclienteganador;
         premio.eliminado = premioDto.eliminado;
         return premio;
     }
