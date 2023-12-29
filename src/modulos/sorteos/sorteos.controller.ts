@@ -7,6 +7,8 @@ import { SorteoDTO } from '@dto/sorteo.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { PremioView } from '@database/view/sorteos/premio.view';
 import { PremiosService } from '@modulos/premios/premios.service';
+import { Cliente } from '@database/entity/cliente.entity';
+import { ParticipanteView } from '@database/view/sorteos/participante.view';
 
 @Controller('sorteos')
 @UseFilters(HttpExceptionFilter)
@@ -60,6 +62,22 @@ export class SorteosController {
         return this.premiosSrv.count({...queries, idsorteo});
     }
 
+    @Get(':id/participantes')
+    async findAllParticipantesBySorteo(
+        @Param('id') idsorteo: number,
+        @Query() queries: QueriesType
+    ): Promise<ParticipanteView[]>{
+        return await this.sorteosSrv.findAllParticipantesBySorteo(idsorteo, queries);
+    }
+
+    @Get(':id/participantes/total')
+    async countParticipantesBySorteo(
+        @Param('id') idsorteo: number,
+        @Query() queries: QueriesType
+    ): Promise<number>{
+        return this.sorteosSrv.countParticipantesBySorteo(idsorteo, queries);
+    }
+
     @Post()
     async create(
         @Body() sorteoDto: SorteoDTO,
@@ -69,6 +87,14 @@ export class SorteosController {
             DTOEntityUtis.sorteoDtoToEntity(sorteoDto),
             this.jwtUtil.extractJwtSub(auth)
         );
+    }
+
+    @Post(':id/participantes/agregar')
+    async agregarParticipantes(
+        @Param('id') idsorteo: number,
+        @Body() criterios: CriteriosSorteoType
+    ){        
+        await this.sorteosSrv.agregarParticipantes(criterios, idsorteo);
     }
 
     @Put(':id')
@@ -92,6 +118,15 @@ export class SorteosController {
         await this.sorteosSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
     }
 
+    @Delete(':idsorteo/participantes/:idcliente')
+    async deleteParticipante(
+        @Param('idsorteo') idsorteo: number,
+        @Param('idcliente') idcliente: number
+    ){
+        await this.sorteosSrv.deleteParticipante(idcliente, idsorteo);
+    }
+
 }
 
-type QueriesType = {[name: string]: any}
+type QueriesType = { [name: string]: any }
+type CriteriosSorteoType = { suscritoshasta: string, aldiahasta: string }

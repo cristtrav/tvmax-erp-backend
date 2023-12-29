@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Cuota } from "./cuota.entity";
+import { Cliente } from "./cliente.entity";
 
 @Entity()
 export class Suscripcion{
@@ -35,5 +37,11 @@ export class Suscripcion{
 
     @Column({length: 100})
     observacion: string;
+    
+    @OneToMany(() => Cuota, (cuota) => cuota.suscripcion)
+    cuotas: Cuota[];
 
+    @ManyToOne(() => Cliente, (cliente) => cliente.suscripciones)
+    @JoinColumn({name: 'idcliente'})
+    cliente: Cliente;
 }

@@ -74,6 +74,8 @@ import { Sorteo } from '@database/entity/sorteos/sorteo.entity';
 import { Premio } from '@database/entity/sorteos/premio.entity';
 import { PremiosModule } from './modulos/premios/premios.module';
 import { PremioView } from '@database/view/sorteos/premio.view';
+import { Participante } from '@database/entity/sorteos/participante.entity';
+import { ParticipanteView } from '@database/view/sorteos/participante.view';
 
 @Module({
   imports: [
@@ -136,7 +138,7 @@ import { PremioView } from '@database/view/sorteos/premio.view';
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
-        Sorteo, Premio, PremioView
+        Sorteo, Premio, PremioView, Participante, ParticipanteView
       ]
     }),
     TasksModule,

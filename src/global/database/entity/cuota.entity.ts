@@ -1,5 +1,6 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { DetalleVenta } from "./detalle-venta.entity";
+import { Suscripcion } from "./suscripcion.entity";
 
 @Entity()
 export class Cuota{
@@ -45,4 +46,8 @@ export class Cuota{
 
     @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.cuota)
     detallesVenta: DetalleVenta
+
+    @ManyToOne(() => Suscripcion, (suscripcion) => suscripcion.cuotas)
+    @JoinColumn({name: 'idsuscripcion'})
+    suscripcion: Suscripcion
 }

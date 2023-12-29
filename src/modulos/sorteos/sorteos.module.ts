@@ -8,13 +8,17 @@ import { Premio } from '@database/entity/sorteos/premio.entity';
 import { UtilModule } from '@util/util.module';
 import { PremiosService } from '@modulos/premios/premios.service';
 import { PremioView } from '@database/view/sorteos/premio.view';
+import { Suscripcion } from '@database/entity/suscripcion.entity';
+import { Cliente } from '@database/entity/cliente.entity';
+import { ParticipanteView } from '@database/view/sorteos/participante.view';
+import { Participante } from '@database/entity/sorteos/participante.entity';
 
 @Module({
   imports: [
     UtilModule,
     JwtModule.register({}),
     TypeOrmModule.forFeature([
-      Sorteo, Premio, PremioView
+      Sorteo, Premio, PremioView, Suscripcion, Cliente, ParticipanteView, Participante
     ])
   ],
   controllers: [SorteosController],

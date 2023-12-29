@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Suscripcion } from "./suscripcion.entity";
 
 @Entity()
 export class Cliente{
@@ -38,4 +39,7 @@ export class Cliente{
 
     @Column({name: 'excluido_sorteo', default: false, nullable: false})
     excluidoSorteo: boolean;
+
+    @OneToMany(() => Suscripcion, (suscripcion) => suscripcion.cliente)
+    suscripciones: Suscripcion[];
 }
