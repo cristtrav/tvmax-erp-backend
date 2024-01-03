@@ -70,6 +70,9 @@ export class ClienteView{
     cantdesconectados: number;
 
     @ViewColumn()
+    excluidosorteo: boolean;
+
+    @ViewColumn()
     eliminado: boolean;
 
 }

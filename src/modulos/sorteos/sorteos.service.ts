@@ -134,23 +134,31 @@ export class SorteosService {
             'cuota',
             `cuota.eliminado = FALSE AND cuota.pagado = FALSE AND cuota.fechaVencimiento <= :aldiahasta`,
             { aldiahasta: new Date(criterios.aldiahasta) }
-        )      
+        )
+        .leftJoinAndSelect(
+            `${als}.cliente`,
+            'cliente'
+        )
         .orderBy(`${als}.idcliente`, 'ASC')
         .getMany();
 
-        //Se obtienen las suscripciones con cantidad de cuotas 0 (Cero cuotas pendientes)
-        const suscripcionesSinPend: Suscripcion[] = suscripciones.filter(sus => sus.cuotas.length == 0);
+        /*
+        Se obtienen las suscripciones con cantidad de cuotas 0 (Cero cuotas pendientes)
+        y sin clientes excluidos
+        */
+        const suscripcionesSinPend: Suscripcion[] = suscripciones.filter(sus => sus.cuotas.length == 0 && !sus.cliente.excluidoSorteo);
         //Se crea un Set con los ID de clientes sin duplicar
         const setIdClientes = new Set<number>(suscripcionesSinPend.map(s => s.idcliente));
-        /*Se crea un Map relacionando ID del cliente
-        con la cantidad de suscripciones sin cuotas pendientes encontradas*/
+        /*
+        Se crea un Map relacionando ID del cliente
+        con la cantidad de suscripciones sin cuotas pendientes encontradas
+        */
         const mapCantSuscSinCuoPend = new Map<number, number>(
             Array.from(setIdClientes, (idcli) => [
                 idcli,
                 suscripcionesSinPend.reduce((cant, s) => s.idcliente == idcli ? cant + 1 : cant, 0)
             ])
         );
-        //const idClientesParticipantes: number[] = [];
         const clientesConSuscActivas = await this.clienteRepo.createQueryBuilder('cliente')
         .where(`cliente.id IN (:...idclientes)`, {idclientes: Array.from(setIdClientes.values())})
         .leftJoinAndSelect(
@@ -163,8 +171,8 @@ export class SorteosService {
         const idClientesParticipantes = Array.from(setIdClientes)
         .filter(idcliente =>
             mapCantSuscSinCuoPend.get(idcliente) == clientesConSuscActivas.find(c => c.id == idcliente)?.suscripciones.length
-        );        
-        console.log('participantes', idClientesParticipantes.length);
+        );
+
         await this.datasource.transaction(async manager => {
             for(let idcliente of idClientesParticipantes){
                 const participante = new Participante();

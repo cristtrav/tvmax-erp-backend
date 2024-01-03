@@ -3,7 +3,7 @@ import { PremioView } from '@database/view/sorteos/premio.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class PremiosService {
@@ -17,11 +17,18 @@ export class PremiosService {
     ){}
 
     private getSelectQuery(queries: QueriesType): SelectQueryBuilder<PremioView>{        
-        const { eliminado, sort, offset, limit, idsorteo } = queries;
+        const { eliminado, sort, offset, limit, idsorteo, search } = queries;
         const alias = 'premio';
         let query = this.premioViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
         if(idsorteo) query = query.andWhere(`${alias}.idsorteo = :idsorteo`, {idsorteo});
+        if(search){
+            query = query.andWhere(new Brackets(qb => {
+                if(!Number.isNaN(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
+                qb = qb.orWhere(`LOWER(${alias}.descripcion) LIKE :descsearch`, {descsearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`LOWER(${alias}.clienteganador) LIKE :clisearch`, {clisearch: `%${search.toLowerCase()}%`});
+            }))
+        }
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
         if(sort){
