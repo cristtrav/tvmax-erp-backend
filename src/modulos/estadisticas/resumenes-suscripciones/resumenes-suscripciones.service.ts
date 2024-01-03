@@ -78,13 +78,13 @@ export class ResumenesSuscripcionesService {
             if(Array.isArray(estado)) queryBuilder = queryBuilder.andWhere(`${alias}.estado IN (:...estado)`, { estado });
             else queryBuilder = queryBuilder.andWhere(`${alias}.estado = :estado`, { estado });
             
-        if (fechainiciosuscripcion) queryBuilder = queryBuilder.andWhere(`${alias}.fechasuscripcion >= (:fechainiciosuscripcion)::date`, { fechainiciosuscripcion });
-        if (fechafinsuscripcion) queryBuilder = queryBuilder.andWhere(`${alias}.fechasuscripcion <= (:fechafinsuscripcion)::date`, { fechafinsuscripcion });
+        if (fechainiciosuscripcion) queryBuilder = queryBuilder.andWhere(`${alias}.fechasuscripcion >= :fechainiciosuscripcion`, { fechainiciosuscripcion: new Date(fechainiciosuscripcion) });
+        if (fechafinsuscripcion) queryBuilder = queryBuilder.andWhere(`${alias}.fechasuscripcion <= (:fechafinsuscripcion)::date`, { fechafinsuscripcion: new Date(fechafinsuscripcion) });
         if (cuotaspendientesdesde) queryBuilder = queryBuilder.andWhere(`${alias}.cuotaspendientes >= :cuotaspendientesdesde`, { cuotaspendientesdesde });
         if (cuotaspendienteshasta) queryBuilder = queryBuilder.andWhere(`${alias}.cuotaspendientes <= :cuotaspendienteshasta`, { cuotaspendienteshasta });
         if (idcobrador) queryBuilder = queryBuilder.andWhere(`${alias}.idcobrador = :idcobrador`, { idcobrador }) ;
-        if (fechainiciocambioestado) queryBuilder = queryBuilder.andWhere(`${alias}.fechacambioestado >= (:fechainiciocambioestado)::date`, { fechainiciocambioestado });
-        if (fechafincambioestado) queryBuilder = queryBuilder.andWhere(`${alias}.fechacambioestado <= (:fechafincambioestado)::date`, { fechafincambioestado });
+        if (fechainiciocambioestado) queryBuilder = queryBuilder.andWhere(`${alias}.fechacambioestado >= :fechainiciocambioestado`, { fechainiciocambioestado: new Date(fechainiciocambioestado) });
+        if (fechafincambioestado) queryBuilder = queryBuilder.andWhere(`${alias}.fechacambioestado <= :fechafincambioestado`, { fechafincambioestado: new Date(fechafincambioestado) });
         if (search){
             queryBuilder = queryBuilder.andWhere(new Brackets(qb => {
                 if(Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: search});
