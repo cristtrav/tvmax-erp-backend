@@ -20,5 +20,6 @@ export class ClienteDTO {
     departamento: string | null = null;
     cantconectados: number = 0;
     cantdesconectados: number = 0;
+    excluidosorteo: boolean = false;
     eliminado: boolean | null = false;
 }

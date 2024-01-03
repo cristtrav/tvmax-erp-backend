@@ -1,4 +1,3 @@
-import { ConsultaCobranzaExterna } from "@database/entity/consulta-cobranza-externa.entity";
 import { FormatoFactura } from "@database/entity/formato-factura.entity";
 import { BarrioDTO } from "@dto/barrio.dto";
 import { ClienteDTO } from "@dto/cliente.dto";
@@ -142,7 +141,8 @@ export class DTOEntityUtis {
         cliente.idcobrador = clienteDto.idcobrador;
         cliente.dvRuc = clienteDto.dvruc;
         cliente.ci = clienteDto.ci;
-        cliente.eliminado = clienteDto.eliminado;
+        if(clienteDto.eliminado != null) cliente.eliminado = clienteDto.eliminado;
+        if(clienteDto.excluidosorteo != null) cliente.excluidoSorteo = clienteDto.excluidosorteo;
         return cliente;
     }
 
