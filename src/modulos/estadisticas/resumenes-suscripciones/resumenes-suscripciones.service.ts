@@ -40,8 +40,11 @@ export class ResumenesSuscripcionesService {
             search,
             sort,
             offset,
-            limit
-        } = queries;
+            limit,
+            idcobrador,
+            fechainiciocambioestado,
+            fechafincambioestado
+        } = queries;        
         if (eliminado != null) queryBuilder = queryBuilder.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
 
         if (idcliente)
@@ -79,6 +82,9 @@ export class ResumenesSuscripcionesService {
         if (fechafinsuscripcion) queryBuilder = queryBuilder.andWhere(`${alias}.fechasuscripcion <= :fechafinsuscripcion`, { fechafinsuscripcion: new Date(`${fechafinsuscripcion}T00:00:00`) });
         if (cuotaspendientesdesde) queryBuilder = queryBuilder.andWhere(`${alias}.cuotaspendientes >= :cuotaspendientesdesde`, { cuotaspendientesdesde });
         if (cuotaspendienteshasta) queryBuilder = queryBuilder.andWhere(`${alias}.cuotaspendientes <= :cuotaspendienteshasta`, { cuotaspendienteshasta });
+        if (idcobrador) queryBuilder = queryBuilder.andWhere(`${alias}.idcobrador = :idcobrador`, { idcobrador }) ;
+        if (fechainiciocambioestado) queryBuilder = queryBuilder.andWhere(`${alias}.fechacambioestado >= :fechainiciocambioestado`, { fechainiciocambioestado });
+        if (fechafincambioestado) queryBuilder = queryBuilder.andWhere(`${alias}.fechacambioestado <= :fechafincambioestado`, { fechafincambioestado });
         if (search){
             queryBuilder = queryBuilder.andWhere(new Brackets(qb => {
                 if(Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: search});

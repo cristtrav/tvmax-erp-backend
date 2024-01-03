@@ -81,8 +81,8 @@ export class SuscripcionesService {
         if (cuotaspendientesdesde) query = query.andWhere(`${alias}.cuotaspendientes >= :cuotaspendientesdesde`, { cuotaspendientesdesde });
         if (cuotaspendienteshasta) query = query.andWhere(`${alias}.cuotaspendientes <= :cuotaspendienteshasta`, { cuotaspendienteshasta });
         if (idcobrador) query = query.andWhere(`${alias}.idcobrador = :idcobrador`, { idcobrador });
-        if (fechainiciocambioestado) query = query.andWhere(`${alias}.fechaCambioEstado >= :fechainiciocambioestado`, { fechainiciocambioestado });
-        if (fechafincambioestado) query = query.andWhere(`${alias}.fechaCambioEstado <= :fechafincambioestado`, { fechafincambioestado });
+        if (fechainiciocambioestado) query = query.andWhere(`${alias}.fechacambioestado >= :fechainiciocambioestado`, { fechainiciocambioestado });
+        if (fechafincambioestado) query = query.andWhere(`${alias}.fechacambioestado <= :fechafincambioestado`, { fechafincambioestado });
         if (search) {
             query = query.andWhere(new Brackets(qb => {
                 if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: search });
