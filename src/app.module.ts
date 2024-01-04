@@ -140,7 +140,13 @@ import { SorteoView } from '@database/view/sorteos/sorteo.view';
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
         Sorteo, Premio, PremioView, Participante, ParticipanteView, SorteoView
-      ]
+      ],
+      extra: {
+        poolSize: 20,
+        connectionTimeoutMillis: 30000,
+        query_timeout: 20000,
+        statement_timeout: 20000
+      }
     }),
     TasksModule,
     SorteosModule,
