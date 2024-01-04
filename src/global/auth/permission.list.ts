@@ -163,6 +163,12 @@ export class Permissions {
     }
 
     static readonly SORTEOS = {
-        ACCESOMODULO: 400 
+        ACCESOMODULO: 400,
+        CONSULTAR: 401,
+        REGISTRAR: 402,
+        EDITAR: 403,
+        ELIMINAR: 404,
+        ACCESOFORMULARIO: 405,
+        CONSULTARULTIMOID: 406
     }
 }

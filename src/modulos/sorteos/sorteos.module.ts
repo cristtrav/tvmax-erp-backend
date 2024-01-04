@@ -13,6 +13,7 @@ import { Cliente } from '@database/entity/cliente.entity';
 import { ParticipanteView } from '@database/view/sorteos/participante.view';
 import { Participante } from '@database/entity/sorteos/participante.entity';
 import { SorteoView } from '@database/view/sorteos/sorteo.view';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { SorteoView } from '@database/view/sorteos/sorteo.view';
       ParticipanteView,
       Participante,
       SorteoView,
-      Cliente
+      Cliente,
+      Permiso
     ])
   ],
   controllers: [SorteosController],

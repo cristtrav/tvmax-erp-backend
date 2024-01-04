@@ -1,5 +1,5 @@
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { SorteosService } from './sorteos.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Sorteo } from '@database/entity/sorteos/sorteo.entity';
@@ -7,12 +7,15 @@ import { SorteoDTO } from '@dto/sorteo.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { PremioView } from '@database/view/sorteos/premio.view';
 import { PremiosService } from '@modulos/premios/premios.service';
-import { Cliente } from '@database/entity/cliente.entity';
 import { ParticipanteView } from '@database/view/sorteos/participante.view';
 import { SorteoView } from '@database/view/sorteos/sorteo.view';
+import { AuthGuard } from '@auth/auth.guard';
+import { RequirePermission } from '@auth/require-permission.decorator';
+import { Permissions } from '@auth/permission.list';
 
 @Controller('sorteos')
 @UseFilters(HttpExceptionFilter)
+@UseGuards(AuthGuard)
 export class SorteosController {
 
     constructor(
@@ -22,6 +25,7 @@ export class SorteosController {
     ){}
 
     @Get()
+    @RequirePermission(Permissions.SORTEOS.CONSULTAR)
     findAll(
         @Query() queries: QueriesType
     ): Promise<SorteoView[]>{
@@ -29,6 +33,7 @@ export class SorteosController {
     }
 
     @Get('total')
+    @RequirePermission(Permissions.SORTEOS.CONSULTAR)
     count(
         @Query() queries: QueriesType
     ): Promise<number>{
@@ -36,11 +41,13 @@ export class SorteosController {
     }
 
     @Get('ultimoid')
+    @RequirePermission(Permissions.SORTEOS.CONSULTARULTIMOID)
     getLastId(): Promise<number>{
         return this.sorteosSrv.getLastId();
     }
 
     @Get(':id')
+    @RequirePermission(Permissions.SORTEOS.CONSULTAR)
     findById(
         @Param('id') id: number
     ): Promise<Sorteo>{
@@ -80,6 +87,7 @@ export class SorteosController {
     }
 
     @Post()
+    @RequirePermission(Permissions.SORTEOS.REGISTRAR)
     async create(
         @Body() sorteoDto: SorteoDTO,
         @Headers('authorization') auth: string
@@ -99,6 +107,7 @@ export class SorteosController {
     }
 
     @Put(':id')
+    @RequirePermission(Permissions.SORTEOS.EDITAR)
     async update(
         @Param('id') id: number,
         @Body() sorteoDto: SorteoDTO,
@@ -112,6 +121,7 @@ export class SorteosController {
     }
 
     @Delete(':id')
+    @RequirePermission(Permissions.SORTEOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
