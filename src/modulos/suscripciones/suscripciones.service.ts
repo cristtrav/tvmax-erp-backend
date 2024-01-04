@@ -86,7 +86,7 @@ export class SuscripcionesService {
         if (search) {
             query = query.andWhere(new Brackets(qb => {
                 if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: search });
-                if (Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.ci = :idsearch`, { idsearch: search });
+                qb = qb.orWhere(`${alias}.ci = :cisearch`, { cisearch: search });
                 qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :clisearch`, { clisearch: `%${search.toLowerCase()}%` });
                 qb = qb.orWhere(`LOWER(${alias}.nromedidor) LIKE :nromedidorsearch`, { nromedidorsearch: `%${search.toLowerCase()}%`})
             }));
@@ -97,6 +97,7 @@ export class SuscripcionesService {
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
             query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+            if(sortColumn != 'id') query = query.addOrderBy(`${alias}.${sortColumn}`, sortOrder);
         }
         return query;
     }
