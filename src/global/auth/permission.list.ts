@@ -188,4 +188,11 @@ export class Permissions {
         ELIMINAR: 485,
         CONSULTARULTIMOID: 486
     }
+
+    static readonly EXCLUSIONESSORTEOS = {
+        ACCESOMODULO: 520,
+        CONSULTAR: 521,
+        AGREGAR: 522,
+        ELIMINAR: 523
+    }
 }
