@@ -71,6 +71,7 @@ export class SorteosController {
     }
 
     @Get(':id/participantes')
+    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.CONSULTAR)
     async findAllParticipantesBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType
@@ -79,6 +80,7 @@ export class SorteosController {
     }
 
     @Get(':id/participantes/total')
+    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.CONSULTAR)
     async countParticipantesBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType
@@ -99,6 +101,7 @@ export class SorteosController {
     }
 
     @Post(':id/participantes/agregar')
+    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.AGREGAR)
     async agregarParticipantes(
         @Param('id') idsorteo: number,
         @Body() criterios: CriteriosSorteoType
@@ -130,6 +133,7 @@ export class SorteosController {
     }
 
     @Delete(':idsorteo/participantes/:idcliente')
+    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.ELIMINAR)
     async deleteParticipante(
         @Param('idsorteo') idsorteo: number,
         @Param('idcliente') idcliente: number

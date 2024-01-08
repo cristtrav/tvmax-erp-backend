@@ -171,4 +171,11 @@ export class Permissions {
         ACCESOFORMULARIO: 405,
         CONSULTARULTIMOID: 406
     }
+
+    static readonly PARTICIPANTESSORTEOS = {
+        ACCESOMODULO: 440,
+        CONSULTAR: 441,
+        AGREGAR: 442,
+        ELIMINAR: 443
+    }
 }
