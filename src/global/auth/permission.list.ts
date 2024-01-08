@@ -169,7 +169,8 @@ export class Permissions {
         EDITAR: 403,
         ELIMINAR: 404,
         ACCESOFORMULARIO: 405,
-        CONSULTARULTIMOID: 406
+        CONSULTARULTIMOID: 406,
+        REALIZARSORTEO: 407
     }
 
     static readonly PARTICIPANTESSORTEOS = {
