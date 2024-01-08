@@ -55,6 +55,7 @@ export class SorteosController {
     }
 
     @Get(':id/premios')
+    @RequirePermission(Permissions.PREMIOSSORTEOS.CONSULTAR)
     findPremiosBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType
@@ -63,6 +64,7 @@ export class SorteosController {
     }
 
     @Get(':id/premios/total')
+    @RequirePermission(Permissions.PREMIOSSORTEOS.CONSULTAR)
     countPremiosBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType

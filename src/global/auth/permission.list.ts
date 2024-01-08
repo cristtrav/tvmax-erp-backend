@@ -178,4 +178,14 @@ export class Permissions {
         AGREGAR: 442,
         ELIMINAR: 443
     }
+
+    static readonly PREMIOSSORTEOS = {
+        ACCESOMODULO: 480,
+        ACCESOFORMULARIO: 481,
+        CONSULTAR: 482,
+        REGISTRAR: 483,
+        EDITAR: 484,
+        ELIMINAR: 485,
+        CONSULTARULTIMOID: 486
+    }
 }

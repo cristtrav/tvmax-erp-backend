@@ -6,11 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Premio } from '@database/entity/sorteos/premio.entity';
 import { PremioView } from '@database/view/sorteos/premio.view';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Premio, PremioView])
+    TypeOrmModule.forFeature([Premio, PremioView, Permiso])
   ],
   providers: [PremiosService, JwtUtilsService],
   controllers: [PremiosController]
