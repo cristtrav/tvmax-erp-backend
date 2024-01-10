@@ -1,4 +1,3 @@
-import { ConsultaCobranzaExterna } from "@database/entity/consulta-cobranza-externa.entity";
 import { FormatoFactura } from "@database/entity/formato-factura.entity";
 import { BarrioDTO } from "@dto/barrio.dto";
 import { ClienteDTO } from "@dto/cliente.dto";
@@ -29,14 +28,15 @@ import { Suscripcion } from "../database/entity/suscripcion.entity";
 import { Timbrado } from "../database/entity/timbrado.entity";
 import { Usuario } from "../database/entity/usuario.entity";
 import { Venta } from "../database/entity/venta.entity";
-import { TipoMaterial } from "@database/entity/tipo-material.entity";
 import { TipoMaterialDTO } from "@dto/tipo-material.dto";
 import { MaterialDTO } from "@dto/material.dto";
-import { Material } from "@database/entity/material.entity";
+import { Material } from "@database/entity/depositos/material.entity";
 import { MovimientoMaterialDTO } from "@dto/movimiento-material.dto";
-import { MovimientoMaterial } from "@database/entity/movimiento-material.entity";
 import { DetalleMovimientoMaterialDTO } from "@dto/detalle-movimiento-material.dto";
-import { DetalleMovimientoMaterial } from "@database/entity/detalle-movimiento-material.entity";
+import { DetalleMovimientoMaterial } from "@database/entity/depositos/detalle-movimiento-material.entity";
+import { MovimientoMaterial } from "@database/entity/depositos/movimiento-material.entity";
+import { TipoMaterial } from "@database/entity/depositos/tipo-material.entity";
+
 
 export class DTOEntityUtis {
 
@@ -241,6 +241,7 @@ export class DTOEntityUtis {
         material.unidadMedida = m.unidadmedida;
         material.idtipoMaterial = m.idtipomaterial;
         material.soloLectura = m.sololectura;
+        material.identificable = m.identificable;
         material.eliminado = m.eliminado;
         return material;
     }

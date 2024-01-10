@@ -4,13 +4,13 @@ import { MovimientosMaterialesController } from './movimientos-materiales.contro
 import { JwtModule } from '@nestjs/jwt';
 import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MovimientoMaterial } from '@database/entity/movimiento-material.entity';
-import { DetalleMovimientoMaterial } from '@database/entity/detalle-movimiento-material.entity';
-import { Existencia } from '@database/entity/existencia.entity';
-import { MovimientoMaterialView } from '@database/view/movimiento-material.view';
 import { DetallesMovimientosMaterialesService } from './detalles-movimientos-materiales/detalles-movimientos-materiales.service';
 import { DetallesMovimientosMaterialesController } from './detalles-movimientos-materiales/detalles-movimientos-materiales.controller';
-import { DetalleMovimientoMaterialView } from '@database/view/detalle-movimiento-material.view';
+import { DetalleMovimientoMaterial } from '@database/entity/depositos/detalle-movimiento-material.entity';
+import { Existencia } from '@database/entity/depositos/existencia.entity';
+import { MovimientoMaterial } from '@database/entity/depositos/movimiento-material.entity';
+import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';
+import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
 
 @Module({
   imports: [

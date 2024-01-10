@@ -1,4 +1,5 @@
-import { DetalleMovimientoMaterialView } from '@database/view/detalle-movimiento-material.view';
+
+import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';

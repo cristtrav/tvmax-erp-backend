@@ -1,5 +1,4 @@
-import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
-import { TipoMaterial } from '@database/entity/tipo-material.entity';
+import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

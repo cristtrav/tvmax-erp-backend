@@ -1,6 +1,6 @@
-import { Existencia } from '@database/entity/existencia.entity';
-import { Material } from '@database/entity/material.entity';
-import { MaterialView } from '@database/view/material.view';
+import { Existencia } from '@database/entity/depositos/existencia.entity';
+import { Material } from '@database/entity/depositos/material.entity';
+import { MaterialView } from '@database/view/depositos/material.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

@@ -4,7 +4,7 @@ import { TiposMaterialesService } from './tipos-materiales.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TipoMaterial } from '@database/entity/tipo-material.entity';
+import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
 
 @Module({
   imports: [

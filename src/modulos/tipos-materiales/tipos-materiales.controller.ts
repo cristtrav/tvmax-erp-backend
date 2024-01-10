@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters } from '@nestjs/common';
 import { TiposMaterialesService } from './tipos-materiales.service';
-import { TipoMaterial } from '@database/entity/tipo-material.entity';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { TipoMaterialDTO } from '@dto/tipo-material.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
 
 @Controller('tiposmateriales')
 @UseFilters(HttpExceptionFilter)

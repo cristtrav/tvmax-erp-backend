@@ -70,16 +70,17 @@ import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-materiales.module';
-import { TipoMaterial } from '@database/entity/tipo-material.entity';
 import { MaterialesModule } from './modulos/materiales/materiales.module';
-import { Material } from '@database/entity/material.entity';
-import { MaterialView } from '@database/view/material.view';
-import { Existencia } from '@database/entity/existencia.entity';
+import { Material } from '@database/entity/depositos/material.entity';
 import { MovimientosMaterialesModule } from './modulos/movimientos-materiales/movimientos-materiales.module';
-import { MovimientoMaterial } from '@database/entity/movimiento-material.entity';
-import { DetalleMovimientoMaterial } from '@database/entity/detalle-movimiento-material.entity';
-import { MovimientoMaterialView } from '@database/view/movimiento-material.view';
-import { DetalleMovimientoMaterialView } from '@database/view/detalle-movimiento-material.view';
+import { DetalleMovimientoMaterial } from '@database/entity/depositos/detalle-movimiento-material.entity';
+import { Existencia } from '@database/entity/depositos/existencia.entity';
+import { MovimientoMaterial } from '@database/entity/depositos/movimiento-material.entity';
+import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
+import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
+import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';
+import { MaterialView } from '@database/view/depositos/material.view';
+import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
 
 @Module({
   imports: [
@@ -142,7 +143,7 @@ import { DetalleMovimientoMaterialView } from '@database/view/detalle-movimiento
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
-        TipoMaterial, Material, Existencia, MovimientoMaterial, DetalleMovimientoMaterial,
+        TipoMaterial, Material, Existencia, MovimientoMaterial, DetalleMovimientoMaterial, MaterialIdentificable,
         MovimientoMaterialView, MaterialView, DetalleMovimientoMaterialView
       ]
     }),

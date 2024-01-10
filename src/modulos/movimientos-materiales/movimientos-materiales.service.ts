@@ -1,7 +1,7 @@
-import { DetalleMovimientoMaterial } from '@database/entity/detalle-movimiento-material.entity';
-import { Existencia } from '@database/entity/existencia.entity';
-import { MovimientoMaterial } from '@database/entity/movimiento-material.entity';
-import { MovimientoMaterialView } from '@database/view/movimiento-material.view';
+import { DetalleMovimientoMaterial } from '@database/entity/depositos/detalle-movimiento-material.entity';
+import { Existencia } from '@database/entity/depositos/existencia.entity';
+import { MovimientoMaterial } from '@database/entity/depositos/movimiento-material.entity';
+import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

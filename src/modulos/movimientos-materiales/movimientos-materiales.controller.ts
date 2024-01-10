@@ -4,10 +4,9 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { MovimientoMaterialDTO } from '@dto/movimiento-material.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
-import { MovimientoMaterialView } from '@database/view/movimiento-material.view';
-import { DetalleMovimientoMaterialView } from '@database/view/detalle-movimiento-material.view';
-import { DetalleMovimientoMaterialDTO } from '@dto/detalle-movimiento-material.dto';
 import { DetallesMovimientosMaterialesService } from './detalles-movimientos-materiales/detalles-movimientos-materiales.service';
+import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';
+import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
 
 @Controller('movimientosmateriales')
 @UseFilters(HttpExceptionFilter)

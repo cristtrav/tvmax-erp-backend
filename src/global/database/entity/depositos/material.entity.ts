@@ -18,5 +18,8 @@ export class Material{
     soloLectura: boolean;
 
     @Column({nullable: false, default: false})
+    identificable: boolean;
+
+    @Column({nullable: false, default: false})
     eliminado: boolean;
 }

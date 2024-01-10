@@ -24,5 +24,8 @@ export class MaterialView {
     cantidad: number;
 
     @ViewColumn()
+    identificable: boolean;
+
+    @ViewColumn()
     eliminado: boolean;
 }
