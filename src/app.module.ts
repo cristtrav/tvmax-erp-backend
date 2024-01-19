@@ -81,6 +81,10 @@ import { MaterialIdentificable } from '@database/entity/depositos/material-ident
 import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';
 import { MaterialView } from '@database/view/depositos/material.view';
 import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
+import { UsuarioDeposito } from '@database/entity/depositos/usuario-deposito.entity';
+import { AppInitService } from './app-init.service';
+import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-depositos.module';
+import { UsuarioDepositoView } from '@database/view/depositos/usuario-deposito.view';
 
 @Module({
   imports: [
@@ -144,15 +148,17 @@ import { MovimientoMaterialView } from '@database/view/depositos/movimiento-mate
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
         TipoMaterial, Material, Existencia, MovimientoMaterial, DetalleMovimientoMaterial, MaterialIdentificable,
-        MovimientoMaterialView, MaterialView, DetalleMovimientoMaterialView
+        MovimientoMaterialView, MaterialView, DetalleMovimientoMaterialView,
+        UsuarioDeposito, UsuarioDepositoView
       ]
     }),
     TasksModule,
     TiposMaterialesModule,
     MaterialesModule,
-    MovimientosMaterialesModule
+    MovimientosMaterialesModule,
+    UsuariosDepositosModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppInitService],
 })
 export class AppModule {}

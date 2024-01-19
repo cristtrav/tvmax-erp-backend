@@ -36,6 +36,8 @@ import { DetalleMovimientoMaterialDTO } from "@dto/detalle-movimiento-material.d
 import { DetalleMovimientoMaterial } from "@database/entity/depositos/detalle-movimiento-material.entity";
 import { MovimientoMaterial } from "@database/entity/depositos/movimiento-material.entity";
 import { TipoMaterial } from "@database/entity/depositos/tipo-material.entity";
+import { UsuarioDepositoDTO } from "@dto/usuario-deposito.dto";
+import { UsuarioDeposito } from "@database/entity/depositos/usuario-deposito.entity";
 
 
 export class DTOEntityUtis {
@@ -254,7 +256,10 @@ export class DTOEntityUtis {
         movimiento.idusuarioEntrega = m.idusuarioentrega;
         movimiento.idusuarioResponsable = m.idusuarioresponsable;
         movimiento.observacion = m.observacion;
-        movimiento.tipoMovimiento = m.tipomovimiento;        
+        if(m.tipomovimiento == 'EN') movimiento.tipoMovimiento = 'EN';
+        if(m.tipomovimiento == 'SA') movimiento.tipoMovimiento = 'SA';
+        if(m.tipomovimiento == 'AJ') movimiento.tipoMovimiento = 'AJ';
+        if(m.tipomovimiento == 'DE') movimiento.tipoMovimiento = 'DE';
         movimiento.eliminado = false;
         movimiento.devuelto = m.devuelto;
         return movimiento;
@@ -269,8 +274,19 @@ export class DTOEntityUtis {
         detalle.idmaterial = d.idmaterial;
         detalle.descripcion = d.descripcion;
         detalle.iddetalleMovimientoReferencia = d.iddetallemovimientoreferencia;
+        detalle.nroSerieMaterial = d.nroseriematerial;
         detalle.eliminado = d.eliminado;
         return detalle;
+    }
+
+    public static usuarioDepositoDTOtoEntity(usuarioDto: UsuarioDepositoDTO): UsuarioDeposito{
+        const usuario = new UsuarioDeposito();
+        usuario.id = usuarioDto.id;
+        usuario.razonSocial = usuarioDto.razonsocial;
+        if(usuarioDto.rol == 'PR') usuario.rol = 'PR';
+        if(usuarioDto.rol == 'RE') usuario.rol = 'RE';
+        usuario.eliminado = usuarioDto.eliminado;
+        return usuario;
     }
 
 }

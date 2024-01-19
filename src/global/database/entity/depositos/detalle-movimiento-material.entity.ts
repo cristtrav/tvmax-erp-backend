@@ -32,6 +32,9 @@ export class DetalleMovimientoMaterial{
     @Column({name: 'iddetalle_movimiento_referencia'})
     iddetalleMovimientoReferencia: number;
 
+    @Column({name: 'nro_serie_material', length: 70})
+    nroSerieMaterial: string;
+
     @Column({nullable: false, default: false})
     eliminado: boolean;
 

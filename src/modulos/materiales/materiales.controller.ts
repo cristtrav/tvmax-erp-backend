@@ -5,6 +5,7 @@ import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { MaterialView } from '@database/view/depositos/material.view';
+import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
 
 @Controller('materiales')
 @UseFilters(HttpExceptionFilter)
@@ -32,6 +33,22 @@ export class MaterialesController {
         @Query() queries: {[name:string]: any}
     ): Promise<number>{
         return this.materialesSrv.count(queries);
+    }
+
+    @Get(':id/identificables')
+    findAllIdentificablesByMaterial(
+        @Param('id') idmaterial: number,
+        @Query() queries: QueriesType
+    ): Promise<MaterialIdentificable[]>{
+        return this.materialesSrv.findAllIdentificables({idmaterial, ...queries});
+    }
+
+    @Get(':id/identificables/total')
+    countIdentificablesByMaterial(
+        @Param('id') idmaterial: number,
+        @Query() queries: QueriesType
+    ): Promise<number>{
+        return this.materialesSrv.countIdentificables({idmaterial, ...queries});
     }
 
     @Get(':id')
@@ -74,3 +91,5 @@ export class MaterialesController {
     }
     
 }
+
+type QueriesType = {[name: string]: any}

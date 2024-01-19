@@ -1,4 +1,5 @@
 import { Existencia } from '@database/entity/depositos/existencia.entity';
+import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
 import { Material } from '@database/entity/depositos/material.entity';
 import { MaterialView } from '@database/view/depositos/material.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
@@ -16,6 +17,8 @@ export class MaterialesService {
         private materialViewRepo: Repository<MaterialView>,
         @InjectRepository(Existencia)
         private existenciaRepo: Repository<Existencia>,
+        @InjectRepository(MaterialIdentificable)
+        private materialIdentificableRepo: Repository<MaterialIdentificable>,
         private datasource: DataSource
     ){}
 
@@ -104,4 +107,31 @@ export class MaterialesService {
         return existenciaPorDefecto;
     }
 
+    private getIdentificableSelectQuery(queries: QueriesType): SelectQueryBuilder<MaterialIdentificable>{
+        const alias = 'matident';
+        const { disponible, idmaterial, offset, limit, sort } = queries;
+        let query = this.materialIdentificableRepo.createQueryBuilder(alias);
+        if(idmaterial != null) query = query.andWhere(`${alias}.idmaterial = :idmaterial`, {idmaterial});
+        if(disponible != null) query = query.andWhere(`${alias}.disponible = :disponible`, {disponible});
+        if(offset) query = query.skip(offset);
+        if(limit) query = query.take(limit);
+        if(sort){
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) == '-' ? 'DESC' : 'ASC';
+            const sortColumn = sort.substring(1);
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
+            if(sortColumn != 'serial') query = query.addOrderBy(`${alias}.serial`, sortOrder);
+        }
+        return query;
+    }
+
+    findAllIdentificables(queries: QueriesType): Promise<MaterialIdentificable[]>{
+        return this.getIdentificableSelectQuery(queries).getMany();
+    }
+
+    countIdentificables(queries: QueriesType): Promise<number>{
+        return this.getIdentificableSelectQuery(queries).getCount();
+    }
+
 }
+
+type QueriesType = {[name: string]: any}

@@ -6,10 +6,10 @@ export class MaterialIdentificable {
     @PrimaryColumn({length: 70})
     serial: string;
 
+    @PrimaryColumn()
+    idmaterial: number
+
     @Column({nullable: false, default: false})
     disponible: boolean;
-
-    @Column({nullable: false})
-    idmaterial: number
 
 }

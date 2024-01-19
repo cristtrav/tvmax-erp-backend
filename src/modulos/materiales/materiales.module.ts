@@ -7,13 +7,14 @@ import { UtilModule } from '@util/util.module';
 import { Material } from '@database/entity/depositos/material.entity';
 import { Existencia } from '@database/entity/depositos/existencia.entity';
 import { MaterialView } from '@database/view/depositos/material.view';
+import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
     TypeOrmModule.forFeature([
-      Material, MaterialView, Existencia
+      Material, MaterialView, Existencia, MaterialIdentificable
     ])
   ],
   providers: [MaterialesService],

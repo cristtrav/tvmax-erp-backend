@@ -23,6 +23,9 @@ export class DetalleMovimientoMaterialView {
     unidadmedida: string;
 
     @ViewColumn()
+    materialidentificable: boolean;
+
+    @ViewColumn()
     cantidad: string;
 
     @ViewColumn()
@@ -33,6 +36,9 @@ export class DetalleMovimientoMaterialView {
 
     @ViewColumn()
     descripcion: string;
+
+    @ViewColumn()
+    nroseriematerial: string;
 
     @ViewColumn()
     eliminado: boolean;

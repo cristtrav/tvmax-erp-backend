@@ -132,4 +132,13 @@ export class EventoAuditoriaUtil{
         return this.getEventoAuditoria(TablasAuditoriaList.EXISTENCIA.id, idusuario, operacion, oldValue, newValue);
     }
 
+    public static getEventoAuditoriaUsuarioDeposito(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.USUARIODEPOSITO.id, idusuario, operacion, oldValue, newValue);
+    }
+
 }

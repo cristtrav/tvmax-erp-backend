@@ -1,6 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { DetalleMovimientoMaterial } from "./detalle-movimiento-material.entity";
 
+const TIPOS_MOVIMIENTOS = ['EN', 'SA', 'DE', 'AJ'] as const;
+export type TipoMovimientoType = typeof TIPOS_MOVIMIENTOS[number];
+
 @Entity({schema: 'depositos'})
 export class MovimientoMaterial {
 
@@ -16,8 +19,8 @@ export class MovimientoMaterial {
     @Column({name: 'idusuario_entrega'})
     idusuarioEntrega: number;
 
-    @Column({name: 'tipo_movimiento', length: 2, nullable: false})
-    tipoMovimiento: string;
+    @Column({name: 'tipo_movimiento', type: 'enum', enum: TIPOS_MOVIMIENTOS, nullable: false})
+    tipoMovimiento: TipoMovimientoType;
 
     @Column({name: 'idmovimiento_referencia'})
     idmovimientoReferencia: number;

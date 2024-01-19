@@ -161,4 +161,46 @@ export class Permissions {
         CONSULTAR: 360,
         ACCESOMODULO: 361
     }
+
+    static readonly DEPOSITOS  = {
+        ACCESOALMODULO: 560,
+        CONSULTAR: 561,
+        REGISTRAR: 562,
+        EDITAR: 563,
+        ELIMINAR: 564
+    }
+
+    static readonly TIPOSMATERIALES = {
+        ACCESOMODULO: 600,
+        CONSULTAR: 601,
+        REGISTRAR: 602,
+        EDITAR: 603,
+        ELIMINAR: 604
+    }
+
+    static readonly MOVIMIENTOSMATERIALES = {
+        ACCESOMODULO: 640,
+        CONSULTAR: 641,
+        REGISTRAR: 642,
+        EDITAR: 643,
+        ELIMINAR: 644
+    }
+
+    static readonly MATERIALES = {
+        ACCESOMODULO: 680,
+        CONSULTAR: 681,
+        REGISTRAR: 682,
+        EDITAR: 683,
+        ELIMINAR: 684
+    }
+
+    static readonly USUARIOSDEPOSITOS = {
+        ACCESOMODULO: 720,
+        CONSULTAR: 721,
+        REGISTRAR: 722,
+        EDITAR: 723,
+        ELIMINAR: 724,
+        CONSULTARULTIMOID: 725,
+        ACCESOFORMULARIO: 726
+    }
 }
