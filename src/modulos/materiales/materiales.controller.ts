@@ -35,6 +35,20 @@ export class MaterialesController {
         return this.materialesSrv.count(queries);
     }
 
+    @Get('identificables')
+    findAllIdentificables(
+        @Query() queries: QueriesType
+    ): Promise<MaterialIdentificable[]>{
+        return this.materialesSrv.findAllIdentificables(queries);
+    }
+
+    @Get('identificables/total')
+    countIdentificables(
+        @Query() queries: QueriesType
+    ): Promise<number>{
+        return this.materialesSrv.countIdentificables(queries);
+    }
+
     @Get(':id/identificables')
     findAllIdentificablesByMaterial(
         @Param('id') idmaterial: number,
