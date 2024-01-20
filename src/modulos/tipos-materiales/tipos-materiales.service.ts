@@ -18,12 +18,17 @@ export class TiposMaterialesService {
     ){}
 
     getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<TipoMaterialView>{
-        const {sort, offset, limit, eliminado } = queries;
+        const {sort, offset, limit, eliminado, id } = queries;
+        console.log(id)
         const alias = "tipomaterial";
         let query = this.tipoMaterialViewRepo.createQueryBuilder(alias);
         if(eliminado) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
+        if(id){
+            if(Array.isArray(id)) query = query.andWhere(`${alias}.id IN (:...id)`, { id });
+            else query = query.andWhere(`${alias}.id = :id`, { id });
+        }
         if(sort){
             const sortColumn = sort.substring(1);
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
