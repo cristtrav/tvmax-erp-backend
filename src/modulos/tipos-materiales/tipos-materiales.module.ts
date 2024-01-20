@@ -5,13 +5,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
+import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
     TypeOrmModule.forFeature([
-      TipoMaterial
+      TipoMaterial, TipoMaterialView
     ])
   ],
   controllers: [TiposMaterialesController],

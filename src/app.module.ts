@@ -85,6 +85,7 @@ import { UsuarioDeposito } from '@database/entity/depositos/usuario-deposito.ent
 import { AppInitService } from './app-init.service';
 import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-depositos.module';
 import { UsuarioDepositoView } from '@database/view/depositos/usuario-deposito.view';
+import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
 
 @Module({
   imports: [
@@ -147,7 +148,7 @@ import { UsuarioDepositoView } from '@database/view/depositos/usuario-deposito.v
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
-        TipoMaterial, Material, Existencia, MovimientoMaterial, DetalleMovimientoMaterial, MaterialIdentificable,
+        TipoMaterial, TipoMaterialView, Material, Existencia, MovimientoMaterial, DetalleMovimientoMaterial, MaterialIdentificable,
         MovimientoMaterialView, MaterialView, DetalleMovimientoMaterialView,
         UsuarioDeposito, UsuarioDepositoView
       ]

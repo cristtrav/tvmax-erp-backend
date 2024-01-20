@@ -23,10 +23,14 @@ export class MaterialesService {
     ){}
 
     private getSelectQuery(params: {[name:string]: any}): SelectQueryBuilder<MaterialView>{
-        const { sort, offset, limit, eliminado, search } = params;
+        const { sort, offset, limit, eliminado, search, idtipomaterial } = params;        
         const alias = 'material';
         let query: SelectQueryBuilder<MaterialView> = this.materialViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if(idtipomaterial){
+            if(Array.isArray(idtipomaterial)) query = query.andWhere(`${alias}.idtipomaterial IN (:...idtipomaterial)`, { idtipomaterial });
+            else query = query.andWhere(`${alias}.idtipomaterial = :idtipomaterial`, { idtipomaterial });
+        }
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
         if(search) query = query.andWhere(new Brackets(qb => {

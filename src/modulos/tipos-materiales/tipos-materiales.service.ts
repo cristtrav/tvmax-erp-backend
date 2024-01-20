@@ -1,4 +1,5 @@
 import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
+import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,14 +11,16 @@ export class TiposMaterialesService {
 
     constructor(
         @InjectRepository(TipoMaterial)
-        private tipoMaterialRepo: Repository<TipoMaterial>,        
+        private tipoMaterialRepo: Repository<TipoMaterial>,
+        @InjectRepository(TipoMaterialView)
+        private tipoMaterialViewRepo: Repository<TipoMaterialView>,
         private datasource: DataSource
     ){}
 
-    getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<TipoMaterial>{
+    getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<TipoMaterialView>{
         const {sort, offset, limit, eliminado } = queries;
         const alias = "tipomaterial";
-        let query = this.tipoMaterialRepo.createQueryBuilder(alias);
+        let query = this.tipoMaterialViewRepo.createQueryBuilder(alias);
         if(eliminado) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
@@ -30,7 +33,7 @@ export class TiposMaterialesService {
         return query;
     }
 
-    findAll(queries: {[name: string]: any}): Promise<TipoMaterial[]>{
+    findAll(queries: {[name: string]: any}): Promise<TipoMaterialView[]>{
         return this.getSelectQuery(queries).getMany();
     }
 

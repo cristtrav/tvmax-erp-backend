@@ -5,6 +5,7 @@ import { TipoMaterialDTO } from '@dto/tipo-material.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
+import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
 
 @Controller('tiposmateriales')
 @UseFilters(HttpExceptionFilter)
@@ -18,7 +19,7 @@ export class TiposMaterialesController {
     @Get()
     findAll(
         @Query() queries: {[name: string]: any}
-    ): Promise<TipoMaterial[]>{
+    ): Promise<TipoMaterialView[]>{
         return this.tiposMaterialesSrv.findAll(queries)
     }
 
