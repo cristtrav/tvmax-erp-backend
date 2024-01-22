@@ -13,6 +13,7 @@ import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-
 import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
 import { Material } from '@database/entity/depositos/material.entity';
 import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { MaterialIdentificable } from '@database/entity/depositos/material-ident
       Existencia,
       MovimientoMaterialView,
       DetalleMovimientoMaterialView,
-      Material, MaterialIdentificable
+      Material, MaterialIdentificable,
+      Permiso
     ])
   ],
   providers: [MovimientosMaterialesService, DetallesMovimientosMaterialesService],

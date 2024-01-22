@@ -185,7 +185,9 @@ export class Permissions {
         CONSULTAR: 641,
         REGISTRAR: 642,
         EDITAR: 643,
-        ELIMINAR: 644
+        ELIMINAR: 644,
+        ACCESOFORMULARIO: 645,
+        CONSULTARULTIMOID: 646
     }
 
     static readonly MATERIALES = {
