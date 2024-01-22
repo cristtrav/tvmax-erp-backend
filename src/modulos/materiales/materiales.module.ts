@@ -8,13 +8,14 @@ import { Material } from '@database/entity/depositos/material.entity';
 import { Existencia } from '@database/entity/depositos/existencia.entity';
 import { MaterialView } from '@database/view/depositos/material.view';
 import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
     TypeOrmModule.forFeature([
-      Material, MaterialView, Existencia, MaterialIdentificable
+      Material, MaterialView, Existencia, MaterialIdentificable, Permiso
     ])
   ],
   providers: [MaterialesService],

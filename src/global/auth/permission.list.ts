@@ -193,7 +193,9 @@ export class Permissions {
         CONSULTAR: 681,
         REGISTRAR: 682,
         EDITAR: 683,
-        ELIMINAR: 684
+        ELIMINAR: 684,
+        ACCESOFORMULARIO: 685,
+        CONSULTARULTIMOID: 686
     }
 
     static readonly USUARIOSDEPOSITOS = {
