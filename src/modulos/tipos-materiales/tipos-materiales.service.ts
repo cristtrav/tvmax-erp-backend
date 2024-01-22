@@ -17,7 +17,7 @@ export class TiposMaterialesService {
         private datasource: DataSource
     ){}
 
-    getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<TipoMaterialView>{
+    private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<TipoMaterialView>{
         const {sort, offset, limit, eliminado, id } = queries;
         console.log(id)
         const alias = "tipomaterial";

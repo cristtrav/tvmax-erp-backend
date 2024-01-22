@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { TiposMaterialesService } from './tipos-materiales.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { TipoMaterialDTO } from '@dto/tipo-material.dto';
@@ -6,9 +6,13 @@ import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
 import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
+import { AuthGuard } from '@auth/auth.guard';
+import { RequirePermission } from '@auth/require-permission.decorator';
+import { Permissions } from '@auth/permission.list';
 
 @Controller('tiposmateriales')
 @UseFilters(HttpExceptionFilter)
+@UseGuards(AuthGuard)
 export class TiposMaterialesController {
 
     constructor(
@@ -17,6 +21,7 @@ export class TiposMaterialesController {
     ){}
 
     @Get()
+    @RequirePermission(Permissions.TIPOSMATERIALES.CONSULTAR)
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<TipoMaterialView[]>{
@@ -24,6 +29,7 @@ export class TiposMaterialesController {
     }
 
     @Get('total')
+    @RequirePermission(Permissions.TIPOSMATERIALES.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -31,11 +37,13 @@ export class TiposMaterialesController {
     }
 
     @Get('ultimoid')
+    @RequirePermission(Permissions.TIPOSMATERIALES.CONSULTARULTIMOID)
     getLastId(): Promise<number>{
         return this.tiposMaterialesSrv.getLastId();
     }
 
     @Post()
+    @RequirePermission(Permissions.TIPOSMATERIALES.REGISTRAR)
     async create(
         @Body() tipoMaterial: TipoMaterialDTO,
         @Headers('authorization') auth: string 
@@ -47,6 +55,7 @@ export class TiposMaterialesController {
     }
 
     @Get(':id')
+    @RequirePermission(Permissions.TIPOSMATERIALES.CONSULTAR)
     async findById(
         @Param('id') id: number
     ): Promise<TipoMaterial>{
@@ -54,6 +63,7 @@ export class TiposMaterialesController {
     }
 
     @Put(':id')
+    @RequirePermission(Permissions.TIPOSMATERIALES.EDITAR)
     async edit(
         @Body() tipoMaterialDto: TipoMaterialDTO,
         @Headers('authorization') auth: string,
@@ -67,6 +77,7 @@ export class TiposMaterialesController {
     }
 
     @Delete(':id')
+    @RequirePermission(Permissions.TIPOSMATERIALES.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

@@ -6,13 +6,14 @@ import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
 import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
     TypeOrmModule.forFeature([
-      TipoMaterial, TipoMaterialView
+      TipoMaterial, TipoMaterialView, Permiso
     ])
   ],
   controllers: [TiposMaterialesController],

@@ -175,7 +175,9 @@ export class Permissions {
         CONSULTAR: 601,
         REGISTRAR: 602,
         EDITAR: 603,
-        ELIMINAR: 604
+        ELIMINAR: 604,
+        ACCESOFORMULARIO: 605,
+        CONSULTARULTIMOID: 606
     }
 
     static readonly MOVIMIENTOSMATERIALES = {
