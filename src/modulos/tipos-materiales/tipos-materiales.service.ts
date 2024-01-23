@@ -19,7 +19,6 @@ export class TiposMaterialesService {
 
     private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<TipoMaterialView>{
         const {sort, offset, limit, eliminado, id } = queries;
-        console.log(id)
         const alias = "tipomaterial";
         let query = this.tipoMaterialViewRepo.createQueryBuilder(alias);
         if(eliminado) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
