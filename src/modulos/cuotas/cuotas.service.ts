@@ -77,7 +77,6 @@ export class CuotasService {
                 .andWhere(`cuota.idservicio = :idservicio`, {idservicio: c.idservicio})
                 .andWhere(`cuota.eliminado = FALSE`)
                 .getOne();
-                console.log(cuotaExistente);
         if(cuotaExistente) throw new HttpException({
             message: `La cuota para el servicio «${cuotaExistente.servicio}» del mes «${format(c.fechaVencimiento, "MMMM yyyy", { locale: es })}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
