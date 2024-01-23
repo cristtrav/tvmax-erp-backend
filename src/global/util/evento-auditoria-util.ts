@@ -87,6 +87,60 @@ export class EventoAuditoriaUtil{
         return this.getEventoAuditoria(TablasAuditoriaList.FORMATOSFACTURAS.id, idusuario, operacion, oldValue, newValue);
     }
 
+    public static getEventoAuditoriaTiposMateriales(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.TIPOMATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaMaterial(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.MATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaMovimientoMaterial(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.MOVIMIENTOMATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaDetalleMovimientoMaterial(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.DETALLEMOVIMIENTOMATERIAL.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaExistencia(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.EXISTENCIA.id, idusuario, operacion, oldValue, newValue);
+    }
+
+    public static getEventoAuditoriaUsuarioDeposito(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ){
+        return this.getEventoAuditoria(TablasAuditoriaList.USUARIODEPOSITO.id, idusuario, operacion, oldValue, newValue);
+    }
+
     public static getEventoAuditoriaSorteos(
         idusuario: number,
         operacion: OperacionType,

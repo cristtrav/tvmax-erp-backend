@@ -32,6 +32,17 @@ import { SorteoDTO } from "@dto/sorteo.dto";
 import { Sorteo } from "@database/entity/sorteos/sorteo.entity";
 import { PremioDTO } from "@dto/premio.dto";
 import { Premio } from "@database/entity/sorteos/premio.entity";
+import { TipoMaterialDTO } from "@dto/tipo-material.dto";
+import { MaterialDTO } from "@dto/material.dto";
+import { Material } from "@database/entity/depositos/material.entity";
+import { MovimientoMaterialDTO } from "@dto/movimiento-material.dto";
+import { DetalleMovimientoMaterialDTO } from "@dto/detalle-movimiento-material.dto";
+import { DetalleMovimientoMaterial } from "@database/entity/depositos/detalle-movimiento-material.entity";
+import { MovimientoMaterial } from "@database/entity/depositos/movimiento-material.entity";
+import { TipoMaterial } from "@database/entity/depositos/tipo-material.entity";
+import { UsuarioDepositoDTO } from "@dto/usuario-deposito.dto";
+import { UsuarioDeposito } from "@database/entity/depositos/usuario-deposito.entity";
+
 
 export class DTOEntityUtis {
 
@@ -239,6 +250,67 @@ export class DTOEntityUtis {
         premio.idclienteGanador = premioDto.idclienteganador;
         premio.eliminado = premioDto.eliminado;
         return premio;
+    }
+
+    public static tipoMaterialDTOtoEntity(tmDto: TipoMaterialDTO): TipoMaterial{
+        const tipoMaterial = new TipoMaterial();
+        tipoMaterial.id = tmDto.id;
+        tipoMaterial.descripcion = tmDto.descripcion;
+        tipoMaterial.eliminado = false;
+        return tipoMaterial;
+    }
+
+    public static materialDTOtoEntity(m: MaterialDTO): Material{
+        const material = new Material()
+        material.id = m.id;
+        material.descripcion = m.descripcion;
+        material.unidadMedida = m.unidadmedida;
+        material.idtipoMaterial = m.idtipomaterial;
+        material.soloLectura = m.sololectura;
+        material.identificable = m.identificable;
+        material.eliminado = m.eliminado;
+        return material;
+    }
+
+    public static movimientoMaterialDTOtoEntity(m: MovimientoMaterialDTO): MovimientoMaterial{
+        const movimiento = new MovimientoMaterial();
+        movimiento.id = m.id;
+        movimiento.fecha = m.fecha;
+        movimiento.idmovimientoReferencia = m.idmovimientoreferencia;
+        movimiento.idusuarioEntrega = m.idusuarioentrega;
+        movimiento.idusuarioResponsable = m.idusuarioresponsable;
+        movimiento.observacion = m.observacion;
+        if(m.tipomovimiento == 'EN') movimiento.tipoMovimiento = 'EN';
+        if(m.tipomovimiento == 'SA') movimiento.tipoMovimiento = 'SA';
+        if(m.tipomovimiento == 'AJ') movimiento.tipoMovimiento = 'AJ';
+        if(m.tipomovimiento == 'DE') movimiento.tipoMovimiento = 'DE';
+        movimiento.eliminado = false;
+        movimiento.devuelto = m.devuelto;
+        return movimiento;
+    }
+
+    public static detalleMovimientoMaterialDTOtoEntity(d: DetalleMovimientoMaterialDTO): DetalleMovimientoMaterial{
+        const detalle = new DetalleMovimientoMaterial();
+        detalle.id = d.id;
+        detalle.cantidad = d.cantidad;
+        detalle.cantidadAnterior = d.cantidadanterior;
+        detalle.idmovimientoMaterial = d.idmovimiento;
+        detalle.idmaterial = d.idmaterial;
+        detalle.descripcion = d.descripcion;
+        detalle.iddetalleMovimientoReferencia = d.iddetallemovimientoreferencia;
+        detalle.nroSerieMaterial = d.nroseriematerial;
+        detalle.eliminado = d.eliminado;
+        return detalle;
+    }
+
+    public static usuarioDepositoDTOtoEntity(usuarioDto: UsuarioDepositoDTO): UsuarioDeposito{
+        const usuario = new UsuarioDeposito();
+        usuario.id = usuarioDto.id;
+        usuario.razonSocial = usuarioDto.razonsocial;
+        if(usuarioDto.rol == 'PR') usuario.rol = 'PR';
+        if(usuarioDto.rol == 'RE') usuario.rol = 'RE';
+        usuario.eliminado = usuarioDto.eliminado;
+        return usuario;
     }
 
 }

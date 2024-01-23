@@ -106,4 +106,40 @@ export class TablasAuditoriaList{
         nombre: 'premio',
         descripcion: 'Premios'
     }
+
+    public static TIPOMATERIAL: TablaAuditoriaDTO = {
+        id: 22,
+        nombre: 'tipo_material',
+        descripcion: 'Tipos de Materiales'
+    }
+
+    public static MATERIAL: TablaAuditoriaDTO = {
+        id: 23,
+        nombre: 'material',
+        descripcion: 'Materiales'
+    }
+
+    public static MOVIMIENTOMATERIAL = {
+        id: 24,
+        nombre: 'movimiento_material',
+        descripcion: 'Movimientos de Materiales'
+    }
+
+    public static DETALLEMOVIMIENTOMATERIAL = {
+        id: 25,
+        nombre: 'detalle_movimiento_material',
+        descripcion: 'Detalles de Movimientos de Materiales'
+    }
+
+    public static EXISTENCIA = {
+        id: 26,
+        nombre: 'existencia',
+        descripcion: 'Existencias de Materiales'
+    }
+
+    public static USUARIODEPOSITO = {
+        id: 27,
+        nombre: 'usuario_deposito',
+        descripcion: 'Usuarios de Depósitos'
+    }
 }

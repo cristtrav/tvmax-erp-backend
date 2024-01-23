@@ -77,6 +77,23 @@ import { PremioView } from '@database/view/sorteos/premio.view';
 import { Participante } from '@database/entity/sorteos/participante.entity';
 import { ParticipanteView } from '@database/view/sorteos/participante.view';
 import { SorteoView } from '@database/view/sorteos/sorteo.view';
+import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-materiales.module';
+import { MaterialesModule } from './modulos/materiales/materiales.module';
+import { Material } from '@database/entity/depositos/material.entity';
+import { MovimientosMaterialesModule } from './modulos/movimientos-materiales/movimientos-materiales.module';
+import { DetalleMovimientoMaterial } from '@database/entity/depositos/detalle-movimiento-material.entity';
+import { Existencia } from '@database/entity/depositos/existencia.entity';
+import { MovimientoMaterial } from '@database/entity/depositos/movimiento-material.entity';
+import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
+import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
+import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';
+import { MaterialView } from '@database/view/depositos/material.view';
+import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
+import { UsuarioDeposito } from '@database/entity/depositos/usuario-deposito.entity';
+import { AppInitService } from './app-init.service';
+import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-depositos.module';
+import { UsuarioDepositoView } from '@database/view/depositos/usuario-deposito.view';
+import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
 
 @Module({
   imports: [
@@ -139,7 +156,11 @@ import { SorteoView } from '@database/view/sorteos/sorteo.view';
         FormatoFactura,
         ConsultaCobranzaExterna, DetalleConsultaCobranzaExterna,
         GeneracionCuotas,
-        Sorteo, Premio, PremioView, Participante, ParticipanteView, SorteoView
+        Sorteo, Premio, PremioView, Participante, ParticipanteView, SorteoView,
+        GeneracionCuotas,
+        TipoMaterial, TipoMaterialView, Material, Existencia, MovimientoMaterial, DetalleMovimientoMaterial, MaterialIdentificable,
+        MovimientoMaterialView, MaterialView, DetalleMovimientoMaterialView,
+        UsuarioDeposito, UsuarioDepositoView
       ],
       extra: {
         poolSize: 20,
@@ -150,9 +171,13 @@ import { SorteoView } from '@database/view/sorteos/sorteo.view';
     }),
     TasksModule,
     SorteosModule,
-    PremiosModule
+    PremiosModule,
+    TiposMaterialesModule,
+    MaterialesModule,
+    MovimientosMaterialesModule,
+    UsuariosDepositosModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppInitService],
 })
 export class AppModule {}

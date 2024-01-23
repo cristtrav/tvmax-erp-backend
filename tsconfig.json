@@ -12,6 +12,9 @@
     "baseUrl": "./",
     "incremental": true,
     "paths": {
+      "@types/*":[
+        "./src/global/types/*"
+      ],
       "@database/*": [
         "./src/global/database/*"
       ],
