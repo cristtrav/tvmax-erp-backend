@@ -57,6 +57,14 @@ export class MaterialesController {
     ): Promise<number>{
         return this.materialesSrv.countIdentificables(queries);
     }
+    
+    @Get(':id/identificables/ultimoserialgenerado')
+    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    getLastGeneratedSerial(
+        @Param('id') idmaterial: number
+    ): Promise<string>{
+        return this.materialesSrv.getUltimoNroSerieAutogenerado(idmaterial);
+    }
 
     @Get(':id/identificables')
     @RequirePermission(Permissions.MATERIALES.CONSULTAR)
@@ -66,6 +74,8 @@ export class MaterialesController {
     ): Promise<MaterialIdentificable[]>{
         return this.materialesSrv.findAllIdentificables({idmaterial, ...queries});
     }
+
+    
 
     @Get(':id/identificables/total')
     @RequirePermission(Permissions.MATERIALES.CONSULTAR)

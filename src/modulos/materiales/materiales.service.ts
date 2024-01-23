@@ -136,6 +136,19 @@ export class MaterialesService {
         return this.getIdentificableSelectQuery(queries).getCount();
     }
 
+    async getUltimoNroSerieAutogenerado(idmaterial: number): Promise<string> {
+        const alias = 'identificable';
+        const matIdent =
+            await this.materialIdentificableRepo
+            .createQueryBuilder(alias)
+            .where(`${alias}.idmaterial = :idmaterial`, {idmaterial})
+            .andWhere(`${alias}.serial LIKE 'TVMX%'`)
+            .orderBy(`SUBSTRING(${alias}.serial, 9)::integer`, 'DESC')
+            .getOne();
+        if(matIdent) return matIdent.serial;
+        else return ''
+    }
+
 }
 
 type QueriesType = {[name: string]: any}
