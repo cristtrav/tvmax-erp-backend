@@ -6,5 +6,7 @@ export interface MaterialDTO{
     idtipomaterial: number;
     tipomaterial: string;
     identificable: boolean;
+    ultimoprecio: string;
+    preciototal: string;
     eliminado: boolean;
 }

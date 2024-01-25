@@ -1,4 +1,4 @@
-import { ViewColumn, ViewEntity } from "typeorm";
+import { View, ViewColumn, ViewEntity } from "typeorm";
 
 @ViewEntity({schema: 'depositos', name: 'vw_materiales', expression: 'SELECT * FROM depositos.vw_materiales'})
 export class MaterialView {
@@ -25,6 +25,12 @@ export class MaterialView {
 
     @ViewColumn()
     identificable: boolean;
+
+    @ViewColumn()
+    ultimoprecio: string;
+
+    @ViewColumn()
+    preciototal: string;
 
     @ViewColumn()
     eliminado: boolean;

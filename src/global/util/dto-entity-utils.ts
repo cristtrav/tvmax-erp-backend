@@ -269,6 +269,7 @@ export class DTOEntityUtis {
         material.soloLectura = m.sololectura;
         material.identificable = m.identificable;
         material.eliminado = m.eliminado;
+        material.ultimoPrecio = m.ultimoprecio;
         return material;
     }
 

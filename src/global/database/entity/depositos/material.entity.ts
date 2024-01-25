@@ -20,6 +20,9 @@ export class Material{
     @Column({nullable: false, default: false})
     identificable: boolean;
 
+    @Column({name: 'ultimo_precio', type: 'numeric', scale: 8, precision: 0, nullable: false, default: 0})
+    ultimoPrecio: string;
+
     @Column({nullable: false, default: false})
     eliminado: boolean;
 }
