@@ -92,12 +92,22 @@ export class MaterialesService {
                 existencia.cantidad = oldExistencia.cantidad;
                 await manager.save(existencia);
 
+                const oldIdentificables = await this.materialIdentificableRepo.findBy({idmaterial: oldId});
+                for(let oldIdent of oldIdentificables){
+                    const identif = new MaterialIdentificable();
+                    identif.idmaterial = material.id;
+                    identif.serial = oldIdent.serial;
+                    identif.disponible = oldIdent.disponible;
+                    await manager.save(identif);
+                }
+
                 const detallesMovimientos = await this.detalleMovimientoMaterialRepo.findBy({idmaterial: oldId});
                 for(let detalle of detallesMovimientos){
                     detalle.idmaterial = material.id;
                     await manager.save(detalle);
                 }
                 await manager.remove(oldExistencia);
+                for(let oldIdent of oldIdentificables) await manager.remove(oldIdent);
                 await manager.remove(oldMaterial);
             }
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaMaterial(idusuario, 'M', oldMaterial, material));
