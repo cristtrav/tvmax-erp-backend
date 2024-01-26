@@ -1,3 +1,4 @@
+import { DetalleMovimientoMaterial } from '@database/entity/depositos/detalle-movimiento-material.entity';
 import { Existencia } from '@database/entity/depositos/existencia.entity';
 import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
 import { Material } from '@database/entity/depositos/material.entity';
@@ -19,6 +20,8 @@ export class MaterialesService {
         private existenciaRepo: Repository<Existencia>,
         @InjectRepository(MaterialIdentificable)
         private materialIdentificableRepo: Repository<MaterialIdentificable>,
+        @InjectRepository(DetalleMovimientoMaterial)
+        private detalleMovimientoMaterialRepo: Repository<DetalleMovimientoMaterial>,
         private datasource: DataSource
     ){}
 
@@ -80,6 +83,23 @@ export class MaterialesService {
 
         await this.datasource.transaction(async manager => {
             await manager.save(material);
+            if(oldId != material.id){
+                
+                const oldExistencia = await this.existenciaRepo.findOneBy({iddeposito: 1, idmaterial: oldId});
+                const existencia = new Existencia();
+                existencia.idmaterial = material.id;
+                existencia.iddeposito = 1;
+                existencia.cantidad = oldExistencia.cantidad;
+                await manager.save(existencia);
+
+                const detallesMovimientos = await this.detalleMovimientoMaterialRepo.findBy({idmaterial: oldId});
+                for(let detalle of detallesMovimientos){
+                    detalle.idmaterial = material.id;
+                    await manager.save(detalle);
+                }
+                await manager.remove(oldExistencia);
+                await manager.remove(oldMaterial);
+            }
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaMaterial(idusuario, 'M', oldMaterial, material));
         });
     }
