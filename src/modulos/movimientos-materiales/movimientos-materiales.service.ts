@@ -35,13 +35,19 @@ export class MovimientosMaterialesService {
             limit,
             eliminado,
             fechainicio,
-            fechafin
+            fechafin,
+            tipomovimiento
         } = queries;
         const alias = 'movimiento';
         let query = this.movimientoMaterialViewRepo.createQueryBuilder(alias);
+
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
         if(fechainicio) query = query.andWhere(`${alias}.fecha >= :fechainicio`, {fechainicio});
         if(fechafin) query = query.andWhere(`${alias}.fecha <= :fechafin`, {fechafin});
+        if(tipomovimiento)
+            if(Array.isArray(tipomovimiento)) query = query.andWhere(`${alias}.tipomovimiento IN (:...tipomovimiento)`, {tipomovimiento});
+            else query = query.andWhere(`${alias}.tipomovimiento = :tipomovimiento`, {tipomovimiento});
+            
         if(offset) query = query.skip(offset);
         if(limit) query = query.take(limit);
         if(sort){
