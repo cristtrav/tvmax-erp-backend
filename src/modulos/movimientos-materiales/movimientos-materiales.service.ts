@@ -29,10 +29,19 @@ export class MovimientosMaterialesService {
     ){}
 
     private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<MovimientoMaterialView>{
-        const { sort, offset, limit, eliminado } = queries;
+        const {
+            sort,
+            offset,
+            limit,
+            eliminado,
+            fechainicio,
+            fechafin
+        } = queries;
         const alias = 'movimiento';
         let query = this.movimientoMaterialViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
+        if(fechainicio) query = query.andWhere(`${alias}.fecha >= :fechainicio`, {fechainicio});
+        if(fechafin) query = query.andWhere(`${alias}.fecha <= :fechafin`, {fechafin});
         if(offset) query = query.skip(offset);
         if(limit) query = query.take(limit);
         if(sort){
