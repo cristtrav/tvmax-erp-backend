@@ -36,7 +36,8 @@ export class MovimientosMaterialesService {
             eliminado,
             fechainicio,
             fechafin,
-            tipomovimiento
+            tipomovimiento,
+            idusuarioresponsable
         } = queries;
         const alias = 'movimiento';
         let query = this.movimientoMaterialViewRepo.createQueryBuilder(alias);
@@ -47,7 +48,8 @@ export class MovimientosMaterialesService {
         if(tipomovimiento)
             if(Array.isArray(tipomovimiento)) query = query.andWhere(`${alias}.tipomovimiento IN (:...tipomovimiento)`, {tipomovimiento});
             else query = query.andWhere(`${alias}.tipomovimiento = :tipomovimiento`, {tipomovimiento});
-            
+        if(idusuarioresponsable != null) query = query.andWhere(`${alias}.idusuarioresponsable = :idusuarioresponsable`, {idusuarioresponsable});
+
         if(offset) query = query.skip(offset);
         if(limit) query = query.take(limit);
         if(sort){
