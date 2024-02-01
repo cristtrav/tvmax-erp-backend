@@ -13,5 +13,7 @@ export class DomicilioDTO {
     iddepartamento: number | null = null;
     departamento: string| null = null;
     tipo: string | null = null;
+    latitud: number | null = null;
+    longitud: number | null = null;
     eliminado: boolean | null = null;
 }

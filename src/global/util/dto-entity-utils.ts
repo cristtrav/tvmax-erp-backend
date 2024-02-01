@@ -157,7 +157,7 @@ export class DTOEntityUtis {
         return cliente;
     }
 
-    public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio {
+    public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio {        
         const domicilio = new Domicilio();
         domicilio.id = domicilioDto.id;
         domicilio.direccion = domicilioDto.direccion;
@@ -168,6 +168,9 @@ export class DTOEntityUtis {
         domicilio.principal = domicilioDto.principal;
         domicilio.tipo = domicilioDto.tipo;
         domicilio.eliminado = domicilioDto.eliminado;
+        if(domicilioDto.latitud != null && domicilioDto.longitud != null)
+            domicilio.ubicacion = {x: domicilioDto.latitud, y: domicilioDto.longitud};
+        else domicilio.ubicacion = null;        
         return domicilio;
     }
 

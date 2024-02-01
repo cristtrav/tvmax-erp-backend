@@ -47,4 +47,10 @@ export class DomicilioView{
 
     @ViewColumn()
     eliminado: boolean;
+
+    @ViewColumn()
+    latitud: number;
+
+    @ViewColumn()
+    longitud: number;
 }
