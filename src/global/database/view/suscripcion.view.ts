@@ -99,4 +99,10 @@ export class SuscripcionView{
     @ViewColumn()
     observacion: string;
 
+    @ViewColumn()
+    latitud: number;
+
+    @ViewColumn()
+    longitud: number;
+
 }
