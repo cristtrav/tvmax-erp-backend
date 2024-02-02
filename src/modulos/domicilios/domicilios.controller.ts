@@ -1,7 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { DomicilioDTO } from '@dto/domicilio.dto';
+import { DomicilioDTO } from 'src/global/dto/domicilio.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DomiciliosService } from './domicilios.service';

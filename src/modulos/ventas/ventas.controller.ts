@@ -1,7 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { VentaDTO } from '@dto/venta.dto';
+import { VentaDTO } from 'src/global/dto/venta.dto';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
 import { VentasService } from './ventas.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';

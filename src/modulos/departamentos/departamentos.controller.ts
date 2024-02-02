@@ -5,7 +5,7 @@ import { RequirePermission } from '../../global/auth/require-permission.decorato
 import { DepartamentosService } from './departamentos.service';
 import { JwtService } from '@nestjs/jwt';
 import { Departamento } from '@database/entity/departamento.entity';
-import { DepartamentoDTO } from '@dto/departamento.dto';
+import { DepartamentoDTO } from 'src/global/dto/departamento.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from 'src/global/filters/http-exception.filter';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';

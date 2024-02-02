@@ -1,6 +1,6 @@
 import { Usuario } from '@database/entity/usuario.entity';
-import { TokenSesionDTO } from '@dto/token-sesion.dto';
-import { UsuarioDTO } from '@dto/usuario.dto';
+import { TokenSesionDTO } from 'src/global/dto/token-sesion.dto';
+import { UsuarioDTO } from 'src/global/dto/usuario.dto';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 

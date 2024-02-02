@@ -4,7 +4,7 @@ import { RequirePermission } from '@auth/require-permission.decorator';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { Rol } from '@database/entity/rol.entity';
 import { RolView } from '@database/view/rol.view';
-import { RolDTO } from '@dto/rol.dto';
+import { RolDTO } from 'src/global/dto/rol.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';

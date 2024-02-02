@@ -1,8 +1,8 @@
 import { Controller, Post, Body, UseFilters, Param, Get, Query } from '@nestjs/common';
 import { SesionService } from './sesion.service';
-import { TokenSesionDTO } from './../../dto/token-sesion.dto';
+import { TokenSesionDTO } from '../../global/dto/token-sesion.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { FuncionalidadDTO } from '@dto/funcionalidad.dto';
+import { FuncionalidadDTO } from 'src/global/dto/funcionalidad.dto';
 import { PermisosService } from '@modulos/permisos/permisos.service';
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 

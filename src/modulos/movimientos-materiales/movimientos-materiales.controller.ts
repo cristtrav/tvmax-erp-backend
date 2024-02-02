@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Header, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MovimientosMaterialesService } from './movimientos-materiales.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { MovimientoMaterialDTO } from '@dto/movimiento-material.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { DetallesMovimientosMaterialesService } from './detalles-movimientos-materiales/detalles-movimientos-materiales.service';
@@ -10,6 +9,7 @@ import { MovimientoMaterialView } from '@database/view/depositos/movimiento-mate
 import { AuthGuard } from '@auth/auth.guard';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
+import { MovimientoMaterialDTO } from '@dto/depositos/movimiento-material.dto';
 
 @Controller('movimientosmateriales')
 @UseFilters(HttpExceptionFilter)

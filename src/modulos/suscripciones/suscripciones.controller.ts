@@ -3,7 +3,7 @@ import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { SuscripcionesService } from './suscripciones.service';
-import { SuscripcionDTO } from '../../dto/suscripcion.dto';
+import { SuscripcionDTO } from '../../global/dto/suscripcion.dto';
 import { CuotasService } from '../cuotas/cuotas.service';
 import { ServiciosService } from '../servicios/servicios.service'
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';

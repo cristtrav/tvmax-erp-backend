@@ -3,7 +3,7 @@ import { Permissions } from 'src/global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';
 import { BarriosService } from './barrios.service';
-import { BarrioDTO } from '../../dto/barrio.dto';
+import { BarrioDTO } from '../../global/dto/barrio.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { BarrioView } from '@database/view/barrio.view';

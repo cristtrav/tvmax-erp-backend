@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, Headers, UseFilters } from '@nestjs/common';
 import { GruposService } from './grupos.service';
-import { GrupoDTO } from './../../dto/grupo.dto';
+import { GrupoDTO } from '../../global/dto/grupo.dto';
 import { AuthGuard } from './../../global/auth/auth.guard';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from '../../global/auth/require-permission.decorator';

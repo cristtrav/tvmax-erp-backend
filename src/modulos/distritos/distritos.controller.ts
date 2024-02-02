@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Headers, UseFilters } from '@nestjs/common';
-import { DistritoDTO } from '../../dto/distrito.dto';
+import { DistritoDTO } from '../../global/dto/distrito.dto';
 import { Permissions } from '../../global/auth/permission.list';
 import { RequirePermission } from 'src/global/auth/require-permission.decorator';
 import { AuthGuard } from '../../global/auth/auth.guard';

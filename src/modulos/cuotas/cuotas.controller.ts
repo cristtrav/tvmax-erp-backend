@@ -1,7 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { CuotaDTO } from '@dto/cuota.dto';
+import { CuotaDTO } from 'src/global/dto/cuota.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Headers, UseFilters } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { CuotasService } from './cuotas.service';

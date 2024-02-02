@@ -1,8 +1,8 @@
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { VentaView } from '@database/view/venta.view';
-import { ResumenCobradoresVentasDTO } from '@dto/resumen-cobradores-ventas.dto';
-import { ResumenGruposVentasDTO } from '@dto/resumen-grupos-ventas.dto';
-import { ResumenServiciosVentasDTO } from '@dto/resumen-servicios-ventas.dto';
+import { ResumenCobradoresVentasDTO } from 'src/global/dto/resumen-cobradores-ventas.dto';
+import { ResumenGruposVentasDTO } from 'src/global/dto/resumen-grupos-ventas.dto';
+import { ResumenServiciosVentasDTO } from 'src/global/dto/resumen-servicios-ventas.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';

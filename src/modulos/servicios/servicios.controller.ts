@@ -7,7 +7,7 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { AuthGuard } from '@auth/auth.guard';
-import { ServicioDTO } from '@dto/servicio.dto';
+import { ServicioDTO } from 'src/global/dto/servicio.dto';
 
 @Controller('servicios')
 @UseGuards(AuthGuard)

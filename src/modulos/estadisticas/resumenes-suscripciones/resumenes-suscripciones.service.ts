@@ -1,12 +1,12 @@
 import { SuscripcionView } from '@database/view/suscripcion.view';
-import { ResumenBarriosSuscripcionesDTO } from '@dto/resumen-barrios-suscripciones.dto';
-import { ResumenCuotasPendientesSuscripcionesDTO } from '@dto/resumen-cuotas-pendientes-suscripciones.dto';
-import { ResumenDepartamentosSuscripcionesDTO } from '@dto/resumen-departamentos-suscripciones.dto';
-import { ResumenDistritosSuscripcionesDTO } from '@dto/resumen-distritos-suscripciones.dto';
-import { ResumenEstadosSuscripcionesDTO } from '@dto/resumen-estados-suscripciones.dto';
-import { ResumenGeneralSuscripcionesDTO } from '@dto/resumen-general-suscripciones.dto';
-import { ResumenGruposSuscripcionesDTO } from '@dto/resumen-grupos-suscripciones.dto';
-import { ResumenServiciosSuscripcionDTO } from '@dto/resumen-servicios-suscripcion.dto';
+import { ResumenBarriosSuscripcionesDTO } from 'src/global/dto/resumen-barrios-suscripciones.dto';
+import { ResumenCuotasPendientesSuscripcionesDTO } from 'src/global/dto/resumen-cuotas-pendientes-suscripciones.dto';
+import { ResumenDepartamentosSuscripcionesDTO } from 'src/global/dto/resumen-departamentos-suscripciones.dto';
+import { ResumenDistritosSuscripcionesDTO } from 'src/global/dto/resumen-distritos-suscripciones.dto';
+import { ResumenEstadosSuscripcionesDTO } from 'src/global/dto/resumen-estados-suscripciones.dto';
+import { ResumenGeneralSuscripcionesDTO } from 'src/global/dto/resumen-general-suscripciones.dto';
+import { ResumenGruposSuscripcionesDTO } from 'src/global/dto/resumen-grupos-suscripciones.dto';
+import { ResumenServiciosSuscripcionDTO } from 'src/global/dto/resumen-servicios-suscripcion.dto';
 import { Injectable } from '@nestjs/common';
 import { Brackets, DataSource, SelectQueryBuilder } from 'typeorm';
 

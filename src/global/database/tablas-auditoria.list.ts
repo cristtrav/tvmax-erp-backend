@@ -1,4 +1,4 @@
-import { TablaAuditoriaDTO } from "@dto/tabla-auditoria.dto";
+import { TablaAuditoriaDTO } from "src/global/dto/tabla-auditoria.dto";
 
 export class TablasAuditoriaList{
     public static GRUPOS: TablaAuditoriaDTO = {

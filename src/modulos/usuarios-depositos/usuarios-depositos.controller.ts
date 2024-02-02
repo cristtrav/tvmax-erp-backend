@@ -2,12 +2,12 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFil
 import { UsuariosDepositosService } from './usuarios-depositos.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { UsuarioDepositoView } from '@database/view/depositos/usuario-deposito.view';
-import { UsuarioDepositoDTO } from '@dto/usuario-deposito.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { AuthGuard } from '@auth/auth.guard';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
+import { UsuarioDepositoDTO } from '@dto/depositos/usuario-deposito.dto';
 
 @Controller('usuariosdepositos')
 @UseFilters(HttpExceptionFilter)

@@ -1,7 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { TimbradoDTO } from '@dto/timbrado.dto';
+import { TimbradoDTO } from 'src/global/dto/timbrado.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { TimbradosService } from './timbrados.service';

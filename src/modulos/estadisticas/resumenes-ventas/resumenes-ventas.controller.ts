@@ -1,9 +1,9 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { ResumenCobradoresVentasDTO } from '@dto/resumen-cobradores-ventas.dto';
-import { ResumenGruposVentasDTO } from '@dto/resumen-grupos-ventas.dto';
-import { ResumenServiciosVentasDTO } from '@dto/resumen-servicios-ventas.dto';
+import { ResumenCobradoresVentasDTO } from 'src/global/dto/resumen-cobradores-ventas.dto';
+import { ResumenGruposVentasDTO } from 'src/global/dto/resumen-grupos-ventas.dto';
+import { ResumenServiciosVentasDTO } from 'src/global/dto/resumen-servicios-ventas.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Controller, Get, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { ResumenesVentasService } from './resumenes-ventas.service';

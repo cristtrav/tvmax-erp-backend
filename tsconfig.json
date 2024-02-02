@@ -22,7 +22,7 @@
         "./src/global/auth/*"
       ],
       "@dto/*": [
-        "./src/dto/*"
+        "src/global/dto/*"
       ],
       "@util/*": [
         "./src/util/*"

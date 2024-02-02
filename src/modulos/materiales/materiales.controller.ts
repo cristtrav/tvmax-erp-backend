@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MaterialesService } from './materiales.service';
-import { MaterialDTO } from '@dto/material.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
@@ -9,6 +8,7 @@ import { MaterialIdentificable } from '@database/entity/depositos/material-ident
 import { AuthGuard } from '@auth/auth.guard';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
+import { MaterialDTO } from '@dto/depositos/material.dto';
 
 @Controller('materiales')
 @UseFilters(HttpExceptionFilter)

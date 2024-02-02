@@ -1,7 +1,7 @@
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
 import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
-import { EventoAuditoriaDTO } from '@dto/evento-auditoria.dto';
-import { TablaAuditoriaDTO } from '@dto/tabla-auditoria.dto';
+import { EventoAuditoriaDTO } from 'src/global/dto/evento-auditoria.dto';
+import { TablaAuditoriaDTO } from 'src/global/dto/tabla-auditoria.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IRangeQuery } from '@util/irangequery.interface';

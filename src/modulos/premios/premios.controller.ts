@@ -1,13 +1,13 @@
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, UseFilters, UseGuards } from '@nestjs/common';
 import { PremiosService } from './premios.service';
-import { PremioDTO } from '@dto/premio.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { PremioView } from '@database/view/sorteos/premio.view';
 import { AuthGuard } from '@auth/auth.guard';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
+import { PremioDTO } from '@dto/sorteos/premio.dto';
 
 @Controller('premios')
 @UseFilters(HttpExceptionFilter)

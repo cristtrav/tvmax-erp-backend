@@ -2,7 +2,7 @@ import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { FormatoFactura } from '@database/entity/formato-factura.entity';
-import { FormatoFacturaDTO } from '@dto/formato-factura.dto';
+import { FormatoFacturaDTO } from 'src/global/dto/formato-factura.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';

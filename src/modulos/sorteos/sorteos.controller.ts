@@ -3,7 +3,6 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFil
 import { SorteosService } from './sorteos.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Sorteo } from '@database/entity/sorteos/sorteo.entity';
-import { SorteoDTO } from '@dto/sorteo.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { PremioView } from '@database/view/sorteos/premio.view';
 import { PremiosService } from '@modulos/premios/premios.service';
@@ -12,6 +11,7 @@ import { SorteoView } from '@database/view/sorteos/sorteo.view';
 import { AuthGuard } from '@auth/auth.guard';
 import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
+import { SorteoDTO } from '@dto/sorteos/sorteo.dto';
 
 @Controller('sorteos')
 @UseFilters(HttpExceptionFilter)

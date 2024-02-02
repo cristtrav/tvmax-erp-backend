@@ -1,7 +1,7 @@
 import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
 import { RequirePermission } from '@auth/require-permission.decorator';
-import { ClienteDTO } from '@dto/cliente.dto';
+import { ClienteDTO } from 'src/global/dto/cliente.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';

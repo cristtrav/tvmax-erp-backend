@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from '@database/entity/usuario.entity';
 import { Repository } from 'typeorm';
 import { Sesion } from '@database/entity/sesion.entity';
-import { TokenSesionDTO } from '@dto/token-sesion.dto';
+import { TokenSesionDTO } from 'src/global/dto/token-sesion.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { JwtService } from '@nestjs/jwt';
 
