@@ -75,4 +75,10 @@ export class ClienteView{
     @ViewColumn()
     eliminado: boolean;
 
+    @ViewColumn()
+    latitud: number;
+
+    @ViewColumn()
+    longitud: number;
+
 }

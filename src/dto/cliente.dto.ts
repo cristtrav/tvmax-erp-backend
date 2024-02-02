@@ -22,4 +22,6 @@ export class ClienteDTO {
     cantdesconectados: number = 0;
     excluidosorteo: boolean = false;
     eliminado: boolean | null = false;
+    latitud: number | null = null;
+    longitud: number | null = null;
 }
