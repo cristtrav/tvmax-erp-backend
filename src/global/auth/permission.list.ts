@@ -244,4 +244,8 @@ export class Permissions {
         CONSULTARULTIMOID: 725,
         ACCESOFORMULARIO: 726
     }
+
+    static readonly MOTIVORECLAMO = {
+        ACCESOMODULO: 760
+    }
 }
