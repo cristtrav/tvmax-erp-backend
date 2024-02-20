@@ -18,7 +18,19 @@ export class ClientesService {
     ) { }
 
     private getSelectQuery(queries: {[name: string]: any}): SelectQueryBuilder<ClienteView>{
-        const { eliminado, search, idcobrador, idbarrio, iddistrito, iddepartamento, sort, offset, limit, ci, excluidosorteo } = queries;        
+        const {
+                eliminado,
+                search,
+                idcobrador,
+                idbarrio,
+                iddistrito,
+                iddepartamento,
+                sort,
+                offset,
+                limit,
+                ci,
+                excluidosorteo
+            } = queries;        
         const alias = 'cliente';
         let query: SelectQueryBuilder<ClienteView> = this.clienteViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
@@ -34,6 +46,7 @@ export class ClientesService {
                 qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellsearch`, {apellsearch: `%${search.toLowerCase()}%`});
                 qb = qb.orWhere(`LOWER(${alias}.razonsocial) LIKE :rssearch`, {rssearch: `%${search.toLowerCase()}%`});
                 qb = qb.orWhere(`${alias}.ci = :cisearch`, {cisearch: search});
+                if(Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
             })
         );
         if(offset) query = query.skip(offset);

@@ -95,6 +95,7 @@ import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-d
 import { UsuarioDepositoView } from '@database/view/depositos/usuario-deposito.view';
 import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
 import { MotivosModule } from './modulos/reclamos/motivos/motivos.module';
+import { ReclamosModule } from './modulos/reclamos/reclamos/reclamos.module';
 
 @Module({
   imports: [
@@ -151,7 +152,8 @@ import { MotivosModule } from './modulos/reclamos/motivos/motivos.module';
     MaterialesModule,
     MovimientosMaterialesModule,
     UsuariosDepositosModule,
-    MotivosModule
+    MotivosModule,
+    ReclamosModule
   ],
   controllers: [AppController],
   providers: [AppService, AppInitService],
