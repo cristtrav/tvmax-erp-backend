@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { TablaAuditoria } from "../tabla-auditoria.entity";
 import { EventoAuditoria } from "../evento-auditoria.entity";
 import { DetalleReclamoDTO } from "@dto/reclamos/detalle-reclamo.dto";
+import { Reclamo } from "./reclamo.entity";
 
 @Entity({schema: 'reclamos'})
 export class DetalleReclamo {
@@ -20,6 +21,10 @@ export class DetalleReclamo {
 
     @Column({default: false, nullable: false})
     eliminado: boolean;
+
+    @ManyToOne(() => Reclamo, (reclamo) => reclamo.detalles)
+    @JoinColumn({name: 'idreclamo'})
+    reclamo: Reclamo;
 
     fromDTO(detalle: DetalleReclamoDTO): DetalleReclamo{
         this.id = detalle.id;

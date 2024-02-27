@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { TablaAuditoria } from "../tabla-auditoria.entity";
 import { EventoAuditoria } from "../evento-auditoria.entity";
 import { DetalleReclamo } from "./detalle-reclamo.entity";
@@ -36,6 +36,9 @@ export class Reclamo {
 
     @Column({default: false, nullable: false})
     eliminado: boolean;
+
+    @OneToMany(() => DetalleReclamo, (detalle) => detalle.reclamo)
+    detalles: DetalleReclamo[];
 
     fromDTO(reclamoDto: ReclamoDTO): Reclamo {
         this.id = reclamoDto.id;
