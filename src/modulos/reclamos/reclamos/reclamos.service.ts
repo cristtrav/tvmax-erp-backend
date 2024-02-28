@@ -5,7 +5,7 @@ import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetalleReclamoDTO } from '@dto/reclamos/detalle-reclamo.dto';
 import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 type QueriesType = {[name: string]: any}
 
@@ -30,12 +30,36 @@ export class ReclamosService implements OnModuleInit {
     }
 
     private getSelectQuery(queries: QueriesType): SelectQueryBuilder<ReclamoView>{
-        const { eliminado, sort, offset, limit } = queries;
+        const {
+            eliminado,
+            sort,
+            offset,
+            limit,
+            search,
+            fechadesde,
+            fechahasta,
+            estado,
+            idusuarioresponsable,
+            idusuarioregistro
+        } = queries;
         const alias = 'reclamo';
         let query = this.reclamoViewRepo.createQueryBuilder(alias);
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
+        if(fechadesde) query = query.andWhere(`${alias}.fecha >= :fechadesde`, { fechadesde });
+        if(fechahasta) query = query.andWhere(`${alias}.fecha <= :fechahasta`, { fechahasta });
+        if(idusuarioresponsable) query = query.andWhere(`${alias}.idusuarioresponsable = :idusuarioresponsable`, { idusuarioresponsable });
+        if(idusuarioregistro) query = query.andWhere(`${alias}.idusuarioregistro = :idusuarioregistro`, { idusuarioregistro });
+        if(estado)
+            if(Array.isArray(estado)) query = query.andWhere(`${alias}.estado IN (:...estado)`, { estado });
+            else query = query.andWhere(`${alias}.estado = :estado`, { estado });
         if(limit) query = query.take(limit);
         if(offset) query = query.skip(offset);
+        if(search){
+            query = query.andWhere(new Brackets((qb) => {
+                if(Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
+                qb = qb.orWhere(`LOWER(${alias}.cliente) LIKE :clisearch`, { clisearch: `%${search.toLowerCase()}%`});
+            }));            
+        }
         if(sort){
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) == '-' ? 'DESC' : 'ASC';
             const sortColumn = sort.substring(1);
