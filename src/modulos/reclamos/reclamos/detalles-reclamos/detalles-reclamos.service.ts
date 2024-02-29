@@ -15,14 +15,15 @@ export class DetallesReclamosService {
 
     private getSelectQuery(queries: QueriesType): SelectQueryBuilder<DetalleReclamoView>{
         const alias = 'detalle';
-        const { idreclamo } = queries;
+        const { idreclamo, eliminado } = queries;
         let query = this.detallesReclamosViewRepo.createQueryBuilder(alias);
+        if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
         if(idreclamo) query = query.andWhere(`${alias}.idreclamo = :idreclamo`, {idreclamo});
         return query;
     }
 
-    findDetallesByReclamo(idreclamo: number): Promise<DetalleReclamoView[]>{
-        return this.getSelectQuery({idreclamo}).getMany();
+    findDetallesByReclamo(idreclamo: number, queries: QueriesType): Promise<DetalleReclamoView[]>{
+        return this.getSelectQuery({idreclamo, ...queries}).getMany();
     }
 
 }

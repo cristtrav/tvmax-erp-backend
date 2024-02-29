@@ -1,5 +1,5 @@
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { Body, Controller, Delete, Get, Headers, Param, Post, Query, UseFilters } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters } from '@nestjs/common';
 import { ReclamosService } from './reclamos.service';
 import { ReclamoDTO } from '@dto/reclamos/reclamo.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
@@ -37,9 +37,17 @@ export class ReclamosController {
 
     @Get(':id/detalles')
     findDetallesByReclamos(
-        @Param('id') idreclamo: number
+        @Param('id') idreclamo: number,
+        @Query() queries: QueriesType
     ): Promise<DetalleReclamoView[]>{
-        return this.detalleReclamosSrv.findDetallesByReclamo(idreclamo);
+        return this.detalleReclamosSrv.findDetallesByReclamo(idreclamo, queries);
+    }
+
+    @Get(':id')
+    findById(
+        @Param('id') idreclamo: number
+    ): Promise<ReclamoView>{
+        return this.reclamosSrv.findById(idreclamo);
     }
 
     @Post()
@@ -50,6 +58,20 @@ export class ReclamosController {
         return await this.reclamosSrv.create(
             new Reclamo().fromDTO(reclamoDto),
             reclamoDto.detalles.map(dDto => new DetalleReclamo().fromDTO(dDto)),
+            this.jwtUtilsSrv.extractJwtSub(auth)
+        );
+    }
+
+    @Put(':id')
+    async update(
+        @Param('id') oldId: number,
+        @Body() reclamoDto: ReclamoDTO,
+        @Headers('authorization') auth: string
+    ){
+        await this.reclamosSrv.update(
+            oldId,
+            new Reclamo().fromDTO(reclamoDto),
+            reclamoDto.detalles.map(d => new DetalleReclamo().fromDTO(d)),
             this.jwtUtilsSrv.extractJwtSub(auth)
         );
     }

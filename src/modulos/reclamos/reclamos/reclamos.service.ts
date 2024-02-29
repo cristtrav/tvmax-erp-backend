@@ -19,6 +19,8 @@ export class ReclamosService implements OnModuleInit {
         private reclamoRepo: Repository<Reclamo>,
         @InjectRepository(TablaAuditoria)
         private tablaAuditoriaRepo: Repository<TablaAuditoria>,
+        @InjectRepository(DetalleReclamo)
+        private detalleReclamoRepo: Repository<DetalleReclamo>,
         private datasource: DataSource
     ){}
 
@@ -77,6 +79,10 @@ export class ReclamosService implements OnModuleInit {
         return this.getSelectQuery(queries).getCount();
     }
 
+    findById(id: number): Promise<ReclamoView>{
+        return this.reclamoViewRepo.findOneBy({id});
+    }
+
     async create(reclamo: Reclamo, detalles: DetalleReclamoDTO[], idusuario: number): Promise<number> {
         let idreclamo: number = -1;
         await this.datasource.transaction(async manager => {
@@ -93,6 +99,44 @@ export class ReclamosService implements OnModuleInit {
             }
         })
         return idreclamo;
+    }
+
+    async update(oldId: number, reclamo: Reclamo, detalles: DetalleReclamo[], idusuario: number){
+        const oldReclamo = await this.reclamoRepo.findOneBy({id: oldId, eliminado: false});
+        const oldDetalles = await this.detalleReclamoRepo.findBy({idreclamo: oldId, eliminado: false});
+        const detallesEliminados = oldDetalles.filter(od => !detalles.find(d => d.id == od.id));
+        //const detallesNuevos = detalles.filter(d => !oldDetalles.find(od => od.id == d.id));
+
+        if(!oldReclamo) throw new HttpException({
+            message: `No se encuentra el reclamo con código «${oldId}».`
+        }, HttpStatus.NOT_FOUND);
+
+        await this.datasource.transaction(async manager => {
+            await manager.save(reclamo);
+            await manager.save(Reclamo.getEventoAuditoria(idusuario, 'M', oldReclamo, reclamo));
+
+            for(let detalleEliminado of detallesEliminados){
+                const oldDetalle = {...detalleEliminado};
+                detalleEliminado.eliminado = true;
+                await manager.save(detalleEliminado);
+                await manager.save(DetalleReclamo.getEventoAuditoria(idusuario, 'E', oldDetalle, detalleEliminado));
+            }
+
+            for(let detalle of detalles){
+                if(!oldDetalles.find(od => od.id == detalle.id)){
+                    delete detalle.id;
+                    detalle.idreclamo = reclamo.id;
+                }
+                await manager.save(detalle);
+                await manager.save(DetalleReclamo.getEventoAuditoria(
+                    idusuario,
+                    detalle.id == null ? 'R' : 'M',
+                    oldDetalles.find(od => od.id == detalle.id),
+                    detalle
+                ));
+            }
+
+        });
     }
 
     async delete(idreclamo: number, idusuario: number){
