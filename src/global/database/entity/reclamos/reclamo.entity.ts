@@ -22,7 +22,7 @@ export class Reclamo {
     @Column({name: 'fecha_hora_cambio_estado', type: 'timestamp without time zone', nullable: false})
     fechaHoraCambioEstado: Date;
 
-    @Column({name: 'observacion_estado', length: 80})
+    @Column({name: 'observacion_estado', length: 30})
     observacionEstado: string;
 
     @Column({name: 'idusuario_registro', nullable: false})
