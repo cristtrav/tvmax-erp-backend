@@ -115,11 +115,9 @@ export class DTOEntityUtis {
         usuario.apellidos = usuarioDTO.apellidos;
         usuario.ci = usuarioDTO.ci;
         usuario.email = usuarioDTO.email;
-        usuario.telefono = usuarioDTO.telefono;
-        usuario.idrol = usuarioDTO.idrol;
+        usuario.telefono = usuarioDTO.telefono;        
         usuario.password = usuarioDTO.password;
         usuario.accesoSistema = usuarioDTO.accesosistema;
-        if (usuarioDTO.eliminado != null) usuario.eliminado = usuarioDTO.eliminado;
         return usuario;
     }
 

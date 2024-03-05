@@ -1,3 +1,5 @@
+import { RolDTO } from "./rol.dto";
+
 export interface UsuarioDTO {
     id: number | null;
     nombres: string | null;
@@ -8,8 +10,8 @@ export interface UsuarioDTO {
     accesosistema: boolean;
     email: string | null;
     telefono: string | null;
-    idrol: number;
-    rol: string;
+    roles?: RolDTO[];
+    idroles?: number[];
     eliminado: boolean;
     sololectura: boolean;
 }

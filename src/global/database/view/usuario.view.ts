@@ -28,14 +28,11 @@ export class UsuarioView{
     telefono: string;
 
     @ViewColumn()
-    idrol: number;
-
-    @ViewColumn()
-    rol: string;
-
-    @ViewColumn()
     eliminado: boolean;
 
     @ViewColumn()
     sololectura: boolean;
+
+    @ViewColumn()
+    idroles: number[];
 }
