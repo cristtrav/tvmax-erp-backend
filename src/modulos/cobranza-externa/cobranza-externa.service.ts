@@ -94,7 +94,6 @@ export class CobranzaExternaService {
             await manager.save(consultaCobranza);
             for (let detalle of detallesConsultaCobranza) await manager.save(detalle);
         });
-        console.log(consultaCobranza)
         return this.consultaCobranzaToDTO(consultaCobranza, detallesConsultaCobranza);
     }
 
