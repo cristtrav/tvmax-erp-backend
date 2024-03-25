@@ -48,7 +48,6 @@ export class UsuariosService {
                 qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombressearch`, { nombressearch: `%${search.toLowerCase()}%` });
                 qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellidossearch`, { apellidossearch: `%${search.toLowerCase()}%` });
                 qb = qb.orWhere(`${alias}.ci = :cisearch`, { cisearch: search });
-                qb = qb.orWhere(`LOWER(${alias}.rol) LIKE :rolsearch`, { rolsearch: `%${search.toLowerCase()}%` });
             })
         );
         return query;
