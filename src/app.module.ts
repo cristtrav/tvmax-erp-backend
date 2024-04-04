@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GruposModule } from './modulos/grupos/grupos.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SesionModule } from './modulos/sesion/sesion.module';
 import { ServiciosModule } from './modulos/servicios/servicios.module';
 import { DepartamentosModule } from './modulos/departamentos/departamentos.module';
@@ -28,7 +28,7 @@ import { CobranzaExternaModule } from './modulos/cobranza-externa/cobranza-exter
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './global/tasks/tasks.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import path, { join } from 'path';
 import { SorteosModule } from './modulos/sorteos/sorteos.module';
 import { PremiosModule } from './modulos/premios/premios.module';
 import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-materiales.module';
@@ -36,6 +36,7 @@ import { MaterialesModule } from './modulos/materiales/materiales.module';
 import { MovimientosMaterialesModule } from './modulos/movimientos-materiales/movimientos-materiales.module';
 import { AppInitService } from './app-init.service';
 import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-depositos.module';
+import databaseConfig from '@config/database.config';
 
 @Module({
   imports: [
@@ -45,7 +46,8 @@ import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-d
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       envFilePath: join(__dirname, '..', '.env'),
-      isGlobal: true
+      isGlobal: true,
+      load: [databaseConfig]
     }),
     GruposModule,
     SesionModule,
@@ -69,21 +71,10 @@ import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-d
     ResumenesVentasModule,
     FormatoFacturasModule,
     CobranzaExternaModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.PGHOST,
-      port: Number(process.env.PGPORT),
-      username: process.env.PGUSER,
-      password: process.env.PGPASSWORD,
-      database: process.env.PGDATABASE,
-      synchronize: false,
-      autoLoadEntities: true,
-      extra: {
-        poolSize: 20,
-        connectionTimeoutMillis: 30000,
-        query_timeout: 20000,
-        statement_timeout: 20000
-      }
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({ ...configService.get('database') })
     }),
     TasksModule,
     SorteosModule,
