@@ -68,6 +68,7 @@ export class UsuarioDepositoRefactoring1712164055978 implements MigrationInterfa
                 eliminado
             FROM rol;`
         );
+        await queryRunner.query(`UPDATE public.funcionalidad SET eliminado = true WHERE id >= 721 AND id <= 725`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -157,6 +158,7 @@ export class UsuarioDepositoRefactoring1712164055978 implements MigrationInterfa
                 eliminado
             FROM rol;`
         );
+        await await queryRunner.query(`UPDATE public.funcionalidad SET eliminado = false WHERE id >= 721 AND id <= 725`);
     }
 
     private async dropViews(queryRunner: QueryRunner){
