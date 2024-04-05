@@ -35,7 +35,6 @@ import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-material
 import { MaterialesModule } from './modulos/materiales/materiales.module';
 import { MovimientosMaterialesModule } from './modulos/movimientos-materiales/movimientos-materiales.module';
 import { AppInitService } from './app-init.service';
-import { UsuariosDepositosModule } from './modulos/usuarios-depositos/usuarios-depositos.module';
 import databaseConfig from '@config/database.config';
 
 @Module({
@@ -81,8 +80,7 @@ import databaseConfig from '@config/database.config';
     PremiosModule,
     TiposMaterialesModule,
     MaterialesModule,
-    MovimientosMaterialesModule,
-    UsuariosDepositosModule
+    MovimientosMaterialesModule
   ],
   controllers: [AppController],
   providers: [AppService, AppInitService],

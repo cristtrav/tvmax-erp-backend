@@ -34,12 +34,10 @@ import { Material } from "@database/entity/depositos/material.entity";
 import { DetalleMovimientoMaterial } from "@database/entity/depositos/detalle-movimiento-material.entity";
 import { MovimientoMaterial } from "@database/entity/depositos/movimiento-material.entity";
 import { TipoMaterial } from "@database/entity/depositos/tipo-material.entity";
-import { UsuarioDeposito } from "@database/entity/depositos/usuario-deposito.entity";
 import { DetalleMovimientoMaterialDTO } from "@dto/depositos/detalle-movimiento-material.dto";
 import { MaterialDTO } from "@dto/depositos/material.dto";
 import { MovimientoMaterialDTO } from "@dto/depositos/movimiento-material.dto";
 import { TipoMaterialDTO } from "@dto/depositos/tipo-material.dto";
-import { UsuarioDepositoDTO } from "@dto/depositos/usuario-deposito.dto";
 import { PremioDTO } from "@dto/sorteos/premio.dto";
 import { SorteoDTO } from "@dto/sorteos/sorteo.dto";
 
@@ -302,16 +300,6 @@ export class DTOEntityUtis {
         detalle.nroSerieMaterial = d.nroseriematerial;
         detalle.eliminado = d.eliminado;
         return detalle;
-    }
-
-    public static usuarioDepositoDTOtoEntity(usuarioDto: UsuarioDepositoDTO): UsuarioDeposito{
-        const usuario = new UsuarioDeposito();
-        usuario.id = usuarioDto.id;
-        usuario.razonSocial = usuarioDto.razonsocial;
-        if(usuarioDto.rol == 'PR') usuario.rol = 'PR';
-        if(usuarioDto.rol == 'RE') usuario.rol = 'RE';
-        usuario.eliminado = usuarioDto.eliminado;
-        return usuario;
     }
 
 }
