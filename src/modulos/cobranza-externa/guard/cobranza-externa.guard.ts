@@ -23,10 +23,13 @@ export class CobranzaExternaGuard implements CanActivate {
   }
 
   private async login(usuario: string, password: string): Promise<boolean> {
-    const usr = await this.usuarioRepo.findOneBy({ id: Number(usuario) });
+    const usr = await this.usuarioRepo.findOne({
+      where: {id: Number(usuario)},
+      relations: {roles: true}
+    })
     if (
       usr != null &&
-      usr.idrol == 5 &&
+      usr.roles.find(r => r.id == 5) &&      
       usr.password != null &&
       password != null &&
       await argon2.verify(usr.password, password)

@@ -8,6 +8,7 @@ import { UsuarioDTO } from 'src/global/dto/usuario.dto';
 import { UsuarioView } from '@database/view/usuario.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
+import { RolView } from '@database/view/rol.view';
 
 @Controller('usuarios')
 @UseGuards(AuthGuard)
@@ -49,6 +50,7 @@ export class UsuariosController {
     ){
         await this.usuarioSrv.create(
             DTOEntityUtis.usuarioDtoToEntity(u),
+            u.idroles ?? [],
             this.jwtUtil.extractJwtSub(auth)
         );
     }
@@ -60,6 +62,14 @@ export class UsuariosController {
         @Body() passwords: { oldPass: string, newPass: string }
     ){
         await this.usuarioSrv.changePassword(id, passwords.oldPass, passwords.newPass);
+    }
+
+    @Get(':id/roles')
+    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    findRolesByUsuario(
+        @Param('id') id: number
+    ): Promise<RolView[]>{
+        return this.usuarioSrv.findRolesByUsuario(id);
     }
 
     @Get(':id')
@@ -80,6 +90,7 @@ export class UsuariosController {
         await this.usuarioSrv.edit(
             oldId,
             DTOEntityUtis.usuarioDtoToEntity(u),
+            u.idroles,
             this.jwtUtil.extractJwtSub(auth)
         );
     }

@@ -1,6 +1,6 @@
 {
   "name": "tvmax-erp-backend",
-  "version": "1.4.7",
+  "version": "1.4.13",
   "description": "Backend del sistema TV Max ERP",
   "author": "Cristhian Traversi",
   "private": true,
@@ -18,7 +18,12 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:run": "npm run typeorm -- migration:run -d ./typeorm/typeorm.config.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d ./typeorm/typeorm.config.ts",
+    "migration:show": "npm run typeorm -- migration:show -d ./typeorm/typeorm.config.ts",
+    "migration:create": "npm run typeorm -- migration:create ./typeorm/migrations/$npm_config_name"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",
@@ -31,6 +36,7 @@
     "@nestjs/typeorm": "^10.0.1",
     "argon2": "^0.31.2",
     "date-fns": "^3.0.6",
+    "dotenv": "^16.4.5",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.12",

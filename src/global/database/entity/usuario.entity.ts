@@ -1,5 +1,6 @@
 import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 import { Funcionalidad } from "./funcionalidad.entity";
+import { Rol } from "./rol.entity";
 
 @Entity()
 export class Usuario {
@@ -28,9 +29,6 @@ export class Usuario {
     @Column({ length: 20 })
     telefono: string;
 
-    @Column({ nullable: false })
-    idrol: number;
-
     @Column({ default: false, nullable: false })
     eliminado: boolean;
 
@@ -52,4 +50,18 @@ export class Usuario {
         }
     })
     permisos: Funcionalidad[];
+
+    @ManyToMany(() => Rol)
+    @JoinTable({
+        name: 'rol_usuario',
+        joinColumn: {
+            name: 'idusuario',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'idrol',
+            referencedColumnName: 'id'
+        }
+    })
+    roles: Rol[];
 }

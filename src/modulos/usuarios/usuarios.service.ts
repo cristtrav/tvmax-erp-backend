@@ -6,6 +6,9 @@ import { Usuario } from '@database/entity/usuario.entity';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { UsuarioView } from '@database/view/usuario.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
+import { Rol } from '@database/entity/rol.entity';
+import { RolUsuario } from '@database/entity/rol-usuario.entity';
+import { RolView } from '@database/view/rol.view';
 
 @Injectable()
 export class UsuariosService {
@@ -15,6 +18,12 @@ export class UsuariosService {
         private usuarioRepo: Repository<Usuario>,
         @InjectRepository(UsuarioView)
         private usuarioViewRepo: Repository<UsuarioView>,
+        @InjectRepository(Rol)
+        private rolRepo: Repository<Rol>,
+        @InjectRepository(RolView)
+        private rolViewRepo: Repository<RolView>,
+        @InjectRepository(RolUsuario)
+        private rolUsuarioRepo: Repository<RolUsuario>,
         private datasource: DataSource,
     ) { }
 
@@ -23,7 +32,9 @@ export class UsuariosService {
         const alias = 'usuario';
         let query = this.usuarioViewRepo.createQueryBuilder(alias);
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
-        if (idrol) query = query.andWhere(`${alias}.idrol ${Array.isArray(idrol) ? 'IN (:...idrol)' : '= :idrol'}`, { idrol });
+        if(idrol != null)
+            if(Array.isArray(idrol)) query = query.andWhere(`${alias}.idroles && :idrol`, { idrol });
+            else query = query.andWhere(`:idrol = ANY(${alias}.idroles)`, { idrol });
         if (limit) query = query.take(limit);
         if (offset) query = query.skip(offset);
         if (sort) {
@@ -37,10 +48,8 @@ export class UsuariosService {
                 qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombressearch`, { nombressearch: `%${search.toLowerCase()}%` });
                 qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellidossearch`, { apellidossearch: `%${search.toLowerCase()}%` });
                 qb = qb.orWhere(`${alias}.ci = :cisearch`, { cisearch: search });
-                qb = qb.orWhere(`LOWER(${alias}.rol) LIKE :rolsearch`, { rolsearch: `%${search.toLowerCase()}%` });
             })
         );
-
         return query;
     }
 
@@ -63,35 +72,84 @@ export class UsuariosService {
         return this.getSelectQuery(queries).getCount();
     }
 
-    async create(u: Usuario, idusuario: number) {
-        const oldUsuario: Usuario | null = await this.usuarioRepo.findOneBy({ id: u.id });
+    async create(u: Usuario, idroles: number[], idusuario: number) {
+        const oldUsuario = await this.usuarioRepo.findOne({
+            where: { id: u.id },
+            relations: { roles: true }
+        });
         if (oldUsuario != null && !oldUsuario.eliminado) throw new HttpException({
             message: `El Usuario con ćodigo «${u.id}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
 
         await this.datasource.transaction(async manager => {
+            if(oldUsuario){
+                for(let rol of oldUsuario.roles){
+                    const rolusuario = new RolUsuario();
+                    rolusuario.idrol = rol.id;
+                    rolusuario.idusuario = u.id;
+                    await manager.remove(rolusuario);
+                }
+            }
+            
             u.eliminado = false;
             if (u.password) u.password = await argon2.hash(u.password);
+            
             await manager.save(u);
+            u.roles = await this.rolRepo.createQueryBuilder('rol').whereInIds(idroles).getMany();
+            for(let idrol of idroles){
+                const rolusuario = new RolUsuario();
+                rolusuario.idrol = idrol;
+                rolusuario.idusuario = u.id;
+                await manager.save(rolusuario);
+            }
             await manager.save(this.getEventoAuditoria(idusuario, 'R', oldUsuario, u));
-        })
+        });
     }
 
     async findById(id: number): Promise<UsuarioView> {
         return this.usuarioViewRepo.findOneByOrFail({ id });
     }
 
-    async edit(oldId: number, u: Usuario, idusuario: number) {
-        const oldUsuario: Usuario = await this.usuarioRepo.findOneByOrFail({ id: oldId });
+    async findRolesByUsuario(idusuario: number): Promise<RolView[]>{
+        const usuario = await this.usuarioRepo.findOneOrFail({
+            where: {id: idusuario, eliminado: false},
+            relations: {roles: true}
+        });        
+        const idroles = usuario.roles.map(r => r.id);
+        if(usuario.roles.length > 0)
+            return await this.rolViewRepo
+                .createQueryBuilder('rol')
+                .where(`rol.id IN (:...idroles)`, {idroles})
+                .getMany();
+        return [];
+    }
+
+    async edit(oldId: number, u: Usuario, idroles: number[], idusuario: number) {
+        const oldUsuario = await this.usuarioRepo.findOneOrFail({
+            where: { id: oldId },
+            relations: { roles: true }
+        });
+        const oldRolesUsuarios = await this.rolUsuarioRepo.findBy({idusuario: oldId});
         if (oldId != u.id && await this.usuarioRepo.findOneBy({ id: u.id, eliminado: false })) throw new HttpException({
             message: `El Usuario con código «${u.id}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
 
         await this.datasource.transaction(async manager => {
+            for(let oldRolUsuario of oldRolesUsuarios) await manager.remove(oldRolUsuario);
             u.eliminado = false;
+            
             if (u.password) u.password = await argon2.hash(u.password);
+            else delete u.password;
+
             await manager.save(u);
             await manager.save(this.getEventoAuditoria(idusuario, 'M', oldUsuario, u));
+            for(let idrol of idroles){
+                const rolUsuario = new RolUsuario();
+                rolUsuario.idrol = idrol;
+                rolUsuario.idusuario = u.id;
+                await manager.save(rolUsuario);
+            }
+            if(oldId != u.id) await manager.remove(oldUsuario);
         })
     }
 
