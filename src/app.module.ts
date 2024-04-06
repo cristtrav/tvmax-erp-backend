@@ -83,7 +83,6 @@ import { ReclamosModule } from './modulos/reclamos/reclamos/reclamos.module';
     TiposMaterialesModule,
     MaterialesModule,
     MovimientosMaterialesModule,
-    UsuariosDepositosModule,
     MotivosModule,
     ReclamosModule
   ],
