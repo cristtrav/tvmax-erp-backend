@@ -72,7 +72,7 @@ export class UsuariosService {
         return this.getSelectQuery(queries).getCount();
     }
 
-    async create(u: Usuario, idroles: number[], idusuario: number) {
+    async create(u: Usuario, idroles: number[] | null, idusuario: number) {
         const oldUsuario = await this.usuarioRepo.findOne({
             where: { id: u.id },
             relations: { roles: true }
@@ -95,12 +95,15 @@ export class UsuariosService {
             if (u.password) u.password = await argon2.hash(u.password);
             
             await manager.save(u);
-            u.roles = await this.rolRepo.createQueryBuilder('rol').whereInIds(idroles).getMany();
-            for(let idrol of idroles){
-                const rolusuario = new RolUsuario();
-                rolusuario.idrol = idrol;
-                rolusuario.idusuario = u.id;
-                await manager.save(rolusuario);
+
+            if(idroles){
+                u.roles = await this.rolRepo.createQueryBuilder('rol').whereInIds(idroles).getMany();
+                for(let idrol of idroles){
+                    const rolusuario = new RolUsuario();
+                    rolusuario.idrol = idrol;
+                    rolusuario.idusuario = u.id;
+                    await manager.save(rolusuario);
+                }
             }
             await manager.save(this.getEventoAuditoria(idusuario, 'R', oldUsuario, u));
         });
@@ -124,7 +127,7 @@ export class UsuariosService {
         return [];
     }
 
-    async edit(oldId: number, u: Usuario, idroles: number[], idusuario: number) {
+    async edit(oldId: number, u: Usuario, idroles: number[] | null, idusuario: number) {
         const oldUsuario = await this.usuarioRepo.findOneOrFail({
             where: { id: oldId },
             relations: { roles: true }
@@ -135,7 +138,6 @@ export class UsuariosService {
         }, HttpStatus.BAD_REQUEST);
 
         await this.datasource.transaction(async manager => {
-            for(let oldRolUsuario of oldRolesUsuarios) await manager.remove(oldRolUsuario);
             u.eliminado = false;
             
             if (u.password) u.password = await argon2.hash(u.password);
@@ -143,11 +145,14 @@ export class UsuariosService {
 
             await manager.save(u);
             await manager.save(this.getEventoAuditoria(idusuario, 'M', oldUsuario, u));
-            for(let idrol of idroles){
-                const rolUsuario = new RolUsuario();
-                rolUsuario.idrol = idrol;
-                rolUsuario.idusuario = u.id;
-                await manager.save(rolUsuario);
+            if(idroles){
+                for(let oldRolUsuario of oldRolesUsuarios) await manager.remove(oldRolUsuario);
+                for(let idrol of idroles){
+                    const rolUsuario = new RolUsuario();
+                    rolUsuario.idrol = idrol;
+                    rolUsuario.idusuario = u.id;
+                    await manager.save(rolUsuario);
+                }
             }
             if(oldId != u.id) await manager.remove(oldUsuario);
         })

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
-import { Permissions } from 'src/global/auth/permission.list';
-import { RequirePermission } from 'src/global/auth/require-permission.decorator';
-import { AuthGuard } from '../../global/auth/auth.guard';
+import { Permissions } from '@auth/permission.list';
+import { RequirePermission } from '@auth/require-permission.decorator';
+import { AuthGuard } from '@auth/auth.guard';
 import { UsuariosService } from './usuarios.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { UsuarioDTO } from 'src/global/dto/usuario.dto';
@@ -50,7 +50,7 @@ export class UsuariosController {
     ){
         await this.usuarioSrv.create(
             DTOEntityUtis.usuarioDtoToEntity(u),
-            u.idroles ?? [],
+            u.idroles,
             this.jwtUtil.extractJwtSub(auth)
         );
     }
