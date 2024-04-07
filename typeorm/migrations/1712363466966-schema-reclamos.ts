@@ -129,8 +129,13 @@ export class SchemaReclamos1712363466966 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE ONLY reclamos.detalle_reclamo ADD CONSTRAINT detalle_reclamo_idmotivo_fkey FOREIGN KEY (idmotivo) REFERENCES reclamos.motivo(id) NOT VALID`);
         await queryRunner.query(`ALTER TABLE ONLY reclamos.detalle_reclamo ADD CONSTRAINT detalle_reclamo_idreclamo_fkey FOREIGN KEY (idreclamo) REFERENCES reclamos.reclamo(id) NOT VALID`);
         await queryRunner.query(`ALTER TABLE ONLY reclamos.material_utilizado ADD CONSTRAINT material_utilizado_idreclamo_fkey FOREIGN KEY (idreclamo) REFERENCES reclamos.reclamo(id) NOT VALID`);
+        await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (28, 'Motivos de Reclamos')`);
+        await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (29, 'Reclamos')`);
+        await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (30, 'Detalles de Reclamos')`);
+        await queryRunner.query(`INSERT INTO public.modulo(id, descripcion, eliminado) VALUES(30, 'Motivos de Reclamos', false)`);
         await queryRunner.query(`INSERT INTO public.modulo(id, descripcion, eliminado) VALUES(31, 'Reclamos', false)`);
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (800, 'Acceso al Módulo', 31, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (760, 'Acceso al Módulo', 30, false)`);
         await queryRunner.query(`INSERT INTO public.rol(id, descripcion, eliminado, solo_lectura) VALUES (9, 'Proceso de Reclamos', false, true)`);
     }
 
@@ -138,8 +143,17 @@ export class SchemaReclamos1712363466966 implements MigrationInterface {
         await queryRunner.query(`DELETE FROM public.rol_usuario WHERE rol_usuario.idrol = 9`);
         await queryRunner.query(`DELETE FROM public.rol WHERE id = 9`);
         await queryRunner.query(`DELETE FROM public.permiso WHERE permiso.idfuncionalidad = 800`);
+        await queryRunner.query(`DELETE FROM public.permiso WHERE permiso.idfuncionalidad = 760`);
         await queryRunner.query(`DELETE FROM public.funcionalidad WHERE id = 800`);
+        await queryRunner.query(`DELETE FROM public.funcionalidad WHERE id = 760`);
+        await queryRunner.query(`DELETE FROM public.modulo WHERE id = 30`);
         await queryRunner.query(`DELETE FROM public.modulo WHERE id = 31`);
+        await queryRunner.query(`DELETE FROM public.evento_auditoria WHERE idtabla = 28`);
+        await queryRunner.query(`DELETE FROM public.evento_auditoria WHERE idtabla = 29`);
+        await queryRunner.query(`DELETE FROM public.evento_auditoria WHERE idtabla = 30`);
+        await queryRunner.query(`DELETE FROM public.tabla_auditoria WHERE id = 28`);
+        await queryRunner.query(`DELETE FROM public.tabla_auditoria WHERE id = 29`);
+        await queryRunner.query(`DELETE FROM public.tabla_auditoria WHERE id = 30`);
         await queryRunner.query(`DROP SCHEMA IF EXISTS reclamos CASCADE`);
     }
 
