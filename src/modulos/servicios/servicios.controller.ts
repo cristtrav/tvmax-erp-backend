@@ -1,16 +1,17 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { ServiciosService } from './servicios.service';
-import { RequirePermission } from '../../global/auth/require-permission.decorator';
 import { Permissions } from '../../global/auth/permission.list';
 import { ServicioView } from '@database/view/servicio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
-import { AuthGuard } from '@auth/auth.guard';
 import { ServicioDTO } from 'src/global/dto/servicio.dto';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('servicios')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class ServiciosController {
 
@@ -20,7 +21,14 @@ export class ServiciosController {
     ) { }
 
     @Get()
-    @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.SERVICIOS.CONSULTAR,
+        Permissions.CUOTAS.ACCESOFORMULARIO,
+        Permissions.SUSCRIPCIONES.ACCESOFORMULARIO,
+        Permissions.PAGOSCLIENTES.ACCESOMODULO,
+        Permissions.POS.ACCESOMODULO,
+        Permissions.VENTAS.ACCESOMODULO
+    )
     async findAll(
         @Query() queries: { [name: string]: any }
     ): Promise<ServicioView[]> {
@@ -28,7 +36,7 @@ export class ServiciosController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
+    @AllowedIn(Permissions.SERVICIOS.CONSULTAR)
     async count(
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
@@ -36,7 +44,7 @@ export class ServiciosController {
     }
 
     @Post()
-    @RequirePermission(Permissions.SERVICIOS.REGISTRAR)
+    @AllowedIn(Permissions.SERVICIOS.REGISTRAR)
     async create(
         @Body() servicio: ServicioDTO,
         @Headers('authorization') auth: string
@@ -48,7 +56,7 @@ export class ServiciosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.SERVICIOS.EDITAR)
+    @AllowedIn(Permissions.SERVICIOS.EDITAR)
     async update(
         @Param('id') oldid: number,
         @Body() s: ServicioDTO,
@@ -62,13 +70,16 @@ export class ServiciosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.SERVICIOS.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.SERVICIOS.ACCESOFORMULARIO)
     async getLastId(): Promise<number> {
         return this.serviciosSrv.getLastId();
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.SERVICIOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.SERVICIOS.ACCESOFORMULARIO,
+        Permissions.CUOTAS.ACCESOFORMULARIO
+    )
     async findById(
         @Param('id') id: number,
     ): Promise<ServicioView> {
@@ -76,7 +87,7 @@ export class ServiciosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.SERVICIOS.ELIMINAR)
+    @AllowedIn(Permissions.SERVICIOS.ELIMINAR)
     async delete(
         @Param('id') id: number,        
         @Headers('authorization') auth: string

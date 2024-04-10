@@ -245,7 +245,37 @@ export class Permissions {
         ACCESOFORMULARIO: 726
     }
 
-    static readonly MOTIVORECLAMO = {
-        ACCESOMODULO: 760
+    static readonly MOTIVOSRECLAMOS = {
+        ACCESOMODULO: 760,
+        ACCESOALFORMULARIO: 761,
+        CONSULTAR: 762,
+        REGISTRAR: 763,
+        EDITAR: 764,
+        ELIMINAR: 765
     }
+
+    static readonly RECLAMOS = {
+        ACCESOMODULO: 800,
+        ACCESOALFORMULARIO: 801,
+        CONSULTAR: 802,
+        REGISTRAR: 803,
+        EDITAR: 804,
+        ELIMINAR: 805
+    }
+
+    static readonly ROLESUSUARIOS = {
+        ACCESOMODULO: 840,
+        CONSULTAR: 841,
+        EDITAR: 842
+    }
+
+    static readonly POS = {
+        ACCESOMODULO: 380
+    }
+
+    static readonly PAGOSCLIENTES = {
+        ACCESOMODULO: 361,
+        CONSULTAR: 360
+    }
+
 }

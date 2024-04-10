@@ -1,13 +1,14 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { CobroDetalleVentaView } from '@database/view/cobro-detalle-venta.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Controller, Get, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { CobrosService } from './cobros.service';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('cobros')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard)
 @UseFilters(HttpExceptionFilter)
 export class CobrosController {
 
@@ -16,7 +17,6 @@ export class CobrosController {
     ){}
 
     @Get('detalles')
-    @RequirePermission(Permissions.COBROS.CONSULTAR)
     findAllDetalles(
         @Query() queries: {[name: string]: any}
     ): Promise<CobroDetalleVentaView[]>{
@@ -24,12 +24,10 @@ export class CobrosController {
     }
 
     @Get('detalles/total')
-    @RequirePermission(Permissions.COBROS.CONSULTAR)
     countDetalles(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
         return this.cobrosSrv.countDetalles(queries);
     }
-
 
 }

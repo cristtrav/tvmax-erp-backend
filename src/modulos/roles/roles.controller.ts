@@ -1,6 +1,4 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { Rol } from '@database/entity/rol.entity';
 import { RolView } from '@database/view/rol.view';
@@ -9,9 +7,12 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { RolesService } from './roles.service';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('roles')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class RolesController {
 
@@ -21,7 +22,10 @@ export class RolesController {
     ){}
 
     @Get()
-    @RequirePermission(Permissions.ROLES.CONSULTAR)
+    @AllowedIn(
+        Permissions.ROLES.CONSULTAR,
+        Permissions.ROLESUSUARIOS.CONSULTAR
+    )
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<RolView[]>{
@@ -29,7 +33,7 @@ export class RolesController {
     }
 
     @Post()
-    @RequirePermission(Permissions.ROLES.REGISTRAR)
+    @AllowedIn(Permissions.ROLES.REGISTRAR)
     async create(
         @Body() rol: RolDTO,
         @Headers('authorization') auth: string
@@ -41,7 +45,7 @@ export class RolesController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.ROLES.CONSULTAR)
+    @AllowedIn(Permissions.ROLES.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -49,13 +53,13 @@ export class RolesController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.ROLES.CONSULTAR)
+    @AllowedIn(Permissions.ROLES.ACCESOFORMULARIO)
     getLastId(): Promise<number>{
         return this.rolesSrv.getLastId();
     }
 
     @Get(':idrol')
-    @RequirePermission(Permissions.ROLES.CONSULTAR)
+    @AllowedIn(Permissions.ROLES.ACCESOFORMULARIO)
     findById(
         @Param('idrol') idrol: number
     ): Promise<Rol>{
@@ -63,7 +67,7 @@ export class RolesController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.ROLES.EDITAR)
+    @AllowedIn(Permissions.ROLES.EDITAR)
     async edit(
         @Param('id') oldId: number,
         @Body() rol: RolDTO,
@@ -77,7 +81,7 @@ export class RolesController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.ROLES.ELIMINAR)
+    @AllowedIn(Permissions.ROLES.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

@@ -1,7 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers, HttpException, HttpStatus } from '@nestjs/common';
-import { AuthGuard } from '../../global/auth/auth.guard';
-import { Permissions } from '../../global/auth/permission.list';
-import { RequirePermission } from '../../global/auth/require-permission.decorator';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { DepartamentosService } from './departamentos.service';
 import { JwtService } from '@nestjs/jwt';
 import { Departamento } from '@database/entity/departamento.entity';
@@ -9,9 +6,13 @@ import { DepartamentoDTO } from 'src/global/dto/departamento.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from 'src/global/filters/http-exception.filter';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { Permissions } from '@auth/permission.list';
 
 @Controller('departamentos')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class DepartamentosController {
 
@@ -22,7 +23,13 @@ export class DepartamentosController {
     ) { }
 
     @Get()
-    @RequirePermission(Permissions.DEPARTAMENTOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.DEPARTAMENTOS.CONSULTAR,
+        Permissions.DISTRITOS.ACCESOMODULO,
+        Permissions.DISTRITOS.ACCESOFORMULARIO,
+        Permissions.CLIENTES.ACCESOMODULO,
+        Permissions.SUSCRIPCIONES.ACCESOMODULO
+    )
     async findAll(
         @Query() queries: { [name: string]: any }
     ): Promise<Departamento[]> {
@@ -30,7 +37,7 @@ export class DepartamentosController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.DEPARTAMENTOS.CONSULTAR)
+    @AllowedIn(Permissions.DEPARTAMENTOS.CONSULTAR)
     async count(
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
@@ -38,7 +45,7 @@ export class DepartamentosController {
     }
 
     @Post()
-    @RequirePermission(Permissions.DEPARTAMENTOS.REGISTRAR)
+    @AllowedIn(Permissions.DEPARTAMENTOS.REGISTRAR)
     async create(
         @Body() d: DepartamentoDTO,
         @Headers('authorization') auth: string
@@ -50,7 +57,7 @@ export class DepartamentosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.DEPARTAMENTOS.EDITAR)
+    @AllowedIn(Permissions.DEPARTAMENTOS.EDITAR)
     async update(
         @Param('id') oldId: string,
         @Body() d: DepartamentoDTO,
@@ -63,7 +70,7 @@ export class DepartamentosController {
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.DEPARTAMENTOS.CONSULTAR)
+    @AllowedIn(Permissions.DEPARTAMENTOS.ACCESOFORMULARIO)
     async findById(
         @Param('id') id: string
     ): Promise<Departamento> {
@@ -71,7 +78,7 @@ export class DepartamentosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.DEPARTAMENTOS.ELIMINAR)
+    @AllowedIn(Permissions.DEPARTAMENTOS.ELIMINAR)
     async delete(
         @Param('id') id: string,
         @Headers('authorization') auth: string

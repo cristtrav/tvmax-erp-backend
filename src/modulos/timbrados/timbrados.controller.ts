@@ -1,6 +1,4 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { TimbradoDTO } from 'src/global/dto/timbrado.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
@@ -9,9 +7,12 @@ import { TimbradoView } from '@database/view/timbrado.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { FormatoFactura } from '@database/entity/formato-factura.entity';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('timbrados')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class TimbradosController {
 
@@ -21,7 +22,7 @@ export class TimbradosController {
     ) { }
 
     @Post()
-    @RequirePermission(Permissions.TIMBRADOS.REGISTRAR)
+    @AllowedIn(Permissions.TIMBRADOS.REGISTRAR)
     async create(
         @Body() t: TimbradoDTO,
         @Headers('authorization') auth: string
@@ -34,7 +35,10 @@ export class TimbradosController {
     }
 
     @Get()
-    @RequirePermission(Permissions.TIMBRADOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.TIMBRADOS.CONSULTAR,
+        Permissions.POS.ACCESOMODULO
+    )
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<TimbradoView[]> {
@@ -42,7 +46,7 @@ export class TimbradosController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.TIMBRADOS.CONSULTAR)
+    @AllowedIn(Permissions.TIMBRADOS.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -50,14 +54,14 @@ export class TimbradosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.TIMBRADOS.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.TIMBRADOS.ACCESOFORMULARIO)
     getLastId(): Promise<number>
     {
         return this.timbradosSrv.getLastId();
     }
 
     @Get(':id/formatoimpresion')
-    @RequirePermission(Permissions.FORMATOFACTURA.CONSULTAR)
+    @AllowedIn(Permissions.POS.ACCESOMODULO)
     findFormatoByIdtimbrado(
         @Param('id') idtimbrado: number
     ): Promise<FormatoFactura>{
@@ -65,7 +69,10 @@ export class TimbradosController {
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.TIMBRADOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.TIMBRADOS.ACCESOFORMULARIO,
+        Permissions.POS.ACCESOMODULO
+    )
     async findById(
         @Param('id') id: number
     ): Promise<TimbradoView> {
@@ -73,7 +80,7 @@ export class TimbradosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.TIMBRADOS.EDITAR)
+    @AllowedIn(Permissions.TIMBRADOS.EDITAR)
     async edit(
         @Param('id') oldid: number,
         @Body() t: TimbradoDTO,
@@ -87,7 +94,7 @@ export class TimbradosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.TIMBRADOS.ELIMINAR)
+    @AllowedIn(Permissions.TIMBRADOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

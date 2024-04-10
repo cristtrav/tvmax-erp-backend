@@ -1,16 +1,17 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards, Headers, UseFilters } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
-import { RequirePermission } from 'src/global/auth/require-permission.decorator';
-import { AuthGuard } from '../../global/auth/auth.guard';
 import { BarriosService } from './barrios.service';
 import { BarrioDTO } from '../../global/dto/barrio.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { BarrioView } from '@database/view/barrio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('barrios')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class BarriosController {
 
@@ -20,7 +21,12 @@ export class BarriosController {
     ) { }
 
     @Get()
-    @RequirePermission(Permissions.BARRIOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.BARRIOS.CONSULTAR,
+        Permissions.DOMICILIOS.ACCESOFORMULARIO,
+        Permissions.CLIENTES.ACCESOMODULO,
+        Permissions.SUSCRIPCIONES.ACCESOMODULO
+    )
     async findAll(
         @Query() queries: { [name: string]: any }
     ): Promise<BarrioView[]> {
@@ -28,7 +34,7 @@ export class BarriosController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.BARRIOS.CONSULTAR)
+    @AllowedIn(Permissions.BARRIOS.CONSULTAR)
     async count(
         @Query() queries: { [name: string]: any }
     ) {
@@ -36,7 +42,7 @@ export class BarriosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.BARRIOS.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.BARRIOS.ACCESOFORMULARIO)
     async getLastId(): Promise<number> {
         try {
             return await this.barriosSrv.getLastId();
@@ -54,7 +60,7 @@ export class BarriosController {
     }
 
     @Post()
-    @RequirePermission(Permissions.BARRIOS.REGISTRAR)
+    @AllowedIn(Permissions.BARRIOS.REGISTRAR)
     async create(
         @Body() b: BarrioDTO,
         @Headers('authorization') auth: string
@@ -66,7 +72,7 @@ export class BarriosController {
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.BARRIOS.CONSULTAR)
+    @AllowedIn(Permissions.BARRIOS.ACCESOFORMULARIO)
     async findById(
         @Param('id') id: number
     ): Promise<BarrioView> {
@@ -74,7 +80,7 @@ export class BarriosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.BARRIOS.EDITAR)
+    @AllowedIn(Permissions.BARRIOS.EDITAR)
     async edit(
         @Param('id') oldId: number,
         @Body() b: BarrioDTO,
@@ -88,7 +94,7 @@ export class BarriosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.BARRIOS.ELIMINAR)
+    @AllowedIn(Permissions.BARRIOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

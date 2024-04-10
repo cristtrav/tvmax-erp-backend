@@ -8,14 +8,15 @@ import { PremioView } from '@database/view/sorteos/premio.view';
 import { PremiosService } from '@modulos/premios/premios.service';
 import { ParticipanteView } from '@database/view/sorteos/participante.view';
 import { SorteoView } from '@database/view/sorteos/sorteo.view';
-import { AuthGuard } from '@auth/auth.guard';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
 import { SorteoDTO } from '@dto/sorteos/sorteo.dto';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 
 @Controller('sorteos')
 @UseFilters(HttpExceptionFilter)
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 export class SorteosController {
 
     constructor(
@@ -25,7 +26,7 @@ export class SorteosController {
     ){}
 
     @Get()
-    @RequirePermission(Permissions.SORTEOS.CONSULTAR)
+    @AllowedIn(Permissions.SORTEOS.CONSULTAR)
     findAll(
         @Query() queries: QueriesType
     ): Promise<SorteoView[]>{
@@ -33,7 +34,7 @@ export class SorteosController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.SORTEOS.CONSULTAR)
+    @AllowedIn(Permissions.SORTEOS.CONSULTAR)
     count(
         @Query() queries: QueriesType
     ): Promise<number>{
@@ -41,13 +42,16 @@ export class SorteosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.SORTEOS.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.SORTEOS.ACCESOFORMULARIO)
     getLastId(): Promise<number>{
         return this.sorteosSrv.getLastId();
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.SORTEOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.SORTEOS.ACCESOFORMULARIO,
+        Permissions.SORTEOS.REALIZARSORTEO
+    )
     findById(
         @Param('id') id: number
     ): Promise<Sorteo>{
@@ -55,7 +59,7 @@ export class SorteosController {
     }
 
     @Get(':id/premios')
-    @RequirePermission(Permissions.PREMIOSSORTEOS.CONSULTAR)
+    @AllowedIn(Permissions.SORTEOS.REALIZARSORTEO)
     findPremiosBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType
@@ -64,7 +68,7 @@ export class SorteosController {
     }
 
     @Get(':id/premios/total')
-    @RequirePermission(Permissions.PREMIOSSORTEOS.CONSULTAR)
+    @AllowedIn(Permissions.PREMIOSSORTEOS.ACCESOMODULO)
     countPremiosBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType
@@ -73,7 +77,10 @@ export class SorteosController {
     }
 
     @Get(':id/participantes')
-    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.PARTICIPANTESSORTEOS.CONSULTAR,
+        Permissions.SORTEOS.REALIZARSORTEO
+    )
     async findAllParticipantesBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType
@@ -82,7 +89,7 @@ export class SorteosController {
     }
 
     @Get(':id/participantes/total')
-    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.CONSULTAR)
+    @AllowedIn(Permissions.PARTICIPANTESSORTEOS.CONSULTAR)
     async countParticipantesBySorteo(
         @Param('id') idsorteo: number,
         @Query() queries: QueriesType
@@ -91,7 +98,7 @@ export class SorteosController {
     }
 
     @Post()
-    @RequirePermission(Permissions.SORTEOS.REGISTRAR)
+    @AllowedIn(Permissions.SORTEOS.REGISTRAR)
     async create(
         @Body() sorteoDto: SorteoDTO,
         @Headers('authorization') auth: string
@@ -103,7 +110,7 @@ export class SorteosController {
     }
 
     @Post(':id/participantes/agregar')
-    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.AGREGAR)
+    @AllowedIn(Permissions.PARTICIPANTESSORTEOS.AGREGAR)
     async agregarParticipantes(
         @Param('id') idsorteo: number,
         @Body() criterios: CriteriosSorteoType
@@ -112,7 +119,7 @@ export class SorteosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.SORTEOS.EDITAR)
+    @AllowedIn(Permissions.SORTEOS.EDITAR)
     async update(
         @Param('id') id: number,
         @Body() sorteoDto: SorteoDTO,
@@ -126,7 +133,7 @@ export class SorteosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.SORTEOS.ELIMINAR)
+    @AllowedIn(Permissions.SORTEOS.ELIMINAR)    
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
@@ -135,7 +142,7 @@ export class SorteosController {
     }
 
     @Delete(':idsorteo/participantes/:idcliente')
-    @RequirePermission(Permissions.PARTICIPANTESSORTEOS.ELIMINAR)
+    @AllowedIn(Permissions.PARTICIPANTESSORTEOS.ELIMINAR)
     async deleteParticipante(
         @Param('idsorteo') idsorteo: number,
         @Param('idcliente') idcliente: number

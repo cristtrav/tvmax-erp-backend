@@ -132,20 +132,34 @@ export class SchemaReclamos1712363466966 implements MigrationInterface {
         await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (28, 'Motivos de Reclamos')`);
         await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (29, 'Reclamos')`);
         await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (30, 'Detalles de Reclamos')`);
+
         await queryRunner.query(`INSERT INTO public.modulo(id, descripcion, eliminado) VALUES(30, 'Motivos de Reclamos', false)`);
         await queryRunner.query(`INSERT INTO public.modulo(id, descripcion, eliminado) VALUES(31, 'Reclamos', false)`);
+        
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (800, 'Acceso al Módulo', 31, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (801, 'Acceso al Formulario', 31, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (802, 'Consultar', 31, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (803, 'Registrar', 31, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (804, 'Editar', 31, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (805, 'Eliminar', 31, false)`);
+
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (760, 'Acceso al Módulo', 30, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (761, 'Acceso al Formulario', 30, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (762, 'Consultar', 30, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (763, 'Registrar', 30, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (764, 'Editar', 30, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (765, 'Eliminar', 30, false)`);
+
         await queryRunner.query(`INSERT INTO public.rol(id, descripcion, eliminado, solo_lectura) VALUES (9, 'Proceso de Reclamos', false, true)`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`DELETE FROM public.rol_usuario WHERE rol_usuario.idrol = 9`);
         await queryRunner.query(`DELETE FROM public.rol WHERE id = 9`);
-        await queryRunner.query(`DELETE FROM public.permiso WHERE permiso.idfuncionalidad = 800`);
-        await queryRunner.query(`DELETE FROM public.permiso WHERE permiso.idfuncionalidad = 760`);
-        await queryRunner.query(`DELETE FROM public.funcionalidad WHERE id = 800`);
-        await queryRunner.query(`DELETE FROM public.funcionalidad WHERE id = 760`);
+        await queryRunner.query(`DELETE FROM public.permiso WHERE permiso.idfuncionalidad >= 800 AND permiso.idfuncionalidad <= 805`);
+        await queryRunner.query(`DELETE FROM public.permiso WHERE permiso.idfuncionalidad >= 760 AND permiso.idfuncionalidad <= 765`);
+        await queryRunner.query(`DELETE FROM public.funcionalidad WHERE idmodulo = 30`);
+        await queryRunner.query(`DELETE FROM public.funcionalidad WHERE idmodulo = 31`);
         await queryRunner.query(`DELETE FROM public.modulo WHERE id = 30`);
         await queryRunner.query(`DELETE FROM public.modulo WHERE id = 31`);
         await queryRunner.query(`DELETE FROM public.evento_auditoria WHERE idtabla = 28`);

@@ -1,6 +1,3 @@
-import { AuthGuard } from '@auth/auth.guard';
-import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { ClienteDTO } from 'src/global/dto/cliente.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
@@ -10,9 +7,13 @@ import { ClienteView } from '@database/view/cliente.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { SuscripcionView } from '@database/view/suscripcion.view';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { Permissions } from '@auth/permission.list';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 
 @Controller('clientes')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class ClientesController {
 
@@ -23,7 +24,12 @@ export class ClientesController {
     ) { }
 
     @Get()
-    @RequirePermission(Permissions.CLIENTES.CONSULTAR)
+    @AllowedIn(
+        Permissions.CLIENTES.CONSULTAR,
+        Permissions.DOMICILIOS.ACCESOFORMULARIO,
+        Permissions.SUSCRIPCIONES.ACCESOFORMULARIO,
+        Permissions.POS.ACCESOMODULO
+    )
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<ClienteView[]> {
@@ -31,7 +37,7 @@ export class ClientesController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.CLIENTES.CONSULTAR)
+    @AllowedIn(Permissions.CLIENTES.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -39,7 +45,7 @@ export class ClientesController {
     }
 
     @Post()
-    @RequirePermission(Permissions.CLIENTES.REGISTRAR)
+    @AllowedIn(Permissions.CLIENTES.REGISTRAR)
     async create(
         @Body() c: ClienteDTO,
         @Headers('authorization') auth: string
@@ -51,13 +57,17 @@ export class ClientesController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.CLIENTES.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.CLIENTES.ACCESOFORMULARIO)
     getLastId(): Promise<number> {
         return this.clientesSrv.getLastId();
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.CLIENTES.CONSULTAR)
+    @AllowedIn(
+        Permissions.CLIENTES.ACCESOFORMULARIO,
+        Permissions.POS.ACCESOMODULO,
+        Permissions.SORTEOS.REALIZARSORTEO
+    )
     findById(
         @Param('id') id: number
     ): Promise<ClienteView> {
@@ -65,7 +75,7 @@ export class ClientesController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.CLIENTES.EDITAR)
+    @AllowedIn(Permissions.CLIENTES.EDITAR)
     async edit(
         @Param('id') oldId: number,
         @Body() c: ClienteDTO,
@@ -79,7 +89,7 @@ export class ClientesController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.CLIENTES.ELIMINAR)
+    @AllowedIn(Permissions.CLIENTES.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
@@ -88,7 +98,10 @@ export class ClientesController {
     }
 
     @Get(':id/suscripciones')
-    @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
+    @AllowedIn(
+        Permissions.PAGOSCLIENTES.ACCESOMODULO,
+        Permissions.POS.ACCESOMODULO
+    )
     findSuscripcionesPorCliente(
         @Param('id') idcliente: number,
         @Query() queries: {[name: string]: any}
@@ -97,7 +110,6 @@ export class ClientesController {
     }
 
     @Get(':id/suscripciones/total')
-    @RequirePermission(Permissions.SUSCRIPCIONES.CONSULTAR)
     countSuscripcionesPorCliente(
         @Param('id') idcliente: number,
         @Query() queries: {[name: string]: any}

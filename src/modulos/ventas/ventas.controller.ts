@@ -1,6 +1,4 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { VentaDTO } from 'src/global/dto/venta.dto';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
 import { VentasService } from './ventas.service';
@@ -10,9 +8,10 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { VentaView } from '@database/view/venta.view';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
+import { LoginGuard } from '@auth/guards/login.guard';
 
 @Controller('ventas')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard)
 @UseFilters(HttpExceptionFilter)
 export class VentasController {
 
@@ -23,15 +22,13 @@ export class VentasController {
     ){}
 
     @Get('count')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     countVentas(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
         return this.ventasSrv.count(queries);
     }
 
-    @Post()
-    @RequirePermission(Permissions.VENTAS.REGISTRAR)
+    @Post()    
     async create(
         @Body() fv: VentaDTO,
         @Headers('authorization') auth: string
@@ -44,7 +41,6 @@ export class VentasController {
     }
 
     @Put()
-    @RequirePermission(Permissions.VENTAS.EDITAR)
     async edit(
         @Body() fv: VentaDTO,
         @Headers('authorization') auth: string
@@ -57,7 +53,6 @@ export class VentasController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.VENTAS.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -65,7 +60,6 @@ export class VentasController {
     }
 
     @Get()
-    @RequirePermission(Permissions.VENTAS.CONSULTAR)
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<VentaView[]>{
@@ -73,7 +67,6 @@ export class VentasController {
     }
 
     @Get(':id/anular')
-    @RequirePermission(Permissions.VENTAS.ANULAR)
     async anular(
         @Param('id') id: number,
         @Headers('authorization') auth: string
@@ -82,7 +75,6 @@ export class VentasController {
     }
 
     @Get(':id/revertiranulacion')
-    @RequirePermission(Permissions.VENTAS.REVERTIRANUL)
     async revertiranul(
         @Param('id') id: number,
         @Headers('authorization') auth: string
@@ -91,23 +83,20 @@ export class VentasController {
     }
 
     @Get(':id/detalles')
-    @RequirePermission(Permissions.VENTAS.CONSULTAR)
     async getDetallesByIdventa(
         @Param('id') id: number
     ): Promise<DetalleVentaView[]>{
         return this.detallesVentaSrv.findByIdVenta(id);
     }
 
-    @Get(':id/detalles/total')
-    @RequirePermission(Permissions.VENTAS.CONSULTAR)
+    @Get(':id/detalles/total')    
     countByIdventa(
         @Param('id') idventa: number
     ): Promise<number>{
         return this.detallesVentaSrv.countByIdVenta(idventa);
     }
 
-    @Delete(':id')
-    @RequirePermission(Permissions.VENTAS.ELIMINAR)
+    @Delete(':id')    
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
@@ -115,8 +104,7 @@ export class VentasController {
         await this.ventasSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
     }
 
-    @Get(':id')
-    @RequirePermission(Permissions.VENTAS.CONSULTAR)
+    @Get(':id')    
     async findById(
         @Param('id') id: number
     ){

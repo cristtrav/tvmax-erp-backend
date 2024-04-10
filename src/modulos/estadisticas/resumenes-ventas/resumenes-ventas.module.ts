@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ResumenesVentasController } from './resumenes-ventas.controller';
 import { ResumenesVentasService } from './resumenes-ventas.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { ResumenesVentasService } from './resumenes-ventas.service';
     TypeOrmModule.forFeature([Venta, VentaView, Permiso, DetalleVentaView])
   ],
   controllers: [ResumenesVentasController],
-  providers: [ResumenesVentasService]
+  providers: [ResumenesVentasService, JwtUtilsService]
 })
 export class ResumenesVentasModule {}

@@ -10,6 +10,7 @@ import { DetalleReclamo } from '@database/entity/reclamos/detalle-reclamo.entity
 import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetallesReclamosService } from './detalles-reclamos/detalles-reclamos.service';
 import { DetalleReclamoView } from '@database/view/reclamos/detalle-reclamo.view';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { DetalleReclamoView } from '@database/view/reclamos/detalle-reclamo.view
       DetalleReclamo,
       TablaAuditoria,
       ReclamoView,
-      DetalleReclamoView
+      DetalleReclamoView,
+      Permiso
     ]),
     JwtModule.register({})
   ],

@@ -1,7 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
-import { AuthGuard } from '@auth/auth.guard';
 import { UsuariosService } from './usuarios.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { UsuarioDTO } from 'src/global/dto/usuario.dto';
@@ -9,9 +7,12 @@ import { UsuarioView } from '@database/view/usuario.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { RolView } from '@database/view/rol.view';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('usuarios')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class UsuariosController {
 
@@ -21,7 +22,17 @@ export class UsuariosController {
     ){}
 
     @Get()
-    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.USUARIOS.CONSULTAR,
+        Permissions.CLIENTES.ACCESOFORMULARIO,
+        Permissions.CLIENTES.ACCESOMODULO,
+        Permissions.SUSCRIPCIONES.ACCESOMODULO,
+        Permissions.PAGOSCLIENTES.ACCESOMODULO,
+        Permissions.VENTAS.ACCESOMODULO,
+        Permissions.MOVIMIENTOSMATERIALES.ACCESOMODULO,
+        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO,
+        Permissions.AUDITORIA.ACCESOMODULO
+    )
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<UsuarioView[]> {
@@ -29,13 +40,13 @@ export class UsuariosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    @AllowedIn(Permissions.USUARIOS.ACCESOFORMULARIO)
     getLastId(): Promise<number>{
         return this.usuarioSrv.getLastId();
     }
 
     @Get('total')
-    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    @AllowedIn(Permissions.USUARIOS.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ):Promise<number>{
@@ -43,7 +54,7 @@ export class UsuariosController {
     }
 
     @Post()
-    @RequirePermission(Permissions.USUARIOS.REGISTRAR)
+    @AllowedIn(Permissions.USUARIOS.REGISTRAR)
     async create(
         @Body() u: UsuarioDTO,
         @Headers('authorization') auth: string
@@ -56,7 +67,7 @@ export class UsuariosController {
     }
 
     @Post(':id/password')
-    @RequirePermission(Permissions.USUARIOS.CAMBIARPASS)
+    @AllowedIn(Permissions.USUARIOS.CAMBIARPASS)
     async changePassword(
         @Param('id') id: number,
         @Body() passwords: { oldPass: string, newPass: string }
@@ -65,15 +76,34 @@ export class UsuariosController {
     }
 
     @Get(':id/roles')
-    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    @AllowedIn(Permissions.ROLESUSUARIOS.CONSULTAR)
     findRolesByUsuario(
         @Param('id') id: number
     ): Promise<RolView[]>{
         return this.usuarioSrv.findRolesByUsuario(id);
     }
 
+    @Put(':id/roles')
+    @AllowedIn(Permissions.ROLESUSUARIOS.EDITAR)
+    async editRolesByUsuario(
+        @Param('id') id: number,
+        @Body() body: {idroles: number[]},
+        @Headers('authorization') auth: string
+    ){
+        await this.usuarioSrv.editRolesByUsuario(
+            id,
+            body.idroles,
+            this.jwtUtil.extractJwtSub(auth)
+        )
+    }
+
     @Get(':id')
-    @RequirePermission(Permissions.USUARIOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.USUARIOS.ACCESOFORMULARIO,
+        Permissions.ROLESUSUARIOS.ACCESOMODULO,
+        Permissions.PERMISOS.ACCESOFORMULARIO,
+        Permissions.VENTAS.ACCESOMODULO
+    )
     async findById(
         @Param('id') id: number
     ): Promise<UsuarioView>{
@@ -81,7 +111,7 @@ export class UsuariosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.USUARIOS.EDITAR)
+    @AllowedIn(Permissions.USUARIOS.EDITAR)
     async edit(
         @Param('id') oldId: number,
         @Body() u: UsuarioDTO,
@@ -96,7 +126,7 @@ export class UsuariosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.USUARIOS.ELIMINAR)
+    @AllowedIn(Permissions.USUARIOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

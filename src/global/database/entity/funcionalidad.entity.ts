@@ -44,18 +44,4 @@ export class Funcionalidad {
     })
     usuarios: Usuario[];
 
-    @ManyToMany(() => Funcionalidad)
-    @JoinTable({
-        name: 'dependencia_funcionalidad',
-        joinColumn: {
-            name: 'idfuncionalidad',
-            referencedColumnName: 'id'
-        },
-        inverseJoinColumn: {
-            name: 'idfuncionalidad_dependencia',
-            referencedColumnName: 'id'
-        }
-    })
-    dependencias: Funcionalidad[];
-
 }

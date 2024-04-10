@@ -1,6 +1,4 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { FormatoFactura } from '@database/entity/formato-factura.entity';
 import { FormatoFacturaDTO } from 'src/global/dto/formato-factura.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
@@ -8,9 +6,10 @@ import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { FormatoFacturasService } from './formato-facturas.service';
+import { LoginGuard } from '@auth/guards/login.guard';
 
 @Controller('formatosfacturas')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard)
 @UseFilters(HttpExceptionFilter)
 export class FormatoFacturasController {
 
@@ -20,7 +19,6 @@ export class FormatoFacturasController {
     ) { }
 
     @Get()
-    @RequirePermission(Permissions.FORMATOFACTURA.CONSULTAR)
     findAll(
         @Query() queries: { [name: string]: any }
     ): Promise<FormatoFactura[]> {
@@ -28,7 +26,6 @@ export class FormatoFacturasController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.FORMATOFACTURA.CONSULTAR)
     count(
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
@@ -36,7 +33,6 @@ export class FormatoFacturasController {
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.FORMATOFACTURA.CONSULTAR)
     findById(
         @Param('id') idformato: number
     ): Promise<FormatoFactura> {
@@ -44,7 +40,6 @@ export class FormatoFacturasController {
     }
 
     @Post()
-    @RequirePermission(Permissions.FORMATOFACTURA.REGISTRAR)
     async create(
         @Body() formato: FormatoFacturaDTO,
         @Headers('authorization') auth: string
@@ -56,7 +51,6 @@ export class FormatoFacturasController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.FORMATOFACTURA.EDITAR)
     async edit(
         @Param('id') idformato: number,
         @Body() formato: FormatoFacturaDTO,
@@ -70,7 +64,6 @@ export class FormatoFacturasController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.FORMATOFACTURA.ELIMINAR)
     async delete(
         @Param('id') idformato: number,
         @Headers('authorization') auth: string

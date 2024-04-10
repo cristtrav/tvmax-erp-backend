@@ -1,15 +1,16 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 import { Modulo } from '@database/entity/modulo.entity';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Body, Controller, Get, Headers, Param, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { PermisosService } from './permisos.service';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('permisos')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class PermisosController {
 
@@ -19,7 +20,7 @@ export class PermisosController {
     ) { }
 
     @Get()
-    @RequirePermission(Permissions.PERMISOS.CONSULTARMODULOSFUNCIONALIDADES)
+    @AllowedIn(Permissions.PERMISOS.CONSULTARMODULOSFUNCIONALIDADES)
     findAllModulos(
         @Query() queries: { [name: string]: any }
     ): Promise<Modulo[]> {
@@ -27,7 +28,7 @@ export class PermisosController {
     }
 
     @Get(':idusuario')
-    @RequirePermission(Permissions.PERMISOS.CONSULTARPERMISOSUSUARIO)
+    @AllowedIn(Permissions.PERMISOS.CONSULTARPERMISOSUSUARIO)
     findAllByIdusuario(
         @Query() queries: { [name: string]: any },
         @Param('idusuario') idusuario: number
@@ -36,7 +37,7 @@ export class PermisosController {
     }
 
     @Put(':idusuario')
-    @RequirePermission(Permissions.PERMISOS.EDITARPERMISOSUSUARIO)
+    @AllowedIn(Permissions.PERMISOS.EDITARPERMISOSUSUARIO)
     async editPermisosUsuario(
         @Param('idusuario') idusuarioModificar: number,
         @Body() idfuncionalidades: number[],

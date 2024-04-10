@@ -31,7 +31,6 @@ export class PermisosService {
             query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
         query = query.leftJoinAndSelect(`${alias}.funcionalidades`, 'funcionalidades', 'funcionalidades.eliminado = :eliminado', { eliminado: 'false' });
-        query = query.leftJoinAndSelect(`funcionalidades.dependencias`, 'dependencias');
         return query;
     }
 
@@ -55,8 +54,7 @@ export class PermisosService {
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) === '-' ? 'DESC' : 'ASC';
             query = query.orderBy(`${alias}.${sortColumn}`, sortOrder);
         }
-        query = query.leftJoinAndSelect(`${alias}.usuarios`, 'usuarios')
-        query = query.leftJoinAndSelect(`${alias}.dependencias`, 'dependencias');
+        query = query.leftJoinAndSelect(`${alias}.usuarios`, 'usuarios');
         query = query.andWhere(`usuarios.id = :idusuario`, { idusuario });
         return query.getMany();
     }

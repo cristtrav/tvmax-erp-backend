@@ -4,14 +4,15 @@ import { PremiosService } from './premios.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { PremioView } from '@database/view/sorteos/premio.view';
-import { AuthGuard } from '@auth/auth.guard';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
 import { PremioDTO } from '@dto/sorteos/premio.dto';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('premios')
 @UseFilters(HttpExceptionFilter)
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 export class PremiosController {
 
     constructor(
@@ -20,13 +21,13 @@ export class PremiosController {
     ){}
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.PREMIOSSORTEOS.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.PREMIOSSORTEOS.ACCESOFORMULARIO)
     getLastId(): Promise<number>{
         return this.premiosSrv.getLastId();
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.PREMIOSSORTEOS.CONSULTAR)
+    @AllowedIn(Permissions.PREMIOSSORTEOS.ACCESOFORMULARIO)
     findById(
         @Param('id') id: number
     ): Promise<PremioView>{
@@ -34,7 +35,7 @@ export class PremiosController {
     }
 
     @Post()
-    @RequirePermission(Permissions.PREMIOSSORTEOS.REGISTRAR)
+    @AllowedIn(Permissions.PREMIOSSORTEOS.REGISTRAR)
     async create(
         @Body() premioDto: PremioDTO,
         @Headers('authorization') auth: string
@@ -46,7 +47,10 @@ export class PremiosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.PREMIOSSORTEOS.EDITAR)
+    @AllowedIn(
+        Permissions.PREMIOSSORTEOS.EDITAR,
+        Permissions.SORTEOS.REALIZARSORTEO
+    )
     async update(
         @Param('id') oldId: number,
         @Body() premioDto: PremioDTO,
@@ -60,7 +64,7 @@ export class PremiosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.PREMIOSSORTEOS.ELIMINAR)
+    @AllowedIn(Permissions.PREMIOSSORTEOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

@@ -1,5 +1,5 @@
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { ReclamosService } from './reclamos.service';
 import { ReclamoDTO } from '@dto/reclamos/reclamo.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
@@ -8,11 +8,16 @@ import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetallesReclamosService } from './detalles-reclamos/detalles-reclamos.service';
 import { DetalleReclamoView } from '@database/view/reclamos/detalle-reclamo.view';
 import { DetalleReclamo } from '@database/entity/reclamos/detalle-reclamo.entity';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { Permissions } from '@auth/permission.list';
 
 type QueriesType = {[name: string]: any}
 
 @Controller('reclamos')
 @UseFilters(HttpExceptionFilter)
+@UseGuards(LoginGuard, AllowedInGuard)
 export class ReclamosController {
 
     constructor(
@@ -22,6 +27,7 @@ export class ReclamosController {
     ){}
 
     @Get()
+    @AllowedIn(Permissions.RECLAMOS.CONSULTAR)
     findAll(
         @Query() queries: QueriesType
     ): Promise<ReclamoView[]>{
@@ -29,6 +35,7 @@ export class ReclamosController {
     }
 
     @Get('total')
+    @AllowedIn(Permissions.RECLAMOS.CONSULTAR)
     count(
         @Query() queries: QueriesType
     ): Promise<number>{
@@ -36,6 +43,7 @@ export class ReclamosController {
     }
 
     @Get(':id/detalles')
+    @AllowedIn(Permissions.RECLAMOS.ACCESOMODULO)
     findDetallesByReclamos(
         @Param('id') idreclamo: number,
         @Query() queries: QueriesType
@@ -51,6 +59,7 @@ export class ReclamosController {
     }
 
     @Post()
+    @AllowedIn(Permissions.RECLAMOS.REGISTRAR)
     async create(
         @Body() reclamoDto: ReclamoDTO,
         @Headers('authorization') auth: string
@@ -63,6 +72,7 @@ export class ReclamosController {
     }
 
     @Put(':id')
+    @AllowedIn(Permissions.RECLAMOS.EDITAR)
     async update(
         @Param('id') oldId: number,
         @Body() reclamoDto: ReclamoDTO,
@@ -77,6 +87,7 @@ export class ReclamosController {
     }
 
     @Delete(':id')
+    @AllowedIn(Permissions.RECLAMOS.ELIMINAR)
     async delete(
         @Param('id') idreclamo: number,
         @Headers('authorization') auth: string

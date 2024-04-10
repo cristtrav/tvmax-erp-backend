@@ -185,4 +185,20 @@ export class UsuariosService {
             }, HttpStatus.BAD_REQUEST);
         }
     }
+
+    public async editRolesByUsuario(idusuarioEditar: number, idroles: number[], idusuario: number){
+        await this.usuarioRepo.findOneByOrFail({id: idusuarioEditar});
+        const oldRolesUsuarios = await this.rolUsuarioRepo.findBy({idusuario: idusuarioEditar});
+        await this.datasource.transaction(async manager => {
+            for(let rolUsuario of oldRolesUsuarios){
+                await manager.remove(rolUsuario);
+            }
+            for(let idrol of idroles){
+                const rolUsuario = new RolUsuario();
+                rolUsuario.idrol = idrol;
+                rolUsuario.idusuario = idusuarioEditar;
+                await manager.save(rolUsuario);
+            }
+        });
+    }
 }

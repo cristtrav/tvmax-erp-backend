@@ -1,9 +1,8 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Controller, UseGuards } from '@nestjs/common';
-import { DetallesVentasService } from './detalles-ventas.service';
+import { LoginGuard } from '@auth/guards/login.guard';
 
 @Controller('ventas/detalles')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard)
 export class DetallesVentasController {
 
     constructor() { }

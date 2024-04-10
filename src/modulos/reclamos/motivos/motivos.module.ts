@@ -5,12 +5,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Motivo } from '@database/entity/reclamos/motivo.entity';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     TypeOrmModule.forFeature([
-      Motivo
+      Motivo,
+      Permiso
     ])
   ],
   providers: [MotivosService, JwtUtilsService],

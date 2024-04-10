@@ -1,6 +1,4 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { DomicilioDTO } from 'src/global/dto/domicilio.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
@@ -8,9 +6,12 @@ import { DomiciliosService } from './domicilios.service';
 import { DomicilioView } from '@database/view/domicilio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('domicilios')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class DomiciliosController {
 
@@ -20,7 +21,10 @@ export class DomiciliosController {
     ){}
 
     @Get()
-    @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.DOMICILIOS.CONSULTAR,
+        Permissions.SUSCRIPCIONES.ACCESOFORMULARIO
+    )
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<DomicilioView[]>{
@@ -28,7 +32,7 @@ export class DomiciliosController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
+    @AllowedIn(Permissions.DOMICILIOS.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -36,13 +40,13 @@ export class DomiciliosController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.DOMICILIOS.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.DOMICILIOS.ACCESOFORMULARIO)
     getLastId(): Promise<number>{
         return this.domiciliosSrv.getLastId();
     }
 
     @Post()
-    @RequirePermission(Permissions.DOMICILIOS.REGISTRAR)
+    @AllowedIn(Permissions.DOMICILIOS.REGISTRAR)
     async create(
         @Body() d: DomicilioDTO,
         @Headers('authorization') auth: string
@@ -54,7 +58,7 @@ export class DomiciliosController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.DOMICILIOS.EDITAR)
+    @AllowedIn(Permissions.DOMICILIOS.EDITAR)
     async edit(
         @Param('id') oldId: number,
         @Body() d: DomicilioDTO,
@@ -68,7 +72,7 @@ export class DomiciliosController {
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.DOMICILIOS.CONSULTAR)
+    @AllowedIn(Permissions.DOMICILIOS.ACCESOFORMULARIO)
     findById(
         @Param('id') id: number
     ): Promise<DomicilioView> {
@@ -76,7 +80,7 @@ export class DomiciliosController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.DOMICILIOS.ELIMINAR)
+    @AllowedIn(Permissions.DOMICILIOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

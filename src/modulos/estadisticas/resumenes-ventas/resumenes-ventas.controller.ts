@@ -1,15 +1,16 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { ResumenCobradoresVentasDTO } from 'src/global/dto/resumen-cobradores-ventas.dto';
 import { ResumenGruposVentasDTO } from 'src/global/dto/resumen-grupos-ventas.dto';
 import { ResumenServiciosVentasDTO } from 'src/global/dto/resumen-servicios-ventas.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Controller, Get, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { ResumenesVentasService } from './resumenes-ventas.service';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('ventas/resumen')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class ResumenesVentasController {
 
@@ -18,7 +19,7 @@ export class ResumenesVentasController {
     ) { }
 
     @Get('monto')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    @AllowedIn(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     getMontoTotal(
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
@@ -26,7 +27,7 @@ export class ResumenesVentasController {
     }
 
     @Get('grupos')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    @AllowedIn(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     getResumenGrupos(
         @Query() queries: { [name: string]: any }
     ): Promise<ResumenGruposVentasDTO[]> {
@@ -34,7 +35,7 @@ export class ResumenesVentasController {
     }
 
     @Get('grupos/total')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    @AllowedIn(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     getTotalResumenGrupos(
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
@@ -42,7 +43,7 @@ export class ResumenesVentasController {
     }
 
     @Get('servicios')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    @AllowedIn(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     getResumenServicios(
         @Query() queries: { [name: string]: any }
     ): Promise<ResumenServiciosVentasDTO[]> {
@@ -50,7 +51,7 @@ export class ResumenesVentasController {
     }
 
     @Get('servicios/total')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    @AllowedIn(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     getTotalResumenServicios(
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
@@ -58,7 +59,7 @@ export class ResumenesVentasController {
     }
 
     @Get('cobradores')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    @AllowedIn(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     getResumenCobradores(
         @Query() queries: { [name: string]: any }
     ): Promise<ResumenCobradoresVentasDTO[]> {
@@ -66,12 +67,10 @@ export class ResumenesVentasController {
     }
 
     @Get('cobradores/total')
-    @RequirePermission(Permissions.ESTADISTICAS.CONSULTARVENTAS)
+    @AllowedIn(Permissions.ESTADISTICAS.CONSULTARVENTAS)
     getTotalResumenCobradores(
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
         return this.resumenesVentasSrv.countResumenCobradores(queries);
     }
-
-
 }

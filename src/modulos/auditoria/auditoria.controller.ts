@@ -1,14 +1,15 @@
-import { AuthGuard } from '@auth/auth.guard';
 import { Permissions } from '@auth/permission.list';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
 import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Controller, Get, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { AuditoriaService } from './auditoria.service';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 
 @Controller('auditoria')
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class AuditoriaController {
 
@@ -18,7 +19,7 @@ export class AuditoriaController {
   ) { }
 
   @Get('eventos')
-  @RequirePermission(Permissions.AUDITORIA.CONSULTAREVENTOS)
+  @AllowedIn(Permissions.AUDITORIA.CONSULTAREVENTOS)
   findAllEventos(
     @Query() queries: { [name: string]: any }
   ): Promise<EventoAuditoriaView[]> {
@@ -26,7 +27,7 @@ export class AuditoriaController {
   }
 
   @Get('eventos/total')
-  @RequirePermission(Permissions.AUDITORIA.CONSULTAREVENTOS)
+  @AllowedIn(Permissions.AUDITORIA.CONSULTAREVENTOS)
   countEventos(
     @Query() queries: { [name: string]: any }
   ): Promise<number> {
@@ -34,7 +35,7 @@ export class AuditoriaController {
   }
 
   @Get('tablas')
-  @RequirePermission(Permissions.AUDITORIA.CONSULTAREVENTOS)
+  @AllowedIn(Permissions.AUDITORIA.ACCESOMODULO)
   findAllTablas(
     @Query() queries: { [name: string]: any }
   ): Promise<TablaAuditoria[]> {
@@ -42,7 +43,7 @@ export class AuditoriaController {
   }
 
   @Get('tablas/total')
-  @RequirePermission(Permissions.AUDITORIA.CONSULTAREVENTOS)
+  @AllowedIn(Permissions.AUDITORIA.ACCESOMODULO)
   countTablas(
     @Query() queries: { [name: string]: any }
   ): Promise<number> {

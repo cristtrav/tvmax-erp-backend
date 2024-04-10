@@ -5,14 +5,15 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { MaterialView } from '@database/view/depositos/material.view';
 import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
-import { AuthGuard } from '@auth/auth.guard';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
 import { MaterialDTO } from '@dto/depositos/material.dto';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('materiales')
 @UseFilters(HttpExceptionFilter)
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 export class MaterialesController {
 
     constructor(
@@ -21,7 +22,10 @@ export class MaterialesController {
     ){}
 
     @Get()
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    @AllowedIn(
+        Permissions.MATERIALES.CONSULTAR,
+        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO
+    )
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<MaterialView[]>{
@@ -29,13 +33,16 @@ export class MaterialesController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.MATERIALES.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.MATERIALES.ACCESOFORMULARIO)
     getLastId(): Promise<number>{
         return this.materialesSrv.getLastId();
     }
 
     @Get('total')
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    @AllowedIn(
+        Permissions.MATERIALES.CONSULTAR,
+        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO
+    )
     count(
         @Query() queries: {[name:string]: any}
     ): Promise<number>{
@@ -43,7 +50,10 @@ export class MaterialesController {
     }
 
     @Get('identificables')
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    @AllowedIn(
+        Permissions.MATERIALES.CONSULTAR,
+        /*Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO*/
+    )
     findAllIdentificables(
         @Query() queries: QueriesType
     ): Promise<MaterialIdentificable[]>{
@@ -51,7 +61,7 @@ export class MaterialesController {
     }
 
     @Get('identificables/total')
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MATERIALES.CONSULTAR)
     countIdentificables(
         @Query() queries: QueriesType
     ): Promise<number>{
@@ -59,7 +69,7 @@ export class MaterialesController {
     }
     
     @Get(':id/identificables/ultimoserialgenerado')
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO)
     getLastGeneratedSerial(
         @Param('id') idmaterial: number
     ): Promise<string>{
@@ -67,7 +77,10 @@ export class MaterialesController {
     }
 
     @Get(':id/identificables')
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    @AllowedIn(
+        Permissions.MATERIALES.ACCESOMODULO,
+        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO
+    )
     findAllIdentificablesByMaterial(
         @Param('id') idmaterial: number,
         @Query() queries: QueriesType
@@ -78,7 +91,7 @@ export class MaterialesController {
     
 
     @Get(':id/identificables/total')
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MATERIALES.ACCESOMODULO)
     countIdentificablesByMaterial(
         @Param('id') idmaterial: number,
         @Query() queries: QueriesType
@@ -87,7 +100,6 @@ export class MaterialesController {
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.MATERIALES.CONSULTAR)
     findById(
         @Param('id') id: number
     ): Promise<MaterialView>{
@@ -95,7 +107,6 @@ export class MaterialesController {
     }
 
     @Post()
-    @RequirePermission(Permissions.MATERIALES.REGISTRAR)
     async create(
         @Body() materialDto: MaterialDTO,
         @Headers('authorization') auth: string
@@ -107,7 +118,6 @@ export class MaterialesController {
     }
 
     @Put(':id')
-    @RequirePermission(Permissions.MATERIALES.EDITAR)
     async update(
         @Param('id') id: number,
         @Body() materialDto: MaterialDTO,
@@ -121,7 +131,6 @@ export class MaterialesController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.MATERIALES.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string

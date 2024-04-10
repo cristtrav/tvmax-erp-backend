@@ -6,14 +6,15 @@ import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { DetallesMovimientosMaterialesService } from './detalles-movimientos-materiales/detalles-movimientos-materiales.service';
 import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';
 import { MovimientoMaterialView } from '@database/view/depositos/movimiento-material.view';
-import { AuthGuard } from '@auth/auth.guard';
-import { RequirePermission } from '@auth/require-permission.decorator';
 import { Permissions } from '@auth/permission.list';
 import { MovimientoMaterialDTO } from '@dto/depositos/movimiento-material.dto';
+import { LoginGuard } from '@auth/guards/login.guard';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('movimientosmateriales')
 @UseFilters(HttpExceptionFilter)
-@UseGuards(AuthGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 export class MovimientosMaterialesController {
 
     constructor(
@@ -23,7 +24,7 @@ export class MovimientosMaterialesController {
     ){}
 
     @Get()
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.CONSULTAR)
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<MovimientoMaterialView[]>{
@@ -31,7 +32,7 @@ export class MovimientosMaterialesController {
     }
 
     @Get('total')
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -39,7 +40,7 @@ export class MovimientosMaterialesController {
     }
 
     @Post()
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.REGISTRAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.REGISTRAR)
     async create(
         @Body() movimiento: MovimientoMaterialDTO,
         @Headers('authorization') auth: string
@@ -52,7 +53,7 @@ export class MovimientosMaterialesController {
     }
 
     @Get('ultimoid')
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO)
     async getLastId(
         @Query() queries: {[name: string]: any},
         @Headers('authorization') auth: string
@@ -61,7 +62,7 @@ export class MovimientosMaterialesController {
     }
     
     @Get(':id/detalles')
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.ACCESOMODULO)
     findAllDetalles(
         @Query() queries: {[name: string]: any},
         @Param('id') id: number
@@ -70,7 +71,7 @@ export class MovimientosMaterialesController {
     }
 
     @Get(':id/detalles/total')
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.ACCESOMODULO)
     countDetalles(
         @Query() queries: {[name: string]: any},
         @Param('id') id: number
@@ -79,7 +80,7 @@ export class MovimientosMaterialesController {
     }
 
     @Get(':id')
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.CONSULTAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO)
     findById(
         @Param('id') id: number
     ): Promise<MovimientoMaterialView>{
@@ -87,7 +88,7 @@ export class MovimientosMaterialesController {
     }
 
     @Delete(':id')
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.ELIMINAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
@@ -96,7 +97,7 @@ export class MovimientosMaterialesController {
     }
 
     @Put()
-    @RequirePermission(Permissions.MOVIMIENTOSMATERIALES.EDITAR)
+    @AllowedIn(Permissions.MOVIMIENTOSMATERIALES.EDITAR)
     async update(
         @Body() movimientoDto: MovimientoMaterialDTO,
         @Headers('authorization') auth: string
