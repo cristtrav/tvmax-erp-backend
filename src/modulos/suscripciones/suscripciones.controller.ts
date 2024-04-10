@@ -62,7 +62,10 @@ export class SuscripcionesController {
     }
 
     @Get(':id')
-    @AllowedIn(Permissions.SUSCRIPCIONES.ACCESOFORMULARIO)
+    @AllowedIn(
+        Permissions.SUSCRIPCIONES.ACCESOFORMULARIO,
+        Permissions.CUOTAS.ACCESOMODULO
+    )
     findById(
         @Param('id') id: number
     ): Promise<SuscripcionView> {

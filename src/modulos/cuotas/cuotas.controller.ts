@@ -12,7 +12,7 @@ import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 
 @Controller('cuotas')
-@UseGuards(LoginGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class CuotasController {
 
@@ -22,6 +22,7 @@ export class CuotasController {
     ){}
 
     @Get()
+    @AllowedIn(Permissions.CUOTAS.CONSULTAR)
     async findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<CuotaView[]>{
@@ -29,6 +30,7 @@ export class CuotasController {
     }
 
     @Get('total')
+    @AllowedIn(Permissions.CUOTAS.CONSULTAR)
     async count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -36,6 +38,7 @@ export class CuotasController {
     }
 
     @Get(':id')
+    @AllowedIn(Permissions.CUOTAS.ACCESOFORMULARIO)
     async findById(
         @Param('id') idc: number
     ): Promise<CuotaView>{
@@ -43,6 +46,10 @@ export class CuotasController {
     }
 
     @Get(':id/cobro')
+    @AllowedIn(
+        Permissions.CUOTAS.ACCESOFORMULARIO,
+        Permissions.CUOTAS.CONSULTAR
+    )
     async findCobroCuota(
         @Param('id') idcuota: number
     ): Promise<CobroCuotasView>{
@@ -50,6 +57,7 @@ export class CuotasController {
     }
 
     @Post()
+    @AllowedIn(Permissions.CUOTAS.REGISTRAR)
     async create(
         @Body() c: CuotaDTO,
         @Headers('authorization') auth: string
@@ -61,6 +69,7 @@ export class CuotasController {
     }
 
     @Put(':id')
+    @AllowedIn(Permissions.CUOTAS.EDITAR)
     async edit(
         @Param('id') oldid: number,
         @Body() c: CuotaDTO,
@@ -74,6 +83,7 @@ export class CuotasController {
     }
 
     @Delete(':id')
+    @AllowedIn(Permissions.CUOTAS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
