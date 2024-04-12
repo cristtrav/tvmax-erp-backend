@@ -100,6 +100,7 @@ export class MaterialesController {
     }
 
     @Get(':id')
+    @AllowedIn(Permissions.MATERIALES.ACCESOFORMULARIO)
     findById(
         @Param('id') id: number
     ): Promise<MaterialView>{
@@ -107,6 +108,7 @@ export class MaterialesController {
     }
 
     @Post()
+    @AllowedIn(Permissions.MATERIALES.REGISTRAR)
     async create(
         @Body() materialDto: MaterialDTO,
         @Headers('authorization') auth: string
@@ -118,6 +120,7 @@ export class MaterialesController {
     }
 
     @Put(':id')
+    @AllowedIn(Permissions.MATERIALES.EDITAR)
     async update(
         @Param('id') id: number,
         @Body() materialDto: MaterialDTO,
@@ -131,6 +134,7 @@ export class MaterialesController {
     }
 
     @Delete(':id')
+    @AllowedIn(Permissions.MATERIALES.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
