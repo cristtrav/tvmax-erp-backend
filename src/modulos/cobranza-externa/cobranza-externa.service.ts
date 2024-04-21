@@ -259,6 +259,7 @@ export class CobranzaExternaService {
         return await this.cuotaViewRepo.createQueryBuilder('cuota')
             .where('cuota.idsuscripcion = :idsuscripcion', { idsuscripcion })
             .andWhere('cuota.pagado = FALSE')
+            .andWhere('cuota.eliminado = FALSE')
             .orderBy('cuota.fechaVencimiento', 'ASC')
             .getMany();
     }
@@ -266,6 +267,7 @@ export class CobranzaExternaService {
     private async getSuscripcionesActivas(ci: string): Promise<SuscripcionView[]> {
         return await this.suscripcionViewRepo.createQueryBuilder('suscripcion')
             .where(`suscripcion.ci = :ci`, { ci })
+            .andWhere(`suscripcion.eliminado = FALSE`)
             .andWhere(new Brackets(qb => {
                 qb = qb.orWhere(`suscripcion.estado = 'C'`);
                 qb = qb.orWhere(`suscripcion.estado = 'R'`);
@@ -276,6 +278,7 @@ export class CobranzaExternaService {
     private async getSuscripcionesInactivas(ci: string): Promise<SuscripcionView[]> {
         return await this.suscripcionViewRepo.createQueryBuilder('suscripcion')
             .where(`suscripcion.ci = :ci`, { ci })
+            .andWhere(`suscripcion.eliminado = FALSE`)
             .andWhere(`suscripcion.estado = 'D'`)
             .getMany();
     }
