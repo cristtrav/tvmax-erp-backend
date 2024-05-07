@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFil
 import { ReclamosService } from './reclamos.service';
 import { ReclamoDTO } from '@dto/reclamos/reclamo.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
-import { Reclamo } from '@database/entity/reclamos/reclamo.entity';
+import { EstadoReclamoType, Reclamo } from '@database/entity/reclamos/reclamo.entity';
 import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetallesReclamosService } from './detalles-reclamos/detalles-reclamos.service';
 import { DetalleReclamoView } from '@database/view/reclamos/detalle-reclamo.view';
@@ -12,6 +12,8 @@ import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';
+import { FinalizacionReclamoDTO } from '@dto/reclamos/finalizacion-reclamo.dto';
+import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
 
 type QueriesType = {[name: string]: any}
 
@@ -27,7 +29,10 @@ export class ReclamosController {
     ){}
 
     @Get()
-    @AllowedIn(Permissions.RECLAMOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.RECLAMOS.CONSULTAR,
+        Permissions.ASIGNACIONESRECLAMOS.ACCESOMODULO
+    )
     findAll(
         @Query() queries: QueriesType
     ): Promise<ReclamoView[]>{
@@ -35,7 +40,10 @@ export class ReclamosController {
     }
 
     @Get('total')
-    @AllowedIn(Permissions.RECLAMOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.RECLAMOS.CONSULTAR,
+        Permissions.ASIGNACIONESRECLAMOS.ACCESOMODULO
+    )
     count(
         @Query() queries: QueriesType
     ): Promise<number>{
@@ -43,7 +51,10 @@ export class ReclamosController {
     }
 
     @Get(':id/detalles')
-    @AllowedIn(Permissions.RECLAMOS.ACCESOMODULO)
+    @AllowedIn(
+        Permissions.RECLAMOS.ACCESOMODULO,
+        Permissions.ASIGNACIONESRECLAMOS.ACCESOMODULO
+    )
     findDetallesByReclamos(
         @Param('id') idreclamo: number,
         @Query() queries: QueriesType
@@ -51,7 +62,17 @@ export class ReclamosController {
         return this.detalleReclamosSrv.findDetallesByReclamo(idreclamo, queries);
     }
 
+    @Get(':id/materiales')
+    @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.ACCESOFORMULARIOFINALIZAR)
+    findMaterialesUtilizados(
+        @Param('id') idreclamo: number,
+        @Query() queries: QueriesType
+    ): Promise<MaterialUtilizadoView[]>{
+        return this.reclamosSrv.findMaterialesUtilizados({idreclamo, ...queries});
+    }
+
     @Get(':id')
+    @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.ACCESOMODULO)
     findById(
         @Param('id') idreclamo: number
     ): Promise<ReclamoView>{
@@ -69,6 +90,62 @@ export class ReclamosController {
             reclamoDto.detalles.map(dDto => new DetalleReclamo().fromDTO(dDto)),
             this.jwtUtilsSrv.extractJwtSub(auth)
         );
+    }
+
+    @Post(':id/asignarresponsable')
+    @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.TOMARLIBERARRECLAMO)
+    async asignarResponsable(
+        @Param('id') idreclamo: number,
+        @Body() body: { idusuarioresponsable: number },
+        @Headers('authorization') auth: string
+    ){
+        await this.reclamosSrv.asignarResponsable(
+            idreclamo,
+            body.idusuarioresponsable,
+            this.jwtUtilsSrv.extractJwtSub(auth)
+        );
+    }
+
+    @Delete(':id/liberarresponsable')
+    @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.TOMARLIBERARRECLAMO)
+    async liberarResponsable(
+        @Param('id') idreclamo: number,
+        @Headers('authorization') auth: string
+    ){
+        await this.reclamosSrv.liberarResponsable(
+            idreclamo,
+            this.jwtUtilsSrv.extractJwtSub(auth)
+        );
+    }
+
+    @Put(':id/estado')
+    @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.CAMBIARESTADO)
+    async cambiarEstado(
+        @Param('id') idreclamo: number,
+        @Body() body: { estado: EstadoReclamoType },
+        @Headers('authorization') auth: string
+    ){
+        await this.reclamosSrv.cambiarEstado(idreclamo, body.estado, this.jwtUtilsSrv.extractJwtSub(auth));
+    }
+
+    @Post(':id/finalizar')
+    @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.FINALIZARRECLAMO)
+    async finalizarReclamo(
+        @Param('id') idreclamo: number,
+        @Body() finalizacion: FinalizacionReclamoDTO,
+        @Headers('authorization') auth: string
+    ){
+        await this.reclamosSrv.finalizarReclamo(idreclamo, finalizacion, this.jwtUtilsSrv.extractJwtSub(auth));
+    }
+
+    @Put(':id/finalizar')
+    @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.EDITARFINALIZACIONRECLAMO)
+    async editarFinalizacion(
+        @Param('id') idreclamo: number,
+        @Body() finalizacion: FinalizacionReclamoDTO,
+        @Headers('authorization') auth: string
+    ){
+        await this.reclamosSrv.editarFinanalizacion(idreclamo, finalizacion, this.jwtUtilsSrv.extractJwtSub(auth));
     }
 
     @Put(':id')

@@ -11,6 +11,8 @@ import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetallesReclamosService } from './detalles-reclamos/detalles-reclamos.service';
 import { DetalleReclamoView } from '@database/view/reclamos/detalle-reclamo.view';
 import { Permiso } from '@database/entity/permiso.entity';
+import { MaterialUtilizado } from '@database/entity/reclamos/material-utilzado.entity';
+import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { Permiso } from '@database/entity/permiso.entity';
       TablaAuditoria,
       ReclamoView,
       DetalleReclamoView,
-      Permiso
+      Permiso,
+      MaterialUtilizado,
+      MaterialUtilizadoView
     ]),
     JwtModule.register({})
   ],
