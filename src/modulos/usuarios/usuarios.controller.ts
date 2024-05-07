@@ -40,7 +40,10 @@ export class UsuariosController {
     }
 
     @Get('ultimoid')
-    @AllowedIn(Permissions.USUARIOS.ACCESOFORMULARIO)
+    @AllowedIn(
+        Permissions.USUARIOS.ACCESOFORMULARIO,
+        Permissions.USUARIOSDEPOSITOS.ACCESOFORMULARIO
+    )
     getLastId(): Promise<number>{
         return this.usuarioSrv.getLastId();
     }
@@ -76,7 +79,10 @@ export class UsuariosController {
     }
 
     @Get(':id/roles')
-    @AllowedIn(Permissions.ROLESUSUARIOS.CONSULTAR)
+    @AllowedIn(
+        Permissions.ROLESUSUARIOS.CONSULTAR,
+        Permissions.USUARIOSDEPOSITOS.ACCESOMODULO
+    )
     findRolesByUsuario(
         @Param('id') id: number
     ): Promise<RolView[]>{
