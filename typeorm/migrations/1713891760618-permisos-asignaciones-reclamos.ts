@@ -30,7 +30,8 @@ export class PermisosAsignacionesReclamos1713891760618 implements MigrationInter
                 cliente.id AS idcliente,
                 cliente.razon_social AS cliente,
                 reclamo.estado,
-                reclamo.eliminado
+                reclamo.eliminado,
+                reclamo.observacion
             FROM reclamos.reclamo
                 JOIN public.suscripcion ON reclamo.idsuscripcion = suscripcion.id
                 JOIN public.domicilio ON suscripcion.iddomicilio = domicilio.id
@@ -72,6 +73,7 @@ export class PermisosAsignacionesReclamos1713891760618 implements MigrationInter
             JOIN depositos.material ON material.id = material_utilizado.idmaterial`
         );
         await queryRunner.query(`UPDATE public.rol SET descripcion = 'Atención de reclamos (Técnico)' WHERE id = 9`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS reclamos.reclamo ADD COLUMN observacion character varying(100)`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -111,6 +113,7 @@ export class PermisosAsignacionesReclamos1713891760618 implements MigrationInter
         await queryRunner.query(`DELETE FROM public.tabla_auditoria WHERE id = 31`);
         await queryRunner.query(`DROP VIEW IF EXISTS reclamos.vw_materiales_utilizados`);
         await queryRunner.query(`UPDATE public.rol SET descripcion = 'Proceso de Reclamos' WHERE id = 9`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS reclamos.reclamo DROP COLUMN IF EXISTS observacion`);
     }
 
 }

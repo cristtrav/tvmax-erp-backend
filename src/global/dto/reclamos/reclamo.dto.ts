@@ -18,4 +18,5 @@ export interface ReclamoDTO {
     cliente?: string;
     eliminado: boolean;
     detalles: DetalleReclamoDTO[];
+    observacion: string;
 }

@@ -37,6 +37,9 @@ export class Reclamo {
     @Column({default: false, nullable: false})
     eliminado: boolean;
 
+    @Column({length: 100})
+    observacion: string;
+
     @OneToMany(() => DetalleReclamo, (detalle) => detalle.reclamo)
     detalles: DetalleReclamo[];
 
@@ -50,6 +53,7 @@ export class Reclamo {
         this.idusuarioResponsable = reclamoDto.idusuarioresponsable
         this.idsuscripcion = reclamoDto.idsuscripcion;
         this.eliminado = reclamoDto.eliminado;
+        this.observacion = reclamoDto.observacion;
         return this;
     }
 

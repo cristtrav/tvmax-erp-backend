@@ -77,4 +77,7 @@ export class ReclamoView{
 
     @ViewColumn()
     eliminado: boolean;
+
+    @ViewColumn()
+    observacion: string;
 }
