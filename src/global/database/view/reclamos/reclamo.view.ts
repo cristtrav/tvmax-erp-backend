@@ -80,4 +80,7 @@ export class ReclamoView{
 
     @ViewColumn()
     observacion: string;
+
+    @ViewColumn()
+    telefono: string;
 }
