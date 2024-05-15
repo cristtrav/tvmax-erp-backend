@@ -46,7 +46,7 @@ export class PermisosAsignacionesReclamos1713891760618 implements MigrationInter
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (883, 'Cambiar estado', 33, false)`);
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (884, 'Acceso al Formulario de Finalizar', 33, false)`);
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (885, 'Finalizar Reclamo', 33, false)`);
-        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (886, 'Editar Finalizacion de Reclamo', 33, false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, nombre, idmodulo, eliminado) VALUES (886, 'Editar Fin de Reclamo', 33, false)`);
         await queryRunner.query(`ALTER TABLE IF EXISTS reclamos.material_utilizado ADD COLUMN descripcion character varying(80)`);
         await queryRunner.query(
             `ALTER TABLE IF EXISTS reclamos.material_utilizado
