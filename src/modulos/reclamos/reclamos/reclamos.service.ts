@@ -1,7 +1,9 @@
 import { DetalleReclamo } from '@database/entity/reclamos/detalle-reclamo.entity';
+import { EventoCambioEstado } from '@database/entity/reclamos/evento-cambio-estado.entity';
 import { MaterialUtilizado } from '@database/entity/reclamos/material-utilzado.entity';
 import { EstadoReclamoType, Reclamo } from '@database/entity/reclamos/reclamo.entity';
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
+import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
 import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
 import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetalleReclamoDTO } from '@dto/reclamos/detalle-reclamo.dto';
@@ -107,6 +109,12 @@ export class ReclamosService implements OnModuleInit {
                 await manager.save(detalle);
                 await manager.save(DetalleReclamo.getEventoAuditoria(idusuario, 'R', null, detalle));
             }
+
+            const evento = new EventoCambioEstado();
+            evento.fechaHora = new Date();
+            evento.estado = reclamo.estado;
+            evento.idreclamo = idreclamo;
+            await manager.save(evento);
         })
         return idreclamo;
     }
@@ -153,6 +161,13 @@ export class ReclamosService implements OnModuleInit {
                     await manager.save(matUtil);
                     await manager.save(MaterialUtilizado.getEventoAuditoria(idusuario, 'E', oldMatUtil, matUtil));
                 }
+            }
+            if(oldReclamo.estado != reclamo.estado){
+                const evento = new EventoCambioEstado();
+                evento.fechaHora = new Date();
+                evento.estado = reclamo.estado;
+                evento.idreclamo = reclamo.id;
+                await manager.save(evento);
             }
         });
     }
@@ -206,6 +221,7 @@ export class ReclamosService implements OnModuleInit {
     }
 
     async cambiarEstado(idreclamo: number, data: {estado: EstadoReclamoType, observacion: string }, idusuario: number ){
+        console.log('cambio estado');
         const reclamo = await this.reclamoRepo.findOneByOrFail({id: idreclamo});
         const materialesUtilizados = await this.materialUtilizadoRepo.findBy({idreclamo});
 
@@ -229,6 +245,12 @@ export class ReclamosService implements OnModuleInit {
                     await manager.save(MaterialUtilizado.getEventoAuditoria(idusuario, 'E', oldMatUtil, matUtil));
                 }
             }
+            const evento = new EventoCambioEstado();
+            evento.fechaHora = new Date();
+            evento.estado = data.estado;
+            evento.idreclamo = idreclamo;
+            evento.observacion = data.observacion;
+            await manager.save(evento);
         })
     }
 

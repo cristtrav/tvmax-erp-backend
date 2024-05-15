@@ -28,7 +28,7 @@ import { CobranzaExternaModule } from './modulos/cobranza-externa/cobranza-exter
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './global/tasks/tasks.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import path, { join } from 'path';
+import { join } from 'path';
 import { SorteosModule } from './modulos/sorteos/sorteos.module';
 import { PremiosModule } from './modulos/premios/premios.module';
 import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-materiales.module';
@@ -38,6 +38,7 @@ import { AppInitService } from './app-init.service';
 import databaseConfig from '@config/database.config';
 import { MotivosModule } from './modulos/reclamos/motivos/motivos.module';
 import { ReclamosModule } from './modulos/reclamos/reclamos/reclamos.module';
+import { EventosCambiosEstadosModule } from './modulos/reclamos/eventos-cambios-estados/eventos-cambios-estados.module';
 
 @Module({
   imports: [
@@ -84,7 +85,8 @@ import { ReclamosModule } from './modulos/reclamos/reclamos/reclamos.module';
     MaterialesModule,
     MovimientosMaterialesModule,
     MotivosModule,
-    ReclamosModule
+    ReclamosModule,
+    EventosCambiosEstadosModule
   ],
   controllers: [AppController],
   providers: [AppService, AppInitService],

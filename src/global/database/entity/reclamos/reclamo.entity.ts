@@ -4,7 +4,7 @@ import { EventoAuditoria } from "../evento-auditoria.entity";
 import { DetalleReclamo } from "./detalle-reclamo.entity";
 import { ReclamoDTO } from "@dto/reclamos/reclamo.dto";
 
-const ESTADOS_RECLAMOS = ['PEN', 'PRO', 'POS', 'FIN', 'OTR'] as const;
+export const ESTADOS_RECLAMOS = ['PEN', 'PRO', 'POS', 'FIN', 'OTR'] as const;
 export type EstadoReclamoType = typeof ESTADOS_RECLAMOS[number];
 
 @Entity({schema: 'reclamos'})

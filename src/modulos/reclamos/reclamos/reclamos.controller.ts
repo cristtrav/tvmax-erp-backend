@@ -14,6 +14,8 @@ import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';
 import { FinalizacionReclamoDTO } from '@dto/reclamos/finalizacion-reclamo.dto';
 import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
+import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
+import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos-cambios-estados.service';
 
 type QueriesType = {[name: string]: any}
 
@@ -25,7 +27,8 @@ export class ReclamosController {
     constructor(
         private reclamosSrv: ReclamosService,
         private detalleReclamosSrv: DetallesReclamosService,
-        private jwtUtilsSrv: JwtUtilsService
+        private jwtUtilsSrv: JwtUtilsService,
+        private eventosCambiosEstadosSrv: EventosCambiosEstadosService
     ){}
 
     @Get()
@@ -69,6 +72,15 @@ export class ReclamosController {
         @Query() queries: QueriesType
     ): Promise<MaterialUtilizadoView[]>{
         return this.reclamosSrv.findMaterialesUtilizados({idreclamo, ...queries});
+    }
+
+    @Get(':id/cambiosestados')
+    @AllowedIn(Permissions.RECLAMOS.ACCESOMODULO)
+    findEventosCambiosEstados(
+        @Param('id') idreclamo: number,
+        @Query() queries: QueriesType
+    ): Promise<EventosCambiosEstadosView[]>{
+        return this.eventosCambiosEstadosSrv.findAllEventosCambiosEstados({idreclamo, ...queries});
     }
 
     @Get(':id')
