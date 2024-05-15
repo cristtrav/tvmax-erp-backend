@@ -122,10 +122,10 @@ export class ReclamosController {
     @AllowedIn(Permissions.ASIGNACIONESRECLAMOS.CAMBIARESTADO)
     async cambiarEstado(
         @Param('id') idreclamo: number,
-        @Body() body: { estado: EstadoReclamoType },
+        @Body() body: { estado: EstadoReclamoType, observacion: string },
         @Headers('authorization') auth: string
     ){
-        await this.reclamosSrv.cambiarEstado(idreclamo, body.estado, this.jwtUtilsSrv.extractJwtSub(auth));
+        await this.reclamosSrv.cambiarEstado(idreclamo, body, this.jwtUtilsSrv.extractJwtSub(auth));
     }
 
     @Post(':id/finalizar')

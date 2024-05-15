@@ -205,21 +205,23 @@ export class ReclamosService implements OnModuleInit {
         });
     }
 
-    async cambiarEstado(idreclamo: number, estado: EstadoReclamoType, idusuario: number ){
+    async cambiarEstado(idreclamo: number, data: {estado: EstadoReclamoType, observacion: string }, idusuario: number ){
         const reclamo = await this.reclamoRepo.findOneByOrFail({id: idreclamo});
         const materialesUtilizados = await this.materialUtilizadoRepo.findBy({idreclamo});
 
-        if(reclamo.estado == estado) throw new HttpException({
+        if(reclamo.estado == data.estado) throw new HttpException({
             message: `El el estado es el mismo que el actual.`
         }, HttpStatus.BAD_REQUEST);
 
         const oldReclamo = { ...reclamo };
-        reclamo.estado = estado;
+        reclamo.estado = data.estado;
         reclamo.fechaHoraCambioEstado = new Date();
+        if(data.estado == 'POS') reclamo.motivoPostergacion = data.observacion;
+
         await this.datasource.transaction(async manager => {
             await manager.save(reclamo);
             await manager.save(Reclamo.getEventoAuditoria(idusuario, 'M', oldReclamo, reclamo));
-            if(estado != 'FIN' && estado != 'OTR'){
+            if(data.estado != 'FIN' && data.estado != 'OTR'){
                 for(let matUtil of materialesUtilizados){
                     const oldMatUtil = { ...matUtil };
                     matUtil.eliminado = true;

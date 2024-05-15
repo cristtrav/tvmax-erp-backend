@@ -83,4 +83,7 @@ export class ReclamoView{
 
     @ViewColumn()
     telefono: string;
+
+    @ViewColumn()
+    motivopostergacion: string;
 }

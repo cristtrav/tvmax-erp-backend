@@ -43,6 +43,9 @@ export class Reclamo {
     @Column({length: 20})
     telefono: string;
 
+    @Column({name: 'motivo_postergacion', length: 60})
+    motivoPostergacion: string;
+
     @OneToMany(() => DetalleReclamo, (detalle) => detalle.reclamo)
     detalles: DetalleReclamo[];
 
@@ -58,6 +61,7 @@ export class Reclamo {
         this.eliminado = reclamoDto.eliminado;
         this.observacion = reclamoDto.observacion;
         this.telefono = reclamoDto.telefono;
+        this.motivoPostergacion = reclamoDto.motivopostergacion;
         return this;
     }
 
