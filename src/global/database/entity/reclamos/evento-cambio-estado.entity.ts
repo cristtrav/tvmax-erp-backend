@@ -16,7 +16,7 @@ export class EventoCambioEstado{
     @Column({type: 'enum', enum: ESTADOS_RECLAMOS, nullable: false})
     estado: EstadoReclamoType;
 
-    @Column({name: 'fecha_hora', type: 'time without time zone', nullable: false})
+    @Column({name: 'fecha_hora', type: 'timestamp with time zone', nullable: false})
     fechaHora: Date;
 
     @Column({length: 60})

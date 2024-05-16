@@ -3,7 +3,7 @@ import { EventoCambioEstado } from '@database/entity/reclamos/evento-cambio-esta
 import { MaterialUtilizado } from '@database/entity/reclamos/material-utilzado.entity';
 import { EstadoReclamoType, Reclamo } from '@database/entity/reclamos/reclamo.entity';
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
-import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
+import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-estado.view';
 import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
 import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetalleReclamoDTO } from '@dto/reclamos/detalle-reclamo.dto';

@@ -3,14 +3,14 @@ import { EventosCambiosEstadosService } from './eventos-cambios-estados.service'
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventoCambioEstado } from '@database/entity/reclamos/evento-cambio-estado.entity';
-import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
+import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-estado.view';
 
 @Module({
   imports: [
     JwtModule.register({}),
     TypeOrmModule.forFeature([
       EventoCambioEstado,
-      EventosCambiosEstadosView
+      EventoCambioEstadoView
     ])
   ],
   providers: [EventosCambiosEstadosService]

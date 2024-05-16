@@ -1,4 +1,4 @@
-import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
+import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-estado.view';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -9,11 +9,11 @@ type QueriesType = {[name: string]: any}
 export class EventosCambiosEstadosService {
 
     constructor(
-        @InjectRepository(EventosCambiosEstadosView)
-        private eventosCambiosEstadosViewRepo: Repository<EventosCambiosEstadosView>
+        @InjectRepository(EventoCambioEstadoView)
+        private eventosCambiosEstadosViewRepo: Repository<EventoCambioEstadoView>
     ){}
 
-    private getSelectQuery(queries: QueriesType): SelectQueryBuilder<EventosCambiosEstadosView>{
+    private getSelectQuery(queries: QueriesType): SelectQueryBuilder<EventoCambioEstadoView>{
         const { idreclamo } = queries;
         const alias = 'evento';
         let query = this.eventosCambiosEstadosViewRepo.createQueryBuilder(alias);
@@ -21,7 +21,7 @@ export class EventosCambiosEstadosService {
         return query;
     }
 
-    findAllEventosCambiosEstados(queries: QueriesType): Promise<EventosCambiosEstadosView[]>{
+    findAllEventosCambiosEstados(queries: QueriesType): Promise<EventoCambioEstadoView[]>{
         return this.getSelectQuery(queries).getMany();
     }
 

@@ -14,7 +14,7 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { MaterialUtilizado } from '@database/entity/reclamos/material-utilzado.entity';
 import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
 import { EventoCambioEstado } from '@database/entity/reclamos/evento-cambio-estado.entity';
-import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
+import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-estado.view';
 import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos-cambios-estados.service';
 import { ReiteracionService } from '../reiteracion/reiteracion.service';
 import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
@@ -31,7 +31,7 @@ import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
       MaterialUtilizado,
       MaterialUtilizadoView,
       EventoCambioEstado,
-      EventosCambiosEstadosView,
+      EventoCambioEstadoView,
       ReiteracionView
     ]),
     JwtModule.register({})

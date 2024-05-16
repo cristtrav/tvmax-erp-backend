@@ -4,7 +4,7 @@ const SCHEMA_NAME = 'reclamos';
 const VIEW_NAME = 'vw_eventos_cambios_estados';
 
 @ViewEntity({schema: SCHEMA_NAME, name: VIEW_NAME, expression: `SELECT * FROM ${SCHEMA_NAME}.${VIEW_NAME}`})
-export class EventosCambiosEstadosView{
+export class EventoCambioEstadoView{
 
     @ViewColumn()
     id: number;
@@ -16,7 +16,7 @@ export class EventosCambiosEstadosView{
     estado: string;
 
     @ViewColumn()
-    fechahora: Date;
+    fechahora: string;
 
     @ViewColumn()
     observacion: string;

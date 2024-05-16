@@ -14,7 +14,7 @@ import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';
 import { FinalizacionReclamoDTO } from '@dto/reclamos/finalizacion-reclamo.dto';
 import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
-import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
+import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-estado.view';
 import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos-cambios-estados.service';
 import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
 import { ReiteracionService } from '../reiteracion/reiteracion.service';
@@ -82,7 +82,7 @@ export class ReclamosController {
     findEventosCambiosEstados(
         @Param('id') idreclamo: number,
         @Query() queries: QueriesType
-    ): Promise<EventosCambiosEstadosView[]>{
+    ): Promise<EventoCambioEstadoView[]>{
         return this.eventosCambiosEstadosSrv.findAllEventosCambiosEstados({idreclamo, ...queries});
     }
 

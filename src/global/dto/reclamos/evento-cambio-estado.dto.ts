@@ -2,6 +2,6 @@ export interface EventoCambioEstadoDTO {
     id: number;
     idreclamo: number;
     estado: string;
-    fechahora: Date;
+    fechahora: string;
     observacion: string;
 }

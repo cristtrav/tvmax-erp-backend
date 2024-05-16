@@ -81,6 +81,7 @@ export class ReiteracionReclamo1715806761282 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`DROP VIEW IF EXISTS reclamos.vw_reclamos`);
         await queryRunner.query(`DROP VIEW IF EXISTS reclamos.vw_reiteraciones`)
         await queryRunner.query(`DROP TABLE IF EXISTS reclamos.reiteracion`);
         await queryRunner.query(`DELETE FROM public.permiso WHERE idfuncionalidad >= 920 AND idfuncionalidad <= 923`);
@@ -88,7 +89,6 @@ export class ReiteracionReclamo1715806761282 implements MigrationInterface {
         await queryRunner.query(`DELETE FROM public.modulo WHERE id = 34`);
         await queryRunner.query(`DELETE FROM public.evento_auditoria WHERE idtabla = 32`);
         await queryRunner.query(`DELETE FROM public.tabla_auditoria WHERE id = 32`);
-        await queryRunner.query(`DROP VIEW IF EXISTS reclamos.vw_reclamos`);
         await queryRunner.query(
             `CREATE OR REPLACE VIEW reclamos.vw_reclamos AS
             SELECT reclamo.id,
