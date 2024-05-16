@@ -18,6 +18,7 @@ import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-es
 import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos-cambios-estados.service';
 import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
 import { ReiteracionService } from '../reiteracion/reiteracion.service';
+import { UsuarioView } from '@database/view/usuario.view';
 
 type QueriesType = {[name: string]: any}
 
@@ -54,6 +55,22 @@ export class ReclamosController {
         @Query() queries: QueriesType
     ): Promise<number>{
         return this.reclamosSrv.count(queries);
+    }
+
+    @Get('usuariosregistro')
+    @AllowedIn(Permissions.RECLAMOS.ACCESOMODULO)
+    findUsuariosRegistro(
+        @Query() queries: QueriesType
+    ): Promise<UsuarioView[]>{
+        return this.reclamosSrv.findUsuarios(queries, 'registro');
+    }
+
+    @Get('usuariosresponsables')
+    @AllowedIn(Permissions.RECLAMOS.ACCESOMODULO)
+    findUsuariosResponsables(
+        @Query() queries: QueriesType
+    ): Promise<UsuarioView[]>{
+        return this.reclamosSrv.findUsuarios(queries, 'responsable');
     }
 
     @Get(':id/detalles')

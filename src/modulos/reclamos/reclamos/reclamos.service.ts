@@ -3,16 +3,17 @@ import { EventoCambioEstado } from '@database/entity/reclamos/evento-cambio-esta
 import { MaterialUtilizado } from '@database/entity/reclamos/material-utilzado.entity';
 import { EstadoReclamoType, Reclamo } from '@database/entity/reclamos/reclamo.entity';
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
-import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-estado.view';
 import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
 import { ReclamoView } from '@database/view/reclamos/reclamo.view';
+import { UsuarioView } from '@database/view/usuario.view';
 import { DetalleReclamoDTO } from '@dto/reclamos/detalle-reclamo.dto';
 import { FinalizacionReclamoDTO } from '@dto/reclamos/finalizacion-reclamo.dto';
 import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, DataSource, QueryBuilder, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 
 type QueriesType = {[name: string]: any}
+type UsuarioType = 'registro' | 'responsable';
 
 @Injectable()
 export class ReclamosService implements OnModuleInit {
@@ -30,6 +31,8 @@ export class ReclamosService implements OnModuleInit {
         private materialUtilizadoViewRepo: Repository<MaterialUtilizadoView>,
         @InjectRepository(MaterialUtilizado)
         private materialUtilizadoRepo: Repository<MaterialUtilizado>,
+        @InjectRepository(UsuarioView)
+        private usuarioViewRepo: Repository<UsuarioView>,
         private datasource: DataSource
     ){}
 
@@ -320,6 +323,36 @@ export class ReclamosService implements OnModuleInit {
         if(idreclamo) query = query.andWhere(`${alias}.idreclamo = :idreclamo`, {idreclamo});
         if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, {eliminado});
         return query.getMany();
+    }
+
+    async findUsuarios(queries: QueriesType, tipo: UsuarioType): Promise<UsuarioView[]>{
+        const { sort, eliminado } = queries;
+        const idsUsuario = await this.getIdsUsuarios(tipo);
+            
+        let query =
+            this.usuarioViewRepo
+            .createQueryBuilder('usuario')
+            .where(`usuario.id IN (:...idsUsuario)`, { idsUsuario });
+
+            if(eliminado != null) query = query.andWhere(`usuario.eliminado = :eliminado`, {eliminado});
+            if(sort){
+                const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) == '-' ? 'DESC' : 'ASC';
+                const sortColumn = sort.substring(1);
+                query = query.orderBy(`usuario.${sortColumn}`, sortOrder);
+                if(sortColumn != 'id') query = query.addOrderBy(`usuario.id`, sortOrder);
+            }
+        return query.getMany();
+    }
+
+    private async getIdsUsuarios(tipo: UsuarioType): Promise<number[]>{
+        const idusuarioCol = tipo == 'registro' ? 'idusuarioRegistro' : 'idusuarioResponsable';
+        return (await this.reclamoRepo
+            .createQueryBuilder('reclamo')
+            .select(`reclamo.${idusuarioCol}`)
+            .distinctOn([`reclamo.${idusuarioCol}`])
+            .where('reclamo.eliminado = FALSE')
+            .getMany()
+        ).map(reclamo => reclamo[idusuarioCol]);
     }
 
 }

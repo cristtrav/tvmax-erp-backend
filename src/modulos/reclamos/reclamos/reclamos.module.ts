@@ -18,6 +18,7 @@ import { EventoCambioEstadoView } from '@database/view/reclamos/evento-cambio-es
 import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos-cambios-estados.service';
 import { ReiteracionService } from '../reiteracion/reiteracion.service';
 import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
+import { UsuarioView } from '@database/view/usuario.view';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
       MaterialUtilizadoView,
       EventoCambioEstado,
       EventoCambioEstadoView,
-      ReiteracionView
+      ReiteracionView,
+      UsuarioView
     ]),
     JwtModule.register({})
   ],
