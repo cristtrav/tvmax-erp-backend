@@ -16,6 +16,8 @@ import { FinalizacionReclamoDTO } from '@dto/reclamos/finalizacion-reclamo.dto';
 import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizado.view';
 import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
 import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos-cambios-estados.service';
+import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
+import { ReiteracionService } from '../reiteracion/reiteracion.service';
 
 type QueriesType = {[name: string]: any}
 
@@ -28,7 +30,8 @@ export class ReclamosController {
         private reclamosSrv: ReclamosService,
         private detalleReclamosSrv: DetallesReclamosService,
         private jwtUtilsSrv: JwtUtilsService,
-        private eventosCambiosEstadosSrv: EventosCambiosEstadosService
+        private eventosCambiosEstadosSrv: EventosCambiosEstadosService,
+        private reiteracionesSrv: ReiteracionService
     ){}
 
     @Get()
@@ -81,6 +84,15 @@ export class ReclamosController {
         @Query() queries: QueriesType
     ): Promise<EventosCambiosEstadosView[]>{
         return this.eventosCambiosEstadosSrv.findAllEventosCambiosEstados({idreclamo, ...queries});
+    }
+
+    @Get(':id/reiteraciones')
+    @AllowedIn(Permissions.RECLAMOS.ACCESOMODULO)
+    findReiteraciones(
+        @Param('id') idreclamo: number,
+        @Query() queries: QueriesType
+    ): Promise<ReiteracionView[]>{
+        return this.reiteracionesSrv.findAll({idreclamo, ...queries});
     }
 
     @Get(':id')

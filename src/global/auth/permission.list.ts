@@ -288,4 +288,11 @@ export class Permissions {
         EDITARFINALIZACIONRECLAMO: 886
     }
 
+    static readonly REITERACIONESRECLAMOS = {
+        CONSULTAR: 920,
+        REGISTRAR: 921,
+        EDITAR: 922,
+        ELIMINAR: 923
+    }
+
 }

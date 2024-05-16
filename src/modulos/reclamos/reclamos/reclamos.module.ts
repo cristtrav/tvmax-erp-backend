@@ -16,6 +16,8 @@ import { MaterialUtilizadoView } from '@database/view/reclamos/material-utilizad
 import { EventoCambioEstado } from '@database/entity/reclamos/evento-cambio-estado.entity';
 import { EventosCambiosEstadosView } from '@database/view/reclamos/eventos-cambios-estados.view';
 import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos-cambios-estados.service';
+import { ReiteracionService } from '../reiteracion/reiteracion.service';
+import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
 
 @Module({
   imports: [
@@ -29,11 +31,18 @@ import { EventosCambiosEstadosService } from '../eventos-cambios-estados/eventos
       MaterialUtilizado,
       MaterialUtilizadoView,
       EventoCambioEstado,
-      EventosCambiosEstadosView
+      EventosCambiosEstadosView,
+      ReiteracionView
     ]),
     JwtModule.register({})
   ],
-  providers: [ReclamosService, JwtUtilsService, DetallesReclamosService, EventosCambiosEstadosService],
+  providers: [
+    ReclamosService,
+    JwtUtilsService,
+    DetallesReclamosService,
+    EventosCambiosEstadosService,
+    ReiteracionService
+  ],
   controllers: [ReclamosController]
 })
 export class ReclamosModule {}

@@ -39,6 +39,7 @@ import databaseConfig from '@config/database.config';
 import { MotivosModule } from './modulos/reclamos/motivos/motivos.module';
 import { ReclamosModule } from './modulos/reclamos/reclamos/reclamos.module';
 import { EventosCambiosEstadosModule } from './modulos/reclamos/eventos-cambios-estados/eventos-cambios-estados.module';
+import { ReiteracionModule } from './modulos/reclamos/reiteracion/reiteracion.module';
 
 @Module({
   imports: [
@@ -86,7 +87,8 @@ import { EventosCambiosEstadosModule } from './modulos/reclamos/eventos-cambios-
     MovimientosMaterialesModule,
     MotivosModule,
     ReclamosModule,
-    EventosCambiosEstadosModule
+    EventosCambiosEstadosModule,
+    ReiteracionModule
   ],
   controllers: [AppController],
   providers: [AppService, AppInitService],
