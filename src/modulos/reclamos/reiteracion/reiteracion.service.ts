@@ -1,3 +1,4 @@
+import { Reclamo } from '@database/entity/reclamos/reclamo.entity';
 import { Reiteracion } from '@database/entity/reclamos/reiteracion.entity';
 import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
@@ -12,6 +13,8 @@ export class ReiteracionService {
     constructor(
         @InjectRepository(ReiteracionView)
         private reiteracionViewRepo: Repository<ReiteracionView>,
+        @InjectRepository(Reclamo)
+        private reclamoRepo: Repository<Reclamo>,
         private datasource: DataSource
     ){}
 
@@ -39,7 +42,12 @@ export class ReiteracionService {
     }
 
     async create(reiteracion: Reiteracion, idusuario: number){
+        const reclamo = await this.reclamoRepo.findOneByOrFail({id: reiteracion.idreclamo});
+        const oldReclamo = { ... reclamo };
+        reclamo.motivoReiteracion = reiteracion.observacion;
         await this.datasource.transaction(async manager => {
+            await manager.save(reclamo);
+            await manager.save(Reclamo.getEventoAuditoria(idusuario, 'M', oldReclamo, reclamo));
             await manager.save(reiteracion);
             await manager.save(Reiteracion.getEventoAuditoria(idusuario, 'R', null, reiteracion));
         });

@@ -89,4 +89,7 @@ export class ReclamoView{
 
     @ViewColumn()
     nroreiteraciones: number;
+
+    @ViewColumn()
+    motivoreiteracion: string;
 }

@@ -224,7 +224,6 @@ export class ReclamosService implements OnModuleInit {
     }
 
     async cambiarEstado(idreclamo: number, data: {estado: EstadoReclamoType, observacion: string }, idusuario: number ){
-        console.log('cambio estado');
         const reclamo = await this.reclamoRepo.findOneByOrFail({id: idreclamo});
         const materialesUtilizados = await this.materialUtilizadoRepo.findBy({idreclamo});
 
