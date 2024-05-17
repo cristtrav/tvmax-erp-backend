@@ -263,6 +263,7 @@ export class ReclamosService implements OnModuleInit {
         if(reclamo.estado != finalizacion.estado) reclamo.fechaHoraCambioEstado = new Date();
         reclamo.estado = <EstadoReclamoType>finalizacion.estado;
         if(reclamo.estado == 'OTR') reclamo.observacionEstado = finalizacion.observacionestado;
+        reclamo.personaRecepcionTecnico = finalizacion.personarecepciontecnico;
 
         await this.datasource.transaction(async manager => {
             await manager.save(reclamo);
@@ -288,6 +289,7 @@ export class ReclamosService implements OnModuleInit {
         if(reclamo.estado != finalizacion.estado) reclamo.fechaHoraCambioEstado = new Date();
         reclamo.estado = <EstadoReclamoType>finalizacion.estado;
         reclamo.observacionEstado = finalizacion.observacionestado;
+        reclamo.personaRecepcionTecnico = finalizacion.personarecepciontecnico;
 
         await this.datasource.transaction(async manager => {
             await manager.save(reclamo);
