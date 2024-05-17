@@ -327,7 +327,8 @@ export class ReclamosService implements OnModuleInit {
     async findUsuarios(queries: QueriesType, tipo: UsuarioType): Promise<UsuarioView[]>{
         const { sort, eliminado } = queries;
         const idsUsuario = await this.getIdsUsuarios(tipo);
-            
+        if(idsUsuario.length == 0) return [];
+        
         let query =
             this.usuarioViewRepo
             .createQueryBuilder('usuario')
