@@ -40,7 +40,7 @@ export class Reclamo {
     @Column({length: 100})
     observacion: string;
 
-    @Column({length: 20})
+    @Column({length: 20, nullable: false})
     telefono: string;
 
     @Column({name: 'motivo_postergacion', length: 60})
