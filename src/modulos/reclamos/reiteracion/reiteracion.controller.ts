@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Headers, Param, Post, UseFilters, UseGuards } from '@nestjs/common';
 import { ReiteracionService } from './reiteracion.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { LoginGuard } from '@auth/guards/login.guard';
@@ -26,6 +26,15 @@ export class ReiteracionController {
         @Headers('authorization') auth: string
     ){
         await this.reiteracionSrv.create(new Reiteracion().fromDTO(reiteracionDto), this.jwtUtils.extractJwtSub(auth));
+    }
+
+    @Delete(':id')
+    @AllowedIn(Permissions.REITERACIONESRECLAMOS.ELIMINAR)
+    async delete(
+        @Param('id') id: number,
+        @Headers('authorization') auth: string
+    ){
+        await this.reiteracionSrv.delete(id, this.jwtUtils.extractJwtSub(auth));
     }
 
 

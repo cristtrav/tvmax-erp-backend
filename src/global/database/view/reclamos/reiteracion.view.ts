@@ -1,4 +1,4 @@
-import { View, ViewColumn, ViewEntity } from "typeorm";
+import { ViewColumn, ViewEntity } from "typeorm";
 
 const SCHEMA_NAME = 'reclamos';
 const VIEW_NAME = 'vw_reiteraciones'

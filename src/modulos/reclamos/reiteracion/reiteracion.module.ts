@@ -8,16 +8,18 @@ import { ReiteracionController } from './reiteracion.controller';
 import { Permiso } from '@database/entity/permiso.entity';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { Reclamo } from '@database/entity/reclamos/reclamo.entity';
+import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 
 @Module({
   imports: [
-    JwtModule.register({}),
     TypeOrmModule.forFeature([
+      Reclamo,
       Reiteracion,
       ReiteracionView,
       Permiso,
-      Reclamo
-    ])
+      ReclamoView
+    ]),
+    JwtModule.register({})
   ],
   providers: [ReiteracionService, JwtUtilsService],
   controllers: [ReiteracionController]

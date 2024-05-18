@@ -1,7 +1,7 @@
 export interface ReiteracionDTO {
-    id: number;
-    idreclamo: number;
-    fechahora: string;
-    observacion: string;
-    eliminado: boolean;
+    id?: number;
+    idreclamo?: number;
+    fechahora?: string;
+    observacion?: string;
+    eliminado?: boolean;
 }

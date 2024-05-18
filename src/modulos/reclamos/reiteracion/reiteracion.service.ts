@@ -11,6 +11,8 @@ type QueriesType = {[name: string]: any}
 export class ReiteracionService {
  
     constructor(
+        @InjectRepository(Reiteracion)
+        private reiteracionRepo: Repository<Reiteracion>,
         @InjectRepository(ReiteracionView)
         private reiteracionViewRepo: Repository<ReiteracionView>,
         @InjectRepository(Reclamo)
@@ -54,9 +56,9 @@ export class ReiteracionService {
     }
 
     async edit(oldId: number, reiteracion: Reiteracion, idusuario: number){
-        const oldReiteracion = await this.reiteracionViewRepo.findOneByOrFail({id: oldId});
+        const oldReiteracion = await this.reiteracionRepo.findOneByOrFail({id: oldId});
         
-        if(await this.reiteracionViewRepo.findOneBy({id: reiteracion.id})) throw new HttpException({
+        if(await this.reiteracionRepo.findOneBy({id: reiteracion.id})) throw new HttpException({
             message: `La reiteración con código «${reiteracion.id}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
         
@@ -68,11 +70,11 @@ export class ReiteracionService {
     }
 
     async delete(id: number, idusuario: number){
-        const reiteracion = await this.reiteracionViewRepo.findOneByOrFail({id});
+        const reiteracion = await this.reiteracionRepo.findOneByOrFail({id});
         const oldReiteracion = { ...reiteracion };
+        reiteracion.eliminado = true;
 
         await this.datasource.transaction(async manager => {
-            reiteracion.eliminado = true;
             await manager.save(reiteracion);
             await manager.save(Reiteracion.getEventoAuditoria(idusuario, 'E', oldReiteracion, reiteracion));
         });
