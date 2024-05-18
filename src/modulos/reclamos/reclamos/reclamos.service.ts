@@ -166,7 +166,7 @@ export class ReclamosService implements OnModuleInit {
                     await manager.save(MaterialUtilizado.getEventoAuditoria(idusuario, 'E', oldMatUtil, matUtil));
                 }
             }
-            if(oldReclamo.estado != reclamo.estado){
+            if(oldReclamo.estado != reclamo.estado){                
                 const evento = new EventoCambioEstado();
                 evento.fechaHora = new Date();
                 evento.estado = reclamo.estado;
@@ -203,24 +203,41 @@ export class ReclamosService implements OnModuleInit {
 
     async asignarResponsable(idreclamo: number, idusuarioResponsable: number, idusuario: number){
         const reclamo = await this.reclamoRepo.findOneByOrFail({id: idreclamo});
+
         if(reclamo.idusuarioResponsable) throw new HttpException({
             message: 'El reclamo ya fue tomado'
         }, HttpStatus.BAD_REQUEST);
         const oldReclamo = { ...reclamo };
+
         reclamo.idusuarioResponsable = idusuarioResponsable;
+        reclamo.estado = 'ASI';
         await this.datasource.transaction(async manager => {
             await manager.save(reclamo);
             await manager.save(Reclamo.getEventoAuditoria(idusuario, 'M', oldReclamo, reclamo));
+
+            const evento = new EventoCambioEstado();
+            evento.estado = reclamo.estado;
+            evento.fechaHora = new Date();
+            evento.idreclamo = reclamo.id;
+            await manager.save(evento);
         });
     }
 
     async liberarResponsable(idreclamo: number, idusuario: number){
         const reclamo = await this.reclamoRepo.findOneByOrFail({ id: idreclamo });
         const oldReclamo = { ...reclamo };
+
         reclamo.idusuarioResponsable = null;
+        reclamo.estado = 'PEN';
         await this.datasource.transaction(async manager => {
             await manager.save(reclamo);
             await manager.save(Reclamo.getEventoAuditoria(idusuario, 'M', oldReclamo, reclamo));
+
+            const evento = new EventoCambioEstado();
+            evento.estado = reclamo.estado;
+            evento.fechaHora = new Date();
+            evento.idreclamo = reclamo.id;
+            await manager.save(evento);
         });
     }
 
@@ -275,6 +292,12 @@ export class ReclamosService implements OnModuleInit {
                 await manager.save(MaterialUtilizado.fromDTO(materialUtilizado));
                 await manager.save(MaterialUtilizado.getEventoAuditoria(idusuario, 'R', null, materialUtilizado));
             }
+
+            const evento = new EventoCambioEstado();
+            evento.idreclamo = idreclamo;
+            evento.fechaHora = new Date();
+            evento.estado = reclamo.estado;
+            await manager.save(evento);
         });
     }
 
