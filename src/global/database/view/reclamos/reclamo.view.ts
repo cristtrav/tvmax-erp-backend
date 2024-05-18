@@ -73,6 +73,9 @@ export class ReclamoView{
     cliente: string;
 
     @ViewColumn()
+    ci: string;
+
+    @ViewColumn()
     estado: string;
 
     @ViewColumn()
