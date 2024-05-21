@@ -72,11 +72,26 @@ export class ReiteracionService {
     async delete(id: number, idusuario: number){
         const reiteracion = await this.reiteracionRepo.findOneByOrFail({id});
         const oldReiteracion = { ...reiteracion };
-        reiteracion.eliminado = true;
+        const reclamo = await this.reclamoRepo.findOneByOrFail({id: reiteracion.idreclamo});
+        const oldReclamo = { ...reclamo };
 
+        const ultReiteracion =
+            await this.reiteracionRepo
+            .createQueryBuilder('reiteracion')
+            .where(`reiteracion.idreclamo = :idreclamo`, {idreclamo: reclamo.id})
+            .andWhere(`reiteracion.id != :id`, {id})
+            .andWhere(`reiteracion.eliminado = FALSE`)
+            .orderBy(`reiteracion.id`, 'DESC')
+            .getOne();
+        
+        reiteracion.eliminado = true;
+        reclamo.motivoReiteracion = ultReiteracion ? ultReiteracion.observacion : null;
         await this.datasource.transaction(async manager => {
             await manager.save(reiteracion);
             await manager.save(Reiteracion.getEventoAuditoria(idusuario, 'E', oldReiteracion, reiteracion));
+
+            await manager.save(reclamo);
+            await manager.save(Reclamo.getEventoAuditoria(idusuario, 'M', oldReclamo, reclamo));
         });
     }
     
