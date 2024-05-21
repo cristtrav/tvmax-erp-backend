@@ -249,6 +249,18 @@ export class ReclamosService implements OnModuleInit {
             message: `El el estado es el mismo que el actual.`
         }, HttpStatus.BAD_REQUEST);
 
+        if(data.estado == 'PRO' && reclamo.estado != 'ASI' && reclamo.estado != 'POS') throw new HttpException({
+            message: 'El reclamo no se encuentra asignado'
+        }, HttpStatus.BAD_REQUEST);
+
+        if(data.estado == 'POS' && (reclamo.estado == 'FIN' || reclamo.estado == 'OTR')) throw new HttpException({
+            message: 'El reclamo está finalizado'
+        }, HttpStatus.BAD_REQUEST);
+
+        if(data.estado == 'POS' && reclamo.estado != 'PRO' && reclamo.estado != 'ASI') throw new HttpException({
+            message: 'El reclamo no está asignado'
+        }, HttpStatus.BAD_REQUEST);    
+
         const oldReclamo = { ...reclamo };
         reclamo.estado = data.estado;
         reclamo.fechaHoraCambioEstado = new Date();
@@ -278,6 +290,14 @@ export class ReclamosService implements OnModuleInit {
         const reclamo = await this.reclamoRepo.findOneByOrFail({id: idreclamo});
         const oldReclamo = { ...reclamo };
 
+        if(reclamo.estado == 'FIN' || reclamo.estado == 'OTR') throw new HttpException({
+            message: 'El reclamo ya está finalizado'
+        }, HttpStatus.BAD_REQUEST);
+
+        if(reclamo.estado != 'PRO') throw new HttpException({
+            message: 'El reclamo no está en proceso'
+        }, HttpStatus.BAD_REQUEST);
+
         if(reclamo.estado != finalizacion.estado) reclamo.fechaHoraCambioEstado = new Date();
         reclamo.estado = <EstadoReclamoType>finalizacion.estado;
         if(reclamo.estado == 'OTR') reclamo.observacionEstado = finalizacion.observacionestado;
@@ -304,6 +324,10 @@ export class ReclamosService implements OnModuleInit {
     async editarFinanalizacion(idreclamo: number, finalizacion: FinalizacionReclamoDTO, idusuario: number){
         const reclamo = await this.reclamoRepo.findOneByOrFail({id: idreclamo});
         const oldReclamo = { ...reclamo };
+
+        if(reclamo.estado != 'FIN' && reclamo.estado != 'OTR') throw new HttpException({
+            message: 'El reclamo aún no fue finalizado'
+        }, HttpStatus.BAD_REQUEST);
 
         const oldMaterialesUtilizados = await this.materialUtilizadoRepo.findBy({idreclamo});
         const materialesEliminados = oldMaterialesUtilizados.filter(mu => !finalizacion.materialesutilizados.find(muNew => muNew.id == mu.id));
