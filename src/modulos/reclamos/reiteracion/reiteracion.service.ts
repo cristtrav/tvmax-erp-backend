@@ -45,6 +45,19 @@ export class ReiteracionService {
 
     async create(reiteracion: Reiteracion, idusuario: number){
         const reclamo = await this.reclamoRepo.findOneByOrFail({id: reiteracion.idreclamo});
+
+        if(reclamo.estado == 'PRO') throw new HttpException({
+            message: `El reclamo se encuentra en proceso`
+        }, HttpStatus.BAD_REQUEST);
+
+        if(reclamo.estado == 'FIN') throw new HttpException({
+            message: 'El reclamo está finalizado'
+        }, HttpStatus.BAD_REQUEST);
+
+        if(reclamo.estado == 'OTR') throw new HttpException({
+            message: `El reclamo se encuentra en estado «${reclamo.observacionEstado}»`
+        }, HttpStatus.BAD_REQUEST);
+
         const oldReclamo = { ... reclamo };
         reclamo.motivoReiteracion = reiteracion.observacion;
         await this.datasource.transaction(async manager => {
