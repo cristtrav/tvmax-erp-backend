@@ -4,6 +4,8 @@ import { TokenSesionDTO } from '../../global/dto/token-sesion.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { PermisosService } from '@modulos/permisos/permisos.service';
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
+import { RolView } from '@database/view/rol.view';
+import { UsuariosService } from '@modulos/usuarios/usuarios.service';
 
 @Controller('sesion')
 @UseFilters(HttpExceptionFilter)
@@ -11,7 +13,8 @@ export class SesionController {
 
     constructor(
         private sesionSrv: SesionService,
-        private permisosSrv: PermisosService
+        private permisosSrv: PermisosService,
+        private usuariosSrv: UsuariosService
     ) { }
 
     @Get('permisos/:idusuario')
@@ -20,6 +23,13 @@ export class SesionController {
         @Query() queries: {[name: string]: any}
     ): Promise<Funcionalidad[]>{
         return this.permisosSrv.findPermisosByIdUsuario(idusuario, queries);
+    }
+
+    @Get('roles/:idusuario')
+    findRoles(
+        @Param('idusuario') idusuario: number
+    ): Promise<RolView[]>{
+        return this.usuariosSrv.findRolesByUsuario(idusuario);
     }
 
     @Post('login')

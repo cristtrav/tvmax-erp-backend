@@ -34,6 +34,27 @@ export class ReclamoView{
     idsuscripcion: number;
 
     @ViewColumn()
+    iddomicilio: number;
+
+    @ViewColumn()
+    direccion: string;
+
+    @ViewColumn()
+    latitud: number;
+
+    @ViewColumn()
+    longitud: number;
+
+    @ViewColumn()
+    idbarrio: number;
+
+    @ViewColumn()
+    barrio: string
+
+    @ViewColumn()
+    obsdomicilio: string;
+
+    @ViewColumn()
     idservicio: number;
 
     @ViewColumn()
@@ -43,14 +64,38 @@ export class ReclamoView{
     monto: number;
 
     @ViewColumn()
+    obssuscripcion: string;
+
+    @ViewColumn()
     idcliente: number;
 
     @ViewColumn()
     cliente: string;
 
     @ViewColumn()
+    ci: string;
+
+    @ViewColumn()
     estado: string;
 
     @ViewColumn()
     eliminado: boolean;
+
+    @ViewColumn()
+    observacion: string;
+
+    @ViewColumn()
+    telefono: string;
+
+    @ViewColumn()
+    motivopostergacion: string;
+
+    @ViewColumn()
+    nroreiteraciones: number;
+
+    @ViewColumn()
+    motivoreiteracion: string;
+
+    @ViewColumn()
+    personarecepciontecnico: string;
 }

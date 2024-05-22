@@ -278,4 +278,21 @@ export class Permissions {
         CONSULTAR: 360
     }
 
+    static readonly ASIGNACIONESRECLAMOS = {
+        ACCESOMODULO: 880,
+        ACCESODETALLE: 881,
+        TOMARLIBERARRECLAMO: 882,
+        CAMBIARESTADO: 883,
+        ACCESOFORMULARIOFINALIZAR: 884,
+        FINALIZARRECLAMO: 885,
+        EDITARFINALIZACIONRECLAMO: 886
+    }
+
+    static readonly REITERACIONESRECLAMOS = {
+        CONSULTAR: 920,
+        REGISTRAR: 921,
+        EDITAR: 922,
+        ELIMINAR: 923
+    }
+
 }

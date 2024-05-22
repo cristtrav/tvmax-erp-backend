@@ -16,6 +16,13 @@ export interface ReclamoDTO {
     monto?: number;
     idcliente?: number;
     cliente?: string;
+    ci?: string;
     eliminado: boolean;
     detalles: DetalleReclamoDTO[];
+    observacion?: string;
+    telefono?: string;
+    motivopostergacion?: string;
+    nroreiteraciones?: number;
+    motivoreiteracion?: string;
+    personarecepciontecnico?: string;
 }

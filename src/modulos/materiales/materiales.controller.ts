@@ -24,7 +24,8 @@ export class MaterialesController {
     @Get()
     @AllowedIn(
         Permissions.MATERIALES.CONSULTAR,
-        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO
+        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO,
+        Permissions.ASIGNACIONESRECLAMOS.ACCESOFORMULARIOFINALIZAR
     )
     findAll(
         @Query() queries: {[name: string]: any}
@@ -41,7 +42,8 @@ export class MaterialesController {
     @Get('total')
     @AllowedIn(
         Permissions.MATERIALES.CONSULTAR,
-        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO
+        Permissions.MOVIMIENTOSMATERIALES.ACCESOFORMULARIO,
+        Permissions.ASIGNACIONESRECLAMOS.ACCESOFORMULARIOFINALIZAR
     )
     count(
         @Query() queries: {[name:string]: any}

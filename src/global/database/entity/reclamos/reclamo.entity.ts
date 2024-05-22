@@ -4,7 +4,7 @@ import { EventoAuditoria } from "../evento-auditoria.entity";
 import { DetalleReclamo } from "./detalle-reclamo.entity";
 import { ReclamoDTO } from "@dto/reclamos/reclamo.dto";
 
-const ESTADOS_RECLAMOS = ['PEN', 'PRO', 'POS', 'FIN', 'OTR'] as const;
+export const ESTADOS_RECLAMOS = ['PEN', 'PRO', 'POS', 'FIN', 'OTR', 'ASI'] as const;
 export type EstadoReclamoType = typeof ESTADOS_RECLAMOS[number];
 
 @Entity({schema: 'reclamos'})
@@ -37,6 +37,21 @@ export class Reclamo {
     @Column({default: false, nullable: false})
     eliminado: boolean;
 
+    @Column({length: 100})
+    observacion: string;
+
+    @Column({length: 20, nullable: false})
+    telefono: string;
+
+    @Column({name: 'motivo_postergacion', length: 60})
+    motivoPostergacion: string;
+
+    @Column({name: 'motivo_reiteracion', length: 60})
+    motivoReiteracion: string;
+
+    @Column({name: 'persona_recepcion_tecnico', length: 50})
+    personaRecepcionTecnico: string;
+
     @OneToMany(() => DetalleReclamo, (detalle) => detalle.reclamo)
     detalles: DetalleReclamo[];
 
@@ -50,6 +65,11 @@ export class Reclamo {
         this.idusuarioResponsable = reclamoDto.idusuarioresponsable
         this.idsuscripcion = reclamoDto.idsuscripcion;
         this.eliminado = reclamoDto.eliminado;
+        this.observacion = reclamoDto.observacion;
+        this.telefono = reclamoDto.telefono;
+        this.motivoPostergacion = reclamoDto.motivopostergacion;
+        this.motivoReiteracion = reclamoDto.motivoreiteracion;
+        this.personaRecepcionTecnico = reclamoDto.personarecepciontecnico;
         return this;
     }
 
