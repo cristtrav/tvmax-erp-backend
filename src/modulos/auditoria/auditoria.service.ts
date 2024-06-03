@@ -1,12 +1,7 @@
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
 import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
-import { EventoAuditoriaDTO } from 'src/global/dto/evento-auditoria.dto';
-import { TablaAuditoriaDTO } from 'src/global/dto/tabla-auditoria.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IRangeQuery } from '@util/irangequery.interface';
-import { ISearchField } from '@util/isearchfield.interface';
-import { WhereParam } from '@util/whereparam';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
@@ -36,7 +31,7 @@ export class AuditoriaService {
         if (fechahorahasta) query = query.andWhere(`${alias}.fechahora <= :fechahorahasta`, { fechahorahasta });
         if (search) {
             query = query.andWhere(new Brackets(qb => {
-                qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: search });
+                if(!Number.isNaN(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, { idsearch: search });
                 qb = qb.orWhere(`LOWER(${alias}.nombresusuario) LIKE :nombressearch`, { nombressearch: `%${search.toLowerCase()}%` });
                 qb = qb.orWhere(`LOWER(${alias}.apellidosusuario) LIKE :apellidossearch`, { apellidossearch: `%${search.toLowerCase()}%` });
                 qb = qb.orWhere(`LOWER(${alias}.tabla) LIKE :tablasearch`, { tablasearch: `%${search.toLowerCase()}%` });
