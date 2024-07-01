@@ -295,4 +295,8 @@ export class Permissions {
         ELIMINAR: 923
     }
 
+    static readonly TRIBUTACION = {
+        ACCESOMODULO: 980
+    }
+
 }

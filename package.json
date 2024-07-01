@@ -1,6 +1,6 @@
 {
   "name": "tvmax-erp-backend",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Backend del sistema TV Max ERP",
   "author": "Cristhian Traversi",
   "private": true,
@@ -34,6 +34,7 @@
     "@nestjs/schedule": "^4.0.0",
     "@nestjs/serve-static": "^4.0.0",
     "@nestjs/typeorm": "^10.0.1",
+    "adm-zip": "^0.5.14",
     "argon2": "^0.31.2",
     "date-fns": "^3.0.6",
     "dotenv": "^16.4.5",
@@ -49,6 +50,7 @@
     "@nestjs/cli": "^10.2.1",
     "@nestjs/schematics": "^10.0.3",
     "@nestjs/testing": "^10.3.0",
+    "@types/adm-zip": "^0.5.5",
     "@types/cron": "^2.0.1",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.11",
