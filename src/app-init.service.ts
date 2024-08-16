@@ -1,10 +1,7 @@
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 import { Permiso } from '@database/entity/permiso.entity';
-import { Usuario } from '@database/entity/usuario.entity';
-import { PermisosService } from '@modulos/permisos/permisos.service';
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AppInitService implements OnApplicationBootstrap {
