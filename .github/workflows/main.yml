@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+	push:
+ 		branches: [ master ]
+jobs:
+	build:
+ 		runs-on: ubuntu-latest
+		steps:
+			- name: Despliega usando SSH
+	 			uses: appleboy/ssh-action@master
+		 		with:
+		 			host: ${{ secrets.PROD_HOST }}
+					username: ${{ secrets.PROD_USERNAME }}
+		 			key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+					port: 22
+		 			script: |
+						cd /home/administrador/Software/tvmax-erp/tvmax-erp-backend/
+						git pull origin master
+						git status
+						npm install
+						npm prune
+						npm run migration:run
+						npm run build
+						pm2 restart tvmax-erp
+						
