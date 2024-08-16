@@ -15,11 +15,11 @@ jobs:
       key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
       port: 22
       script: |
-       cd /home/administrador/Software/tvmax-erp/tvmax-erp-backend/
+       cd ${{ secrets.PROD_DIRECTORY }}
        git pull origin master
        git status
        npm install
        npm prune
        npm run migration:run
        npm run build
-       pm2 restart tvmax-erp
+       pm2 restart ${{ secrets.PROD_PM2_APP_NAME }}
