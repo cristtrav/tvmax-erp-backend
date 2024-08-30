@@ -8,12 +8,14 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { CuotaView } from '@database/view/cuota.view';
 import { Permiso } from '@database/entity/permiso.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
+import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
+import { Suscripcion } from '@database/entity/suscripcion.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
     UtilModule,
-    TypeOrmModule.forFeature([Cuota, CuotaView, CobroCuotasView, Permiso])
+    TypeOrmModule.forFeature([Cuota, CuotaView, CobroCuotasView, Permiso, GeneracionCuotas, Suscripcion])
   ],
   providers: [CuotasService],
   controllers: [CuotasController]

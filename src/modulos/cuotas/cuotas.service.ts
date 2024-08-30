@@ -2,12 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cuota } from '@database/entity/cuota.entity';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { CuotaView } from '@database/view/cuota.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
+import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
+import { Suscripcion } from '@database/entity/suscripcion.entity';
 
 @Injectable()
 export class CuotasService {
@@ -19,6 +22,10 @@ export class CuotasService {
         private cuotaViewRepo: Repository<CuotaView>,
         @InjectRepository(CobroCuotasView)
         private cobroCuotaViewRepo: Repository<CobroCuotasView>,
+        @InjectRepository(GeneracionCuotas)
+        private generacionCuotasRepo: Repository<GeneracionCuotas>,
+        @InjectRepository(Suscripcion)
+        private suscripcionRepo: Repository<Suscripcion>,
         private datasource: DataSource
     ) { }
 
@@ -109,5 +116,56 @@ export class CuotasService {
 
     async findCobro(idcuota: number): Promise<CobroCuotasView> {
         return this.cobroCuotaViewRepo.findOneByOrFail({ idcuota });
+    }
+
+    async generarCuotas(mes: number, anio: number){
+        if(mes < 1 || mes > 12) return;
+        console.log(`Generando cuotas para el mes ${mes} y año ${anio}...`);
+        let cantCuotasGeneradas = 0;
+        let cantSuscripcionesOmitidas = 0;
+        const suscripcionesActivas =
+            await this.suscripcionRepo.createQueryBuilder('suscripcion')
+                .where(`suscripcion.gentileza = FALSE`)
+                .andWhere(new Brackets(qb => {
+                    qb = qb.orWhere(`suscripcion.estado = 'C'`)
+                    qb = qb.orWhere(`suscripcion.estado = 'R'`)
+                }))
+                .getMany();
+
+        const generacionCuotas = new GeneracionCuotas();
+        generacionCuotas.fechaHoraInicio = new Date();
+        generacionCuotas.cantidadCuotasOmitidas = suscripcionesActivas.length;
+        await this.generacionCuotasRepo.save(generacionCuotas);
+
+        for (let suscripcion of suscripcionesActivas) {
+            const fechaCuota = new Date(anio, mes - 1);
+            const cuotaExistente =
+                await this.cuotaRepo.createQueryBuilder('cuota')
+                    .where(`EXTRACT(month FROM cuota.fechaVencimiento) = :mes`, { mes: (fechaCuota.getMonth() + 1) })
+                    .andWhere(`EXTRACT(year FROM cuota.fechaVencimiento) = :anio`, { anio: fechaCuota.getFullYear() })
+                    .andWhere(`cuota.idsuscripcion = :idsuscripcion`, { idsuscripcion: suscripcion.id })
+                    .andWhere(`cuota.idservicio = :idservicio`, {idservicio: suscripcion.idservicio})
+                    .andWhere(`cuota.eliminado = FALSE`)
+                    .getOne();
+            if (!cuotaExistente) {
+                const cuota = new Cuota();
+                cuota.idsuscripcion = suscripcion.id;
+                cuota.eliminado = false;
+                cuota.pagado = false;
+                cuota.fechaVencimiento = new Date(fechaCuota.getFullYear(), fechaCuota.getMonth(), 1);
+                cuota.monto = suscripcion.monto;
+                cuota.idservicio = suscripcion.idservicio;
+                await this.datasource.transaction(async manager => {
+                    await manager.save(cuota);
+                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'R', null, cuota));
+                    cantCuotasGeneradas++;
+                })
+            } else cantSuscripcionesOmitidas++
+        }
+        console.log('Generación de cuotas finalizada...');
+        generacionCuotas.cantidadCuotas = cantCuotasGeneradas;
+        generacionCuotas.cantidadCuotasOmitidas =cantSuscripcionesOmitidas;
+        generacionCuotas.fechaHoraFin = new Date();
+        await this.generacionCuotasRepo.save(generacionCuotas);
     }
 }

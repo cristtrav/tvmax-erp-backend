@@ -14,6 +14,7 @@ import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 import { Permiso } from '@database/entity/permiso.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
+import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
       CobroCuotasView,
       Suscripcion,
       SuscripcionView,
-      Permiso
+      Permiso,
+      GeneracionCuotas
     ]),
     UtilModule
   ],
