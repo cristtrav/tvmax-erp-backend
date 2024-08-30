@@ -94,4 +94,12 @@ export class CuotasController {
         );
     }
 
+    @Post('generar')
+    @AllowedIn(Permissions.CUOTAS.GENERARCUOTASMES)
+    async generar(
+        @Body() body: { anio: number, mes: number }
+    ){
+        this.cuotaSrv.generarCuotas(body.mes, body.anio);
+    }
+
 }

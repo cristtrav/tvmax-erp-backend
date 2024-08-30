@@ -138,11 +138,10 @@ export class CuotasService {
         await this.generacionCuotasRepo.save(generacionCuotas);
 
         for (let suscripcion of suscripcionesActivas) {
-            const fechaCuota = new Date(anio, mes - 1);
             const cuotaExistente =
                 await this.cuotaRepo.createQueryBuilder('cuota')
-                    .where(`EXTRACT(month FROM cuota.fechaVencimiento) = :mes`, { mes: (fechaCuota.getMonth() + 1) })
-                    .andWhere(`EXTRACT(year FROM cuota.fechaVencimiento) = :anio`, { anio: fechaCuota.getFullYear() })
+                    .where(`EXTRACT(month FROM cuota.fechaVencimiento) = :mes`, { mes })
+                    .andWhere(`EXTRACT(year FROM cuota.fechaVencimiento) = :anio`, { anio })
                     .andWhere(`cuota.idsuscripcion = :idsuscripcion`, { idsuscripcion: suscripcion.id })
                     .andWhere(`cuota.idservicio = :idservicio`, {idservicio: suscripcion.idservicio})
                     .andWhere(`cuota.eliminado = FALSE`)
@@ -152,7 +151,7 @@ export class CuotasService {
                 cuota.idsuscripcion = suscripcion.id;
                 cuota.eliminado = false;
                 cuota.pagado = false;
-                cuota.fechaVencimiento = new Date(fechaCuota.getFullYear(), fechaCuota.getMonth(), 1);
+                cuota.fechaVencimiento = new Date(anio, mes - 1, 1);
                 cuota.monto = suscripcion.monto;
                 cuota.idservicio = suscripcion.idservicio;
                 await this.datasource.transaction(async manager => {

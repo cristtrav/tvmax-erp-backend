@@ -109,7 +109,8 @@ export class Permissions {
         EDITAR: 222,
         ELIMINAR: 223,
         ACCESOFORMULARIO: 224,
-        ACCESOMODULO: 225
+        ACCESOMODULO: 225,
+        GENERARCUOTASMES: 226
     }
     static readonly TIMBRADOS = {
         CONSULTAR: 240,
