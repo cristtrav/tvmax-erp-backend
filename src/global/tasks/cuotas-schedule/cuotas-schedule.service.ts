@@ -12,6 +12,6 @@ export class CuotasScheduleService {
     @Cron('0 6 1 * *')
     async generarCuotasSuscripcionesActivas() {
         let fechaHoraActual = new Date();
-        await this.cuotasService.generarCuotas(fechaHoraActual.getMonth() - 1, fechaHoraActual.getFullYear());
+        await this.cuotasService.generarCuotas(fechaHoraActual.getMonth() + 1, fechaHoraActual.getFullYear());
     }
 }
