@@ -132,6 +132,7 @@ export class DTOEntityUtis {
         timbrado.ultimoNroUsado = timbradoDTO.ultnrousado;
         timbrado.activo = timbradoDTO.activo;
         timbrado.idformatoFactura = timbradoDTO.idformatofactura;
+        timbrado.electronico = timbradoDTO.electronico;
         return timbrado;
     }
 

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { VentasService } from './ventas.service';
-import { VentasController } from './ventas.controller';
+import { VentasService } from './service/ventas.service';
+import { VentasController } from './controller/ventas.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientesService } from '../clientes/clientes.service';
 import { UtilModule } from '@util/util.module';
-import { DetallesVentasService } from './detalles-ventas/detalles-ventas.service';
-import { DetallesVentasController } from './detalles-ventas/detalles-ventas.controller';
+import { DetallesVentasService } from './service/detalles-ventas.service';
+import { DetallesVentasController } from './controller/detalles-ventas.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClienteView } from '@database/view/cliente.view';
 import { Cliente } from '@database/entity/cliente.entity';
@@ -18,6 +18,15 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { Cobro } from '@database/entity/cobro.entity';
+import { FacturaElectronicaUtilsService } from './service/factura-electronica-utils.service';
+import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
+import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
+import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
+import { TimbradoView } from '@database/view/timbrado.view';
+import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/factura-electronica.service';
+import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
+import { SifenUtilsService } from './service/sifen-utils.service';
 
 @Module({
   imports: [
@@ -31,11 +40,24 @@ import { Cobro } from '@database/entity/cobro.entity';
       VentaView,
       DetalleVenta, DetalleVentaView,
       Timbrado,
+      TimbradoView,
       Cuota, CobroCuotasView,
-      Cobro
+      Cobro,
+      DatoContribuyente,
+      ActividadEconomica,
+      Establecimiento,
+      FacturaElectronica,
+      CodigoSeguridadContribuyente
     ])
   ],
-  providers: [VentasService, ClientesService, DetallesVentasService],
+  providers: [
+    VentasService,
+    ClientesService,
+    DetallesVentasService,
+    FacturaElectronicaUtilsService,
+    FacturaElectronicaService,
+    SifenUtilsService
+  ],
   controllers: [VentasController, DetallesVentasController]
 })
 export class VentasModule {}

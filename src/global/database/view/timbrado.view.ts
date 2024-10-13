@@ -40,6 +40,9 @@ export class TimbradoView{
     idformatofactura: number;
 
     @ViewColumn()
+    electronico: boolean;
+
+    @ViewColumn()
     eliminado: boolean;
 
 }

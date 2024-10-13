@@ -10,4 +10,5 @@ export class TimbradoDTO {
     ultnrousado: number | null = null;
     activo: boolean | null = true;
     idformatofactura: number | null = null;
+    electronico: boolean = false;
 }

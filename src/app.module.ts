@@ -41,6 +41,11 @@ import { ReclamosModule } from './modulos/reclamos/reclamos/reclamos.module';
 import { EventosCambiosEstadosModule } from './modulos/reclamos/eventos-cambios-estados/eventos-cambios-estados.module';
 import { ReiteracionModule } from './modulos/reclamos/reiteracion/reiteracion.module';
 import { TributacionModule } from './modulos/facturacion/tributacion/tributacion.module';
+import { ActividadEconomicaModule } from './modulos/facturacion/actividad-economica/actividad-economica.module';
+import { DatoContribuyenteModule } from './modulos/facturacion/dato-contribuyente/dato-contribuyente.module';
+import { EstablecimientosModule } from './modulos/facturacion/establecimientos/establecimientos.module';
+import { FacturaElectronicaModule } from './modulos/facturacion/factura-electronica/factura-electronica.module';
+import { CodigoSeguridadContribuyenteModule } from './modulos/facturacion/codigo-seguridad-contribuyente/codigo-seguridad-contribuyente.module';
 
 @Module({
   imports: [
@@ -90,7 +95,12 @@ import { TributacionModule } from './modulos/facturacion/tributacion/tributacion
     ReclamosModule,
     EventosCambiosEstadosModule,
     ReiteracionModule,
-    TributacionModule
+    TributacionModule,
+    ActividadEconomicaModule,
+    DatoContribuyenteModule,
+    EstablecimientosModule,
+    FacturaElectronicaModule,
+    CodigoSeguridadContribuyenteModule
   ],
   controllers: [AppController],
   providers: [AppService, AppInitService],

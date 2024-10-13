@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Venta } from '@database/entity/venta.entity';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
@@ -9,6 +9,11 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Cliente } from '@database/entity/cliente.entity';
+import { FacturaElectronicaUtilsService } from './factura-electronica-utils.service';
+import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { writeFile } from 'fs/promises';
+import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
+import { SifenUtilsService } from './sifen-utils.service';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -37,6 +42,8 @@ export class VentasService {
         @InjectRepository(Cobro)
         private cobroRepo: Repository<Cobro>,
         private datasource: DataSource,
+        private facturaElectronicaSrv: FacturaElectronicaUtilsService,
+        private sifenUtilsSrv: SifenUtilsService
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<VentaView> {
@@ -136,6 +143,21 @@ export class VentasService {
                     await manager.save(cuota);
                     await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota));
                 }
+            }
+            
+            if(timbrado.electronico){
+                console.log("FACTURA ELECTRONICA");
+                const facturaElectronica = new FacturaElectronica();
+                facturaElectronica.idventa = venta.id;
+                facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
+                facturaElectronica.version = 1;
+                facturaElectronica.fechaCambioEstado = new Date();
+                const xmlDE = await this.facturaElectronicaSrv.generarDE(venta, detalles);
+                const signedXmlDE = await this.facturaElectronicaSrv.generarDEFirmado(xmlDE);
+                facturaElectronica.documentoElectronico = signedXmlDE ?? xmlDE;
+                facturaElectronica.firmado = signedXmlDE != null;
+                await manager.save(facturaElectronica);
+                await this.sifenUtilsSrv.enviar(facturaElectronica, manager);
             }
         });
         return idventa

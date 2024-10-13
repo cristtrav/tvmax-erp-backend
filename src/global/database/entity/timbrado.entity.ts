@@ -76,6 +76,9 @@ export class Timbrado{
     @Column({name: 'idformato_factura'})
     idformatoFactura: number;
 
+    @Column({name: 'electronico', nullable: false, default: false})
+    electronico: boolean;
+
     @ManyToOne(() => FormatoFactura, (formato) => formato.timbrados)
     @JoinColumn({
         name: 'idformato_factura'

@@ -64,6 +64,9 @@ export class VentaView{
     prefijofactura: string;
 
     @ViewColumn()
+    facturaelectronica: boolean;
+
+    @ViewColumn()
     idcobradorcomision: number;
 
     @ViewColumn()
