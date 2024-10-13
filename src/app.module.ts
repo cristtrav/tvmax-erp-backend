@@ -40,7 +40,7 @@ import { MotivosModule } from './modulos/reclamos/motivos/motivos.module';
 import { ReclamosModule } from './modulos/reclamos/reclamos/reclamos.module';
 import { EventosCambiosEstadosModule } from './modulos/reclamos/eventos-cambios-estados/eventos-cambios-estados.module';
 import { ReiteracionModule } from './modulos/reclamos/reiteracion/reiteracion.module';
-import { TributacionModule } from './modulos/facturacion/tributacion/tributacion.module';
+import { TributacionModule } from './modulos/facturacion/exportarcsv/exportar-csv.module';
 import { ActividadEconomicaModule } from './modulos/facturacion/actividad-economica/actividad-economica.module';
 import { DatoContribuyenteModule } from './modulos/facturacion/dato-contribuyente/dato-contribuyente.module';
 import { EstablecimientosModule } from './modulos/facturacion/establecimientos/establecimientos.module';

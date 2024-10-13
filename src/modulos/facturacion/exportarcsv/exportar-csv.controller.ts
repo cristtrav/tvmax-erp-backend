@@ -1,5 +1,5 @@
 import { Controller, Get, Header, Query, StreamableFile, UseFilters, UseGuards } from '@nestjs/common';
-import { TributacionService } from './tributacion.service';
+import { ExportarCsvService } from './exportar-csv.service';
 import { QueriesInterface } from './interfaces/queries.interface';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { LoginGuard } from '@auth/guards/login.guard';
@@ -7,17 +7,17 @@ import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';
 
-@Controller('tributacion')
+@Controller('exportarcsv')
 @UseFilters(HttpExceptionFilter)
 @UseGuards(LoginGuard, AllowedInGuard)
-export class TributacionController {
+export class ExportarCsvController {
 
     constructor(
-        private tributaionSrv: TributacionService
+        private tributaionSrv: ExportarCsvService
     ){}
 
     @Get('ventas/totalarchivos')
-    @AllowedIn(Permissions.TRIBUTACION.ACCESOMODULO)
+    @AllowedIn(Permissions.EXPORTARCSVTRIBUTACION.ACCESOMODULO)
     countFiles(
         @Query() queries: QueriesInterface
     ): Promise<number>{
@@ -25,7 +25,7 @@ export class TributacionController {
     }
 
     @Get('ventas/archivo')
-    @AllowedIn(Permissions.TRIBUTACION.ACCESOMODULO)
+    @AllowedIn(Permissions.EXPORTARCSVTRIBUTACION.ACCESOMODULO)
     @Header('content-type', 'text/csv')
     getFile(
         @Query() queries: QueriesInterface

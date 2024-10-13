@@ -296,7 +296,7 @@ export class Permissions {
         ELIMINAR: 923
     }
 
-    static readonly TRIBUTACION = {
+    static readonly EXPORTARCSVTRIBUTACION = {
         ACCESOMODULO: 980
     }
 

@@ -6,7 +6,7 @@ import { QueriesInterface } from './interfaces/queries.interface';
 import * as AdmZip from 'adm-zip';
 
 @Injectable()
-export class TributacionService {
+export class ExportarCsvService {
 
     readonly MAX_PER_FILE: number = 5000;
 

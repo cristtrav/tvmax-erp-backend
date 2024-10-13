@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { TributacionController } from './tributacion.controller';
-import { TributacionService } from './tributacion.service';
+import { ExportarCsvController } from './exportar-csv.controller';
+import { ExportarCsvService } from './exportar-csv.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VentaView } from '@database/view/venta.view';
@@ -19,7 +19,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
       Permiso
     ])
   ],
-  controllers: [TributacionController],
-  providers: [TributacionService, JwtUtilsService]
+  controllers: [ExportarCsvController],
+  providers: [ExportarCsvService, JwtUtilsService]
 })
 export class TributacionModule {}
