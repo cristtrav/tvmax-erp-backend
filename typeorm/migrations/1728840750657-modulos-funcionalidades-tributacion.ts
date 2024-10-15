@@ -12,7 +12,7 @@ export class ModulosFuncionalidadesTributacion1728840750657 implements Migration
 
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1020, 36, 'Acceso al Módulo', false)`);
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1021, 36, 'Consultar', false)`);
-        await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1022, 36, 'Modificar', false)`);
+        await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1022, 36, 'Editar', false)`);
 
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1060, 37, 'Acceso al Módulo', false)`);
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1061, 37, 'Consultar', false)`);
@@ -31,16 +31,25 @@ export class ModulosFuncionalidadesTributacion1728840750657 implements Migration
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1142, 39, 'Registrar', false)`);
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1143, 39, 'Editar', false)`);
         await queryRunner.query(`INSERT INTO public.funcionalidad(id, idmodulo, nombre, eliminado) VALUES(1144, 39, 'Eliminar', false)`);
+
+        await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (33, 'Datos del contribuyente')`);
+        await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (34, 'Actividades económicas')`);
+        await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (35, 'Establecimientos')`);
+        await queryRunner.query(`INSERT INTO public.tabla_auditoria(id, descripcion) VALUES (36, 'Código de Seguridad del Contribuyente')`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         const idmodulos = [36, 37, 38, 39];
         const idfuncionalidades = [1020, 1021, 1022, 1060, 1061, 1062, 1063, 1064, 1100, 1101, 1102, 1103, 1104, 1140, 1141, 1142, 1143, 1144];
-        
+        const idtablasAditoria = [33, 34, 35, 36];
+
         await queryRunner.query(`UPDATE public.modulo SET descripcion = 'Tributación' WHERE modulo.id = 35`);
         await queryRunner.query(`DELETE FROM public.permiso WHERE idfuncionalidad IN (${idfuncionalidades.join(',')})`);
         await queryRunner.query(`DELETE FROM public.funcionalidad WHERE id IN (${idfuncionalidades.join(',')})`);
         await queryRunner.query(`DELETE FROM public.modulo WHERE id IN (${idmodulos.join(',')})`);
+        await queryRunner.query(`DELETE FROM public.evento_auditoria WHERE idtabla IN (${idtablasAditoria.join(',')})`);
+        await queryRunner.query(`DELETE FROM public.tabla_auditoria WHERE id IN (${idtablasAditoria.join(',')})`);
+
     }
 
 }
