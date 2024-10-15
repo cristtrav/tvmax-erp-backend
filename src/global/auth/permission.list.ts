@@ -300,4 +300,34 @@ export class Permissions {
         ACCESOMODULO: 980
     }
 
+    static readonly DATOSCONTRIBUYENTE = {
+        ACCESOMODULO: 1020,
+        CONSULTAR: 1021,
+        EDITAR: 1022
+    }
+    
+    static readonly ACTIVIDADESECONOMICAS = {
+        ACCESOMODULO: 1060,
+        CONSULTAR: 1061,
+        REGISTRAR: 1062,
+        EDITAR: 1063,
+        ELIMINAR: 1064
+    }
+
+    static readonly ESTABLECIMIENTOS = {
+        ACCESOMODULO: 1100,
+        CONSULTAR: 1101,
+        REGISTRAR: 1102,
+        EDITAR: 1103,
+        ELIMINAR: 1104
+    }
+
+    static readonly CODIGOSEGURIDADCONTRIBUYENTE = {
+        ACCESOMODULO: 1140,
+        CONSULTAR: 1141,
+        REGISTRAR: 1142,
+        EDITAR: 1143,
+        ELIMINAR: 1144
+    }
+
 }
