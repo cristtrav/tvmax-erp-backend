@@ -5,10 +5,13 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFil
 import { ActividadEconomicaService } from './actividad-economica.service';
 import { ActividadEconomicaDTO } from '@dto/facturacion/actividad-economica.dto';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { Permissions } from '@auth/permission.list';
 
 @Controller('actividadeseconomicas')
-//@UseGuards(LoginGuard)
-//@UseFilters(HttpExceptionFilter)
+@UseGuards(LoginGuard, AllowedInGuard)
+@UseFilters(HttpExceptionFilter)
 export class ActividadEconomicaController {
 
     constructor(
@@ -17,6 +20,7 @@ export class ActividadEconomicaController {
     ){}
 
     @Get()
+    @AllowedIn(Permissions.ACTIVIDADESECONOMICAS.CONSULTAR)
     findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<ActividadEconomica[]>{
@@ -24,6 +28,7 @@ export class ActividadEconomicaController {
     }
 
     @Get('count')
+    @AllowedIn(Permissions.ACTIVIDADESECONOMICAS.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
@@ -31,6 +36,7 @@ export class ActividadEconomicaController {
     }
 
     @Get(':id')
+    @AllowedIn(Permissions.ACTIVIDADESECONOMICAS.CONSULTAR)
     findById(
         @Param('id') id: string
     ): Promise<ActividadEconomica>{
@@ -38,6 +44,7 @@ export class ActividadEconomicaController {
     }
 
     @Post()
+    @AllowedIn(Permissions.ACTIVIDADESECONOMICAS.REGISTRAR)
     async create(
         @Body() actividadDto: ActividadEconomicaDTO,
         @Headers('authorization') auth: string
@@ -49,6 +56,7 @@ export class ActividadEconomicaController {
     }
 
     @Put(':id')
+    @AllowedIn(Permissions.ACTIVIDADESECONOMICAS.EDITAR)
     async edit(
         @Body() actividadDto: ActividadEconomicaDTO,
         @Param('id') oldId: string,
@@ -62,6 +70,7 @@ export class ActividadEconomicaController {
     }
 
     @Delete(':id')
+    @AllowedIn(Permissions.ACTIVIDADESECONOMICAS.ELIMINAR)
     async delete(
         @Param('id') id: string,
         @Headers('authorization') auth: string
