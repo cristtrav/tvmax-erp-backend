@@ -46,6 +46,7 @@ import { DatoContribuyenteModule } from './modulos/facturacion/dato-contribuyent
 import { EstablecimientosModule } from './modulos/facturacion/establecimientos/establecimientos.module';
 import { FacturaElectronicaModule } from './modulos/facturacion/factura-electronica/factura-electronica.module';
 import { CodigoSeguridadContribuyenteModule } from './modulos/facturacion/codigo-seguridad-contribuyente/codigo-seguridad-contribuyente.module';
+import { CodigoSerguridadContribuyenteController } from './modulos/facturacion/codigo-seguridad-contribuyente/codigo-serguridad-contribuyente.controller';
 
 @Module({
   imports: [
