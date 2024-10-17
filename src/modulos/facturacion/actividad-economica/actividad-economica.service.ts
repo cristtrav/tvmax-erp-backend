@@ -34,7 +34,7 @@ export class ActividadEconomicaService {
         return this.getSelectQuery(queries).getCount();
     }
 
-    public findById(id: number): Promise<ActividadEconomica>{
+    public findById(id: string): Promise<ActividadEconomica>{
         return this.actividadEconomicaRepo.findOneByOrFail({ id });
     }
 
@@ -45,7 +45,7 @@ export class ActividadEconomicaService {
         })
     }
 
-    public async edit(oldId: number, actividad: ActividadEconomica, idusuario: number){
+    public async edit(oldId: string, actividad: ActividadEconomica, idusuario: number){
         const oldActividad = await this.actividadEconomicaRepo.findOneBy({id: oldId});
         await this.datasource.transaction(async manager => {
             await manager.save(ActividadEconomica.getEventoAuditoria(idusuario, 'M', oldActividad, actividad));
@@ -54,7 +54,7 @@ export class ActividadEconomicaService {
         })
     }
 
-    public async delete(id: number, idusuario: number){
+    public async delete(id: string, idusuario: number){
         const oldActividad = await this.actividadEconomicaRepo.findOneBy({ id });
         await this.datasource.transaction(async manager => {
             await manager.save(ActividadEconomica.getEventoAuditoria(idusuario, 'E', oldActividad, null));

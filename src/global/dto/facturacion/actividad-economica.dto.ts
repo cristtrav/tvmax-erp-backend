@@ -1,4 +1,4 @@
 export interface ActividadEconomicaDTO{
-    id: number;
+    id: string;
     descripcion: string;
 }

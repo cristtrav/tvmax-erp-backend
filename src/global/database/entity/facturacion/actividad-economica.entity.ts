@@ -8,8 +8,8 @@ export class ActividadEconomica{
     
     static readonly TABLA_AUDITORIA = new TablaAuditoria().initialize(34, 'Actividades Económicas');
 
-    @PrimaryColumn()
-    id: number;
+    @PrimaryColumn({length: 15})
+    id: string;
 
     @Column({length: 150, nullable: false})
     descripcion: string;

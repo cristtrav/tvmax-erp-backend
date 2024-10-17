@@ -32,7 +32,7 @@ export class ActividadEconomicaController {
 
     @Get(':id')
     findById(
-        @Param('id') id: number
+        @Param('id') id: string
     ): Promise<ActividadEconomica>{
         return this.actividadesEconomicasSrv.findById(id);
     }
@@ -51,7 +51,7 @@ export class ActividadEconomicaController {
     @Put(':id')
     async edit(
         @Body() actividadDto: ActividadEconomicaDTO,
-        @Param('id') oldId: number,
+        @Param('id') oldId: string,
         @Headers('authorization') auth: string
     ){
         await this.actividadesEconomicasSrv.edit(
@@ -63,7 +63,7 @@ export class ActividadEconomicaController {
 
     @Delete(':id')
     async delete(
-        @Param('id') id: number,
+        @Param('id') id: string,
         @Headers('authorization') auth: string
     ){
         await this.actividadesEconomicasSrv.delete(id, this.jwtUtils.extractJwtSub(auth));
