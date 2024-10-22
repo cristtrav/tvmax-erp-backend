@@ -1,0 +1,1 @@
+export type DepartamentoSifenType = { codDepartamento: number, departamento: string }

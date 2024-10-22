@@ -1,0 +1,74 @@
+[
+  {
+    "codDepartamento": 1,
+    "departamento": "CAPITAL"
+  },
+  {
+    "codDepartamento": 2,
+    "departamento": "CONCEPCION"
+  },
+  {
+    "codDepartamento": 3,
+    "departamento": "SAN PEDRO"
+  },
+  {
+    "codDepartamento": 4,
+    "departamento": "CORDILLERA"
+  },
+  {
+    "codDepartamento": 5,
+    "departamento": "GUAIRA"
+  },
+  {
+    "codDepartamento": 6,
+    "departamento": "CAAGUAZU"
+  },
+  {
+    "codDepartamento": 7,
+    "departamento": "CAAZAPA"
+  },
+  {
+    "codDepartamento": 8,
+    "departamento": "ITAPUA"
+  },
+  {
+    "codDepartamento": 9,
+    "departamento": "MISIONES"
+  },
+  {
+    "codDepartamento": 10,
+    "departamento": "PARAGUARI"
+  },
+  {
+    "codDepartamento": 11,
+    "departamento": "ALTO PARANA"
+  },
+  {
+    "codDepartamento": 12,
+    "departamento": "CENTRAL"
+  },
+  {
+    "codDepartamento": 13,
+    "departamento": "NEEMBUCU"
+  },
+  {
+    "codDepartamento": 14,
+    "departamento": "AMAMBAY"
+  },
+  {
+    "codDepartamento": 15,
+    "departamento": "PTE. HAYES"
+  },
+  {
+    "codDepartamento": 16,
+    "departamento": "BOQUERON"
+  },
+  {
+    "codDepartamento": 17,
+    "departamento": "ALTO PARAGUAY"
+  },
+  {
+    "codDepartamento": 18,
+    "departamento": "CANINDEYU"
+  }
+]

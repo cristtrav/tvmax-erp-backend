@@ -1,0 +1,1352 @@
+[
+  {
+    "codDepartamento": 1,
+    "codDistrito": 1,
+    "distrito": "ASUNCION (DISTRITO)"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 2,
+    "distrito": "CONCEPCION (MUNICIPIO)"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 3,
+    "distrito": "SAN LAZARO"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 4,
+    "distrito": "SAN CARLOS"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 5,
+    "distrito": "BELEN"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 6,
+    "distrito": "LORETO"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 7,
+    "distrito": "HORQUETA"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 8,
+    "distrito": "SAN SALVADOR"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 9,
+    "distrito": "YBY YA'U"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 267,
+    "distrito": "SAN CARLOS DEL APA"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 270,
+    "distrito": "SARGENTO JOSE FELIX LOPEZ"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 280,
+    "distrito": "PASO BARRETO (MUNICIPIO)"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 281,
+    "distrito": "SAN ALFREDO (MUNICIPIO)"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 282,
+    "distrito": "AZOTE¿Y (MUNICIPIO)"
+  },
+  {
+    "codDepartamento": 2,
+    "codDistrito": 286,
+    "distrito": "ARROYITO"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 10,
+    "distrito": "SAN PEDRO DE YCUAMANDYYU"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 11,
+    "distrito": "ANTEQUERA"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 12,
+    "distrito": "GRAL. E.AQUINO"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 13,
+    "distrito": "ITACURUBI DEL ROSARIO"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 14,
+    "distrito": "SAN ESTANISLAO (SANTANI)"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 15,
+    "distrito": "LIMA"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 16,
+    "distrito": "NUEVA GERMANIA"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 17,
+    "distrito": "TACUATI"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 18,
+    "distrito": "UNION"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 19,
+    "distrito": "25 DE DICIEMBRE"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 20,
+    "distrito": "VILLA DEL ROSARIO"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 21,
+    "distrito": "YATAITY DEL NORTE"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 22,
+    "distrito": "ISIDORO RESQUIN"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 23,
+    "distrito": "CHORE"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 24,
+    "distrito": "SAN PABLO"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 25,
+    "distrito": "SAN JOSE DEL ROSARIO"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 220,
+    "distrito": "GUAYAIBI"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 226,
+    "distrito": "CAPIIBARY"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 245,
+    "distrito": "YRYBUCUA"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 263,
+    "distrito": "SANTA ROSA DEL AGUARAY"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 268,
+    "distrito": "LIBERACIÓN"
+  },
+  {
+    "codDepartamento": 3,
+    "codDistrito": 285,
+    "distrito": "SAN VICENTE PANCHOLO"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 26,
+    "distrito": "CAACUPE"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 27,
+    "distrito": "ALTOS"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 28,
+    "distrito": "ARROYOS Y ESTEROS"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 29,
+    "distrito": "ATYRA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 30,
+    "distrito": "CARAGUATAY"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 31,
+    "distrito": "EMBOSCADA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 32,
+    "distrito": "EUSEBIO AYALA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 33,
+    "distrito": "ISLA PUCU"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 34,
+    "distrito": "ITACURUBI DE LA CORDILLERA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 35,
+    "distrito": "JUAN DE MENA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 36,
+    "distrito": "NUEVA COLOMBIA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 37,
+    "distrito": "PIRIBEBUY"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 38,
+    "distrito": "1RO.DE MARZO"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 39,
+    "distrito": "SAN BERNARDINO"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 40,
+    "distrito": "SANTA ELENA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 41,
+    "distrito": "TOBATI"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 42,
+    "distrito": "VALENZUELA"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 43,
+    "distrito": "LOMA GRANDE"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 44,
+    "distrito": "SAN JOSE OBRERO"
+  },
+  {
+    "codDepartamento": 4,
+    "codDistrito": 214,
+    "distrito": "MBOCAYATY DEL YHAGUY"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 45,
+    "distrito": "VILLARRICA"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 46,
+    "distrito": "SAN SALVADOR"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 47,
+    "distrito": "BORJA"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 48,
+    "distrito": "INDEPENDENCIA (R.D.MELGAREJO)"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 49,
+    "distrito": "GRAL.EUGENIO A. GARAY"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 50,
+    "distrito": "CNEL. MARTINEZ"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 51,
+    "distrito": "JOSE FASSARDI"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 52,
+    "distrito": "FELIX PEREZ CARDOZO"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 53,
+    "distrito": "MAURICIO JOSE TROCHE"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 54,
+    "distrito": "ITAPE"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 55,
+    "distrito": "ITURBE"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 56,
+    "distrito": "MBOCAYATY"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 57,
+    "distrito": "NATALICIO TALAVERA"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 58,
+    "distrito": "ÑUMI"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 59,
+    "distrito": "YATAITY"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 60,
+    "distrito": "DR. BOTREL"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 225,
+    "distrito": "PASO YOBAY"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 246,
+    "distrito": "SIN EQUIVALENCIA"
+  },
+  {
+    "codDepartamento": 5,
+    "codDistrito": 265,
+    "distrito": "TEBICUARY"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 61,
+    "distrito": "CNEL. OVIEDO"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 62,
+    "distrito": "CAAGUAZU"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 63,
+    "distrito": "CARAYAO"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 64,
+    "distrito": "CECILIO BAEZ"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 65,
+    "distrito": "NUEVA LONDRES"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 66,
+    "distrito": "SAN JOAQUIN"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 67,
+    "distrito": "SAN JOSE DE LOS ARROYOS"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 68,
+    "distrito": "YHU"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 69,
+    "distrito": "JUAN MANUEL FRUTOS"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 70,
+    "distrito": "REPATRIACION"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 71,
+    "distrito": "SANTA ROSA DEL MBUTUY"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 72,
+    "distrito": "J. EULOGIO ESTIGARRIBIA"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 73,
+    "distrito": "JOSE D. OCAMPOS"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 74,
+    "distrito": "R.I.3 CORRALES"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 75,
+    "distrito": "RAUL A. OVIEDO"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 76,
+    "distrito": "MCAL.F.SOLANO LOPEZ"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 227,
+    "distrito": "3 DE FEBRERO"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 228,
+    "distrito": "SIMON BOLIVAR"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 229,
+    "distrito": "LA PASTORA"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 237,
+    "distrito": "VAQUERIA"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 244,
+    "distrito": "ESCULIES"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 275,
+    "distrito": "TEMBIAPORA"
+  },
+  {
+    "codDepartamento": 6,
+    "codDistrito": 276,
+    "distrito": "NUEVA TOLEDO"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 77,
+    "distrito": "CAAZAPA"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 78,
+    "distrito": "BUENA VISTA"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 79,
+    "distrito": "GRAL. H. MORINIGO"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 80,
+    "distrito": "MACIEL"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 81,
+    "distrito": "MOISES BERTONI"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 82,
+    "distrito": "SAN JUAN NEPOMUCENO"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 83,
+    "distrito": "ABAI"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 84,
+    "distrito": "TAVAI"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 85,
+    "distrito": "YEGROS"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 86,
+    "distrito": "YUTY"
+  },
+  {
+    "codDepartamento": 7,
+    "codDistrito": 272,
+    "distrito": "3 DE MAYO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 87,
+    "distrito": "ENCARNACION"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 88,
+    "distrito": "BELLA VISTA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 89,
+    "distrito": "CAMBYRETA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 90,
+    "distrito": "CAPITAN MEZA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 91,
+    "distrito": "CARMEN DEL PARANA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 92,
+    "distrito": "CAPITAN MIRANDA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 93,
+    "distrito": "CORONEL BOGADO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 94,
+    "distrito": "FRAM"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 95,
+    "distrito": "GRAL. ARTIGAS"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 96,
+    "distrito": "GRAL. DELGADO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 97,
+    "distrito": "HOHENAU"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 98,
+    "distrito": "JESUS"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 99,
+    "distrito": "OBLIGADO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 100,
+    "distrito": "SAN COSME Y DAMIAN"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 101,
+    "distrito": "SAN PEDRO DEL PARANA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 102,
+    "distrito": "NUEVA ALBORADA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 103,
+    "distrito": "TRINIDAD"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 104,
+    "distrito": "NATALIO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 105,
+    "distrito": "JOSE LEANDRO OVIEDO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 106,
+    "distrito": "SAN RAFAEL DEL PARANA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 107,
+    "distrito": "CARLOS A. LOPEZ"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 108,
+    "distrito": "JULIO D. OTAÑO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 109,
+    "distrito": "EDELIRA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 110,
+    "distrito": "SAN JUAN DEL PARANA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 111,
+    "distrito": "LA PAZ"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 112,
+    "distrito": "TOMAS R. PEREIRA"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 113,
+    "distrito": "YATYTAY"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 114,
+    "distrito": "HERIBERTA S.DE IGLESIAS"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 221,
+    "distrito": "PIRAPO"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 232,
+    "distrito": "ITAPUA POTY"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 243,
+    "distrito": "FEDERICO CHAVEZ"
+  },
+  {
+    "codDepartamento": 8,
+    "codDistrito": 262,
+    "distrito": "ALTO VERA"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 115,
+    "distrito": "SAN JUAN BAUTISTA"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 116,
+    "distrito": "AYOLAS"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 117,
+    "distrito": "SAN IGNACIO"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 118,
+    "distrito": "SAN MIGUEL"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 119,
+    "distrito": "SAN PATRICIO"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 120,
+    "distrito": "SANTIAGO"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 121,
+    "distrito": "SANTA MARIA"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 122,
+    "distrito": "SANTA ROSA"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 123,
+    "distrito": "VILLA FLORIDA"
+  },
+  {
+    "codDepartamento": 9,
+    "codDistrito": 124,
+    "distrito": "YABEBYRY"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 125,
+    "distrito": "PARAGUARI"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 126,
+    "distrito": "ACAHAY"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 127,
+    "distrito": "CAAPUCU"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 128,
+    "distrito": "CABALLERO"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 129,
+    "distrito": "CARAPEGUA"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 130,
+    "distrito": "LA COLMENA"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 131,
+    "distrito": "ESCOBAR"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 132,
+    "distrito": "MBUYAPEY"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 133,
+    "distrito": "PIRAYU"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 134,
+    "distrito": "QUIINDY"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 135,
+    "distrito": "ROQUE GONZALEZ"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 136,
+    "distrito": "SAPUCAI"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 137,
+    "distrito": "YBYCUI"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 138,
+    "distrito": "QUYQUYHO"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 139,
+    "distrito": "YBYTYMI"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 140,
+    "distrito": "TEBICUARY MI"
+  },
+  {
+    "codDepartamento": 10,
+    "codDistrito": 141,
+    "distrito": "YAGUARON"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 142,
+    "distrito": "HERNANDARIAS"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 143,
+    "distrito": "DOMINGO MARTINEZ DE IRALA"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 144,
+    "distrito": "ÑACUNDAY"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 145,
+    "distrito": "CIUDAD DEL ESTE"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 146,
+    "distrito": "JUAN LEON MALLORQUIN"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 147,
+    "distrito": "ITAKYRY"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 148,
+    "distrito": "JUAN E.O'LEARY"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 149,
+    "distrito": "PRESIDENTE FRANCO"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 150,
+    "distrito": "YGUAZU"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 151,
+    "distrito": "SAN CRISTOBAL"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 209,
+    "distrito": "SANTA RITA"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 210,
+    "distrito": "MINGA GUAZU"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 211,
+    "distrito": "LOS CEDRALES"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 212,
+    "distrito": "SAN ALBERTO"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 213,
+    "distrito": "MINGA PORA"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 215,
+    "distrito": "NARANJAL"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 216,
+    "distrito": "SANTA ROSA DEL MONDAY"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 217,
+    "distrito": "IRUÑA"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 219,
+    "distrito": "MBARACAYU"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 239,
+    "distrito": "SANTA FE DEL PARANA"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 240,
+    "distrito": "NUEVA ESPERANZA"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 269,
+    "distrito": "TAVAPY"
+  },
+  {
+    "codDepartamento": 11,
+    "codDistrito": 273,
+    "distrito": "DR. RAUL PEÑA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 152,
+    "distrito": "AREGUA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 153,
+    "distrito": "CAPIATA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 154,
+    "distrito": "FERNANDO DE LA MORA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 155,
+    "distrito": "GUARAMBARE"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 156,
+    "distrito": "ITA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 157,
+    "distrito": "ITAUGUA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 158,
+    "distrito": "LIMPIO"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 159,
+    "distrito": "LUQUE"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 160,
+    "distrito": "MARIANO ROQUE ALONSO"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 161,
+    "distrito": "ÑEMBY"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 162,
+    "distrito": "NUEVA ITALIA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 163,
+    "distrito": "SAN ANTONIO"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 164,
+    "distrito": "SAN LORENZO"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 165,
+    "distrito": "VILLA ELISA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 166,
+    "distrito": "VILLETA"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 167,
+    "distrito": "YPACARAI"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 168,
+    "distrito": "YPANE"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 169,
+    "distrito": "LAMBARE"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 170,
+    "distrito": "J.AUGUSTO SALDIVAR"
+  },
+  {
+    "codDepartamento": 12,
+    "codDistrito": 277,
+    "distrito": "LOMA PYTA"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 171,
+    "distrito": "PILAR"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 172,
+    "distrito": "ALBERDI"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 173,
+    "distrito": "CERRITO"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 174,
+    "distrito": "DESMOCHADOS"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 175,
+    "distrito": "GUAZU CUA"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 176,
+    "distrito": "HUMAITA"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 177,
+    "distrito": "ISLA UMBU"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 178,
+    "distrito": "LAURELES"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 179,
+    "distrito": "PASO DE PATRIA"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 180,
+    "distrito": "MAYOR J.D.MARTINEZ"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 181,
+    "distrito": "SAN JUAN DE ÑEEMBUCU"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 182,
+    "distrito": "TACUARAS"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 183,
+    "distrito": "VILLA OLIVA"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 184,
+    "distrito": "VILLALBIN"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 203,
+    "distrito": "GRAL.JOSE EDUVIGIS DIAZ"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 205,
+    "distrito": "VILLA FRANCA"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 230,
+    "distrito": "VILLA FRANCA"
+  },
+  {
+    "codDepartamento": 13,
+    "codDistrito": 231,
+    "distrito": "VILLALBIN"
+  },
+  {
+    "codDepartamento": 14,
+    "codDistrito": 185,
+    "distrito": "PEDRO JUAN CABALLERO"
+  },
+  {
+    "codDepartamento": 14,
+    "codDistrito": 186,
+    "distrito": "BELLA VISTA"
+  },
+  {
+    "codDepartamento": 14,
+    "codDistrito": 187,
+    "distrito": "CAPITAN BADO"
+  },
+  {
+    "codDepartamento": 14,
+    "codDistrito": 278,
+    "distrito": "KARAPAI"
+  },
+  {
+    "codDepartamento": 14,
+    "codDistrito": 279,
+    "distrito": "ZANJA PYTA"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 188,
+    "distrito": "VILLA HAYES"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 189,
+    "distrito": "BENJAMIN ACEVAL(MONTE SOCIEDAD"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 190,
+    "distrito": "PTO.PINAZCO"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 191,
+    "distrito": "NANAWA"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 206,
+    "distrito": "POZO COLORADO"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 242,
+    "distrito": "JOSE FALCON"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 261,
+    "distrito": "TTE. 1RO. IRALA FERNANDEZ"
+  },
+  {
+    "codDepartamento": 15,
+    "codDistrito": 264,
+    "distrito": "TENIENTE ESTEBAN MARTINEZ"
+  },
+  {
+    "codDepartamento": 16,
+    "codDistrito": 192,
+    "distrito": "MCAL.ESTIGARRIBIA"
+  },
+  {
+    "codDepartamento": 16,
+    "codDistrito": 193,
+    "distrito": "BOQUERON"
+  },
+  {
+    "codDepartamento": 16,
+    "codDistrito": 194,
+    "distrito": "PEDRO P.PEÑA"
+  },
+  {
+    "codDepartamento": 16,
+    "codDistrito": 234,
+    "distrito": "GRAL. EUGENIO A. GARAY"
+  },
+  {
+    "codDepartamento": 16,
+    "codDistrito": 259,
+    "distrito": "FILADELFIA"
+  },
+  {
+    "codDepartamento": 16,
+    "codDistrito": 260,
+    "distrito": "LOMA PLATA"
+  },
+  {
+    "codDepartamento": 17,
+    "codDistrito": 195,
+    "distrito": "FUERTE OLIMPO"
+  },
+  {
+    "codDepartamento": 17,
+    "codDistrito": 196,
+    "distrito": "BAHIA NEGRA"
+  },
+  {
+    "codDepartamento": 17,
+    "codDistrito": 218,
+    "distrito": "PUERTO CASADO"
+  },
+  {
+    "codDepartamento": 17,
+    "codDistrito": 223,
+    "distrito": "PUERTO GUARANI"
+  },
+  {
+    "codDepartamento": 17,
+    "codDistrito": 233,
+    "distrito": "MAYOR PABLO LAGERENZA"
+  },
+  {
+    "codDepartamento": 17,
+    "codDistrito": 266,
+    "distrito": "CARMELO PERALTA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 197,
+    "distrito": "SAN ISIDRO DEL CURUGUATY"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 198,
+    "distrito": "VILLA YGATIMI"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 199,
+    "distrito": "YPEJHU"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 200,
+    "distrito": "CORPUS CHRISTI"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 201,
+    "distrito": "ITANARA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 202,
+    "distrito": "FRANCISCO CABALLERO ALVAREZ"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 207,
+    "distrito": "SALTO DEL GUAIRA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 235,
+    "distrito": "LA PALOMA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 236,
+    "distrito": "KATUETE"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 238,
+    "distrito": "NUEVA ESPERANZA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 241,
+    "distrito": "YASY KAÑY"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 271,
+    "distrito": "YBYRAROBANA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 274,
+    "distrito": "YBY PYTA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 283,
+    "distrito": "MARACANA"
+  },
+  {
+    "codDepartamento": 18,
+    "codDistrito": 284,
+    "distrito": "PUERTO ADELA"
+  }
+]

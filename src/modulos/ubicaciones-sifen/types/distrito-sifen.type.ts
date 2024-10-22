@@ -1,0 +1,1 @@
+export type DistritoSifenType = { codDepartamento: number, codDistrito: number, distrito: string }
