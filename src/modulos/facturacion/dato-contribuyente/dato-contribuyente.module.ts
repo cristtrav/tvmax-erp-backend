@@ -5,12 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatoContribuyenteController } from './dato-contribuyente.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({
   imports:[
     JwtModule.register({}),    
     TypeOrmModule.forFeature([
-      DatoContribuyente
+      DatoContribuyente,
+      Permiso
     ])
   ],
   providers: [DatoContribuyenteService, JwtUtilsService],
