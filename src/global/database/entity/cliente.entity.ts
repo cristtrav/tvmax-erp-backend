@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { Suscripcion } from "./suscripcion.entity";
+import { Venta } from "./venta.entity";
 
 @Entity()
 export class Cliente{
@@ -42,4 +43,7 @@ export class Cliente{
 
     @OneToMany(() => Suscripcion, (suscripcion) => suscripcion.cliente)
     suscripciones: Suscripcion[];
+
+    @OneToMany(() => Venta, (venta) => venta.cliente)
+    ventas: Venta[];
 }
