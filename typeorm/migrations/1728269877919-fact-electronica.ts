@@ -84,7 +84,7 @@ export class FactElectronica1728269877919 implements MigrationInterface {
                 documento_electronico xml NOT NULL,
                 firmado boolean NOT NULL DEFAULT false,
                 version smallint NOT NULL,
-                idestado_documento_sifen integer,
+                idestado_documento_sifen integer NOT NULL,
                 fecha_cambio_estado timestamp with time zone NOT NULL,
                 observacion text,
                 PRIMARY KEY (idventa),
