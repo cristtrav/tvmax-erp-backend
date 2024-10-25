@@ -11,12 +11,19 @@ export class EnvioEmailFacturaElectronica1729608910209 implements MigrationInter
                 PRIMARY KEY (id)
             );`
         );
+
+        await queryRunner.query(
+            `INSERT INTO facturacion.estado_envio_email(id, descripcion) VALUES(1, 'No enviado');
+            INSERT INTO facturacion.estado_envio_email(id, descripcion) VALUES(2, 'Enviado');
+            INSERT INTO facturacion.estado_envio_email(id, descripcion) VALUES(3, 'Envio fallido');`
+        );
+
         await queryRunner.query(
             `ALTER TABLE IF EXISTS facturacion.factura_electronica
-                ADD COLUMN idestado_envio_email integer NOT NULL;
+                ADD COLUMN idestado_envio_email integer NOT NULL DEFAULT 1;
 
             ALTER TABLE IF EXISTS facturacion.factura_electronica
-                ADD COLUMN fecha_cambio_estado_envio_email timestamp with time zone NOT NULL;
+                ADD COLUMN fecha_cambio_estado_envio_email timestamp with time zone NOT NULL DEFAULT NOW();
 
             ALTER TABLE IF EXISTS facturacion.factura_electronica
                 ADD COLUMN intento_envio_email smallint NOT NULL DEFAULT 0;
@@ -30,11 +37,7 @@ export class EnvioEmailFacturaElectronica1729608910209 implements MigrationInter
                 ON DELETE NO ACTION
                 NOT VALID;`
         );
-        await queryRunner.query(
-            `INSERT INTO facturacion.estado_envio_email(id, descripcion) VALUES(1, 'No enviado');
-            INSERT INTO facturacion.estado_envio_email(id, descripcion) VALUES(2, 'Enviado');
-            INSERT INTO facturacion.estado_envio_email(id, descripcion) VALUES(3, 'Envio fallido');`
-        );
+        
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
