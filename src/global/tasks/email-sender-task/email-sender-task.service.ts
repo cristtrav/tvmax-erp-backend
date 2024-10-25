@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
+import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 
 @Injectable()
 export class EmailSenderTaskService {
@@ -55,7 +56,8 @@ export class EmailSenderTaskService {
 
     private async getFacturas(): Promise<FacturaElectronica[]>{
         const alias = 'fact';
-        return this.facturaElectronicaRepo
+        const ambienteSifen = process.env.SIFEN_AMBIENTE ?? 'test';
+        let query = this.facturaElectronicaRepo
             .createQueryBuilder(alias)
             .andWhere(new Brackets(qb => {
                 qb = qb.orWhere(`${alias}.idestadoEnvioEmail = 1`);
@@ -63,8 +65,12 @@ export class EmailSenderTaskService {
             }))
             .andWhere(`${alias}.intentoEnvioEmail <= :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
             .take(this.TAMANIO_LOTE)
-            .orderBy(`${alias}.idventa`, 'DESC')
-            .getMany();
+            .orderBy(`${alias}.idventa`, 'DESC');
+            if(ambienteSifen == 'prod') query = query.andWhere(new Brackets((qb) => {
+                qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobado`, { idestadoAprobado: EstadoDocumentoSifen.APROBADO });
+                qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobadoObs`, { idestadoAprobadoObs: EstadoDocumentoSifen.APROBADO_CON_OBS });
+            }));
+        return query.getMany();
     }
 
     private smtpConfigExists(): boolean {
