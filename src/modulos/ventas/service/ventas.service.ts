@@ -11,9 +11,9 @@ import { Cobro } from '@database/entity/cobro.entity';
 import { Cliente } from '@database/entity/cliente.entity';
 import { FacturaElectronicaUtilsService } from './factura-electronica-utils.service';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
-import { writeFile } from 'fs/promises';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenUtilsService } from './sifen-utils.service';
+import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -156,6 +156,9 @@ export class VentasService {
                 const signedXmlDE = await this.facturaElectronicaSrv.generarDEFirmado(xmlDE);
                 facturaElectronica.documentoElectronico = signedXmlDE ?? xmlDE;
                 facturaElectronica.firmado = signedXmlDE != null;
+                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
+                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+                facturaElectronica.intentoEnvioEmail = 0;
                 await manager.save(facturaElectronica);
                 await this.sifenUtilsSrv.enviar(facturaElectronica, manager);
             }

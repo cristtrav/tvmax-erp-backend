@@ -24,4 +24,16 @@ export class FacturaElectronica {
     @Column({name: 'observacion', type: 'text'})
     observacion: string;
 
+    @Column({name: 'idestado_envio_email', nullable: false})
+    idestadoEnvioEmail: number;
+
+    @Column({name: 'fecha_cambio_estado_envio_email', nullable: false, type: 'timestamp with time zone'})
+    fechaCambioEstadoEnvioEmaill: Date;
+
+    @Column({name: 'intento_envio_email', nullable: false, default: 0})
+    intentoEnvioEmail: number;
+
+    @Column({name: 'observacion_envio_email', type: 'text'})
+    observacionEnvioEmail: string;
+
 }

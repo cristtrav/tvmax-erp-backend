@@ -43,6 +43,7 @@
     "facturacionelectronicapy-setapi": "^1.0.29",
     "facturacionelectronicapy-xmlgen": "^1.0.251",
     "facturacionelectronicapy-xmlsign": "^1.0.17",
+    "nodemailer": "^6.9.15",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.12",
