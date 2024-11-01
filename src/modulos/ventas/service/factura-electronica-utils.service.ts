@@ -22,7 +22,8 @@ import { Repository } from 'typeorm';
 import { ClienteView } from '@database/view/cliente.view';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
-
+import { xml2json } from 'xml-js';
+import { VentaView } from '@database/view/venta.view';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
@@ -39,7 +40,9 @@ export class FacturaElectronicaUtilsService {
         @InjectRepository(ClienteView)
         private clienteViewRepo: Repository<ClienteView>,
         @InjectRepository(CodigoSeguridadContribuyente)
-        private cscRepo: Repository<CodigoSeguridadContribuyente>
+        private cscRepo: Repository<CodigoSeguridadContribuyente>,
+        @InjectRepository(VentaView)
+        private ventaViewRepo: Repository<VentaView>
     ) { }
 
     public async generarDE(venta: Venta, detalles: DetalleVenta[]): Promise<string> {
@@ -240,6 +243,22 @@ export class FacturaElectronicaUtilsService {
             return null;
         }
         
+    }
+
+    public async getCancelacion(idevento: number, factura: FacturaElectronica): Promise<string>{
+        const data = {
+            cdc: this.getCDC(factura),
+            motivo: 'Cancelación de CDC'
+        }
+        const venta = await this.ventaViewRepo.findOneByOrFail({ id: factura.idventa });
+        const timbrado = await this.timbradoViewRepo.findOneByOrFail({ id: venta.idtimbrado });
+        const documentoXML = await xmlgen.generateXMLEventoCancelacion(idevento, await this.getParams(timbrado), data);
+        return documentoXML;
+    }
+
+    private getCDC(factura: FacturaElectronica): string {
+        const deJson = JSON.parse(xml2json(factura.documentoElectronico));
+        return deJson.elements[0].elements[1].attributes.Id;
     }
       
 }

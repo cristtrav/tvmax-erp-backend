@@ -27,6 +27,8 @@ import { FacturaElectronicaService } from '@modulos/facturacion/factura-electron
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { SifenUtilsService } from './service/sifen-utils.service';
+import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
+import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 
 @Module({
   imports: [
@@ -47,7 +49,9 @@ import { SifenUtilsService } from './service/sifen-utils.service';
       ActividadEconomica,
       Establecimiento,
       FacturaElectronica,
-      CodigoSeguridadContribuyente
+      CodigoSeguridadContribuyente,
+      CancelacionFactura,
+      EstadoDocumentoSifen
     ])
   ],
   providers: [

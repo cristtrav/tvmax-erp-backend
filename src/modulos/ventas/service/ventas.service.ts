@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Venta } from '@database/entity/venta.entity';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
@@ -14,6 +14,7 @@ import { FacturaElectronica } from '@database/entity/facturacion/factura-electro
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenUtilsService } from './sifen-utils.service';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
+import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -42,8 +43,10 @@ export class VentasService {
         @InjectRepository(Cobro)
         private cobroRepo: Repository<Cobro>,
         private datasource: DataSource,
-        private facturaElectronicaSrv: FacturaElectronicaUtilsService,
-        private sifenUtilsSrv: SifenUtilsService
+        private facturaElectronicaUtilSrv: FacturaElectronicaUtilsService,
+        private sifenUtilsSrv: SifenUtilsService,
+        @InjectRepository(FacturaElectronica)
+        private facturaElectronicaRepo: Repository<FacturaElectronica>
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<VentaView> {
@@ -152,8 +155,8 @@ export class VentasService {
                 facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
                 facturaElectronica.version = 1;
                 facturaElectronica.fechaCambioEstado = new Date();
-                const xmlDE = await this.facturaElectronicaSrv.generarDE(venta, detalles);
-                const signedXmlDE = await this.facturaElectronicaSrv.generarDEFirmado(xmlDE);
+                const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
+                const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
                 facturaElectronica.documentoElectronico = signedXmlDE ?? xmlDE;
                 facturaElectronica.firmado = signedXmlDE != null;
                 facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
@@ -277,6 +280,7 @@ export class VentasService {
         venta.anulado = anulado;
 
         await this.datasource.transaction(async manager => {
+            
             await manager.save(venta);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'M', oldVenta, venta));
 
@@ -289,6 +293,21 @@ export class VentasService {
                     await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota))
                 };
             }
+
+            const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
+            if(factElectronica != null){
+                const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
+                const documentoXml = await this.facturaElectronicaUtilSrv.getCancelacion(idevento, factElectronica)
+                const cancelacion = new CancelacionFactura();
+                cancelacion.id = idevento;
+                cancelacion.documento = documentoXml;
+                cancelacion.fechaHora = new Date();
+                cancelacion.idventa = venta.id;
+                cancelacion.envioCorrecto = false;
+                await manager.save(cancelacion);
+                await this.sifenUtilsSrv.enviarCancelacion(cancelacion, manager);
+            }
+
         });
     }
 
