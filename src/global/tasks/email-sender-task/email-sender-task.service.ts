@@ -40,7 +40,7 @@ export class EmailSenderTaskService {
         private datoContribuyenteRepo: Repository<DatoContribuyente>        
     ){}
 
-    @Cron('*/30 * * * *')
+    @Cron('* * * * *')
     async enviar(){
         if(!this.smtpConfigExists()){
             console.log('Parámetros SMTP no configurados en variables de entorno.');
@@ -84,7 +84,7 @@ export class EmailSenderTaskService {
         return {
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT,
-            secure: true,
+            secure: process.env.SMTP_SECURE != null ? process.env.SMTP_SECURE == 'true' : false,
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASSWORD
@@ -97,7 +97,10 @@ export class EmailSenderTaskService {
         const razonSocial = (await this.datoContribuyenteRepo.findOneBy({ clave: DatoContribuyente.RAZON_SOCIAL })).valor;
         const nombreArchivo = `${venta.timbrado}-${venta.prefijofactura}-${venta.nrofactura.toString().padStart(7, '0')}`;
         return {
-            from: `${process.env.SMTP_HOST}`,
+            from: {
+                name: process.env.SMTP_NAME ?? 'Facturación TVMAX',
+                address: `${process.env.SMTP_USER}`
+            },
             to: `${cliente.email}`,
             subject: `Factura Electrónica Nro ${venta.nrofactura} | ${razonSocial}`,
             text: `Estimado/a ${cliente.razonSocial}, \nAdjunto encontrará su factura en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE). \n¡Gracias por su preferencia!`,
