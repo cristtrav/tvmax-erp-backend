@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { VentasService } from './service/ventas.service';
 import { VentasController } from './controller/ventas.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { ClientesService } from '../clientes/clientes.service';
+import { ClientesService } from '../clientes/service/clientes.service';
 import { UtilModule } from '@util/util.module';
 import { DetallesVentasService } from './service/detalles-ventas.service';
 import { DetallesVentasController } from './controller/detalles-ventas.controller';

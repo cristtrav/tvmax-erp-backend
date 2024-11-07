@@ -124,5 +124,5 @@ export class ClientesService {
             await manager.save(this.getEventoAuditoria(idusuario, 'E', oldCliente, cliente));
         });
     }
-
+    
 }

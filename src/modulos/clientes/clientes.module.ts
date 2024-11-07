@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ClientesService } from './clientes.service';
-import { ClientesController } from './clientes.controller';
+import { ClientesService } from './service/clientes.service';
+import { ClientesController } from './controller/clientes.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { SuscripcionesService } from '../suscripciones/suscripciones.service';
 import { UtilModule } from '@util/util.module';
