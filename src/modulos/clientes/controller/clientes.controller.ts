@@ -11,6 +11,7 @@ import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
+import { Cliente } from '@database/entity/cliente.entity';
 
 @Controller('clientes')
 @UseGuards(LoginGuard, AllowedInGuard)
@@ -51,7 +52,7 @@ export class ClientesController {
         @Headers('authorization') auth: string
     ) {
         await this.clientesSrv.create(
-            DTOEntityUtis.clienteDtoToEntity(c),
+            new Cliente().fromDTO(c),
             this.jwtUtil.extractJwtSub(auth)
         );
     }
@@ -83,7 +84,7 @@ export class ClientesController {
     ) {
         await this.clientesSrv.edit(
             oldId,
-            DTOEntityUtis.clienteDtoToEntity(c),
+            new Cliente().fromDTO(c),
             this.jwtUtil.extractJwtSub(auth)
         );
     }
@@ -115,6 +116,16 @@ export class ClientesController {
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
         return this.suscripcionesSrv.count({...queries, idcliente});
+    }
+
+    @Put(':id/contacto')
+    @AllowedIn(Permissions.CLIENTES.ACTUALIZARCONTACTO)
+    async editContacto(
+        @Param('id') id: number,
+        @Body() contacto: { telefono1: string, telefono2: string, email: string },
+        @Headers('authorization') auth: string
+    ){
+        await this.clientesSrv.editContacto(id, contacto, this.jwtUtil.extractJwtSub(auth));
     }
 
 }

@@ -1,9 +1,14 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { Suscripcion } from "./suscripcion.entity";
 import { Venta } from "./venta.entity";
+import { TablaAuditoria } from "./tabla-auditoria.entity";
+import { ClienteDTO } from "@dto/cliente.dto";
+import { EventoAuditoria } from "./evento-auditoria.entity";
 
 @Entity()
 export class Cliente{
+
+    static readonly TABLA_AUDITORIA = new TablaAuditoria().initialize(13, 'Clientes');
 
     @PrimaryColumn()
     id: number;
@@ -46,4 +51,36 @@ export class Cliente{
 
     @OneToMany(() => Venta, (venta) => venta.cliente)
     ventas: Venta[];
+
+    static getEventoAuditoria(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: any,
+        newValue: any
+    ): EventoAuditoria {
+        const evento = new EventoAuditoria();
+        evento.idusuario = idusuario;
+        evento.operacion = operacion;
+        evento.fechahora = new Date();
+        evento.idtabla = Cliente.TABLA_AUDITORIA.id;
+        evento.estadoanterior = oldValue;
+        evento.estadonuevo = newValue;
+        return evento;
+    }
+
+    public fromDTO(clienteDto: ClienteDTO): Cliente {
+        this.id = clienteDto.id;
+        this.nombres = clienteDto.nombres;
+        this.apellidos = clienteDto.apellidos;
+        this.razonSocial = clienteDto.razonsocial;
+        this.telefono1 = clienteDto.telefono1;
+        this.telefono2 = clienteDto.telefono2;
+        this.email = clienteDto.email;
+        this.idcobrador = clienteDto.idcobrador;
+        this.dvRuc = clienteDto.dvruc;
+        this.ci = clienteDto.ci;
+        if(clienteDto.eliminado != null) this.eliminado = clienteDto.eliminado;
+        if(clienteDto.excluidosorteo != null) this.excluidoSorteo = clienteDto.excluidosorteo;
+        return this;
+    }
 }

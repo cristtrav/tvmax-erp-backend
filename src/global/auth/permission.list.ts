@@ -91,7 +91,8 @@ export class Permissions {
         ELIMINAR: 183,
         ACCESOMODULO: 184,
         ACCESOFORMULARIO: 185,
-        CONSULTARULTIMOID: 186
+        CONSULTARULTIMOID: 186,
+        ACTUALIZARCONTACTO:187
     }
 
     static readonly DOMICILIOS = {

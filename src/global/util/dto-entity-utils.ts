@@ -136,7 +136,7 @@ export class DTOEntityUtis {
         return timbrado;
     }
 
-    public static clienteDtoToEntity(clienteDto: ClienteDTO): Cliente {
+    /*public static clienteDtoToEntity(clienteDto: ClienteDTO): Cliente {
         const cliente = new Cliente();
         cliente.id = clienteDto.id;
         cliente.nombres = clienteDto.nombres;
@@ -151,7 +151,7 @@ export class DTOEntityUtis {
         if(clienteDto.eliminado != null) cliente.eliminado = clienteDto.eliminado;
         if(clienteDto.excluidosorteo != null) cliente.excluidoSorteo = clienteDto.excluidosorteo;
         return cliente;
-    }
+    }*/
 
     public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio {        
         const domicilio = new Domicilio();

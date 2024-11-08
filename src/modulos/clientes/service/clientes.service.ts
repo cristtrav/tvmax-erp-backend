@@ -59,17 +59,6 @@ export class ClientesService {
         return query;
     }
 
-    private getEventoAuditoria(idusuario: number, operacion: 'R' | 'M' | 'E', oldValue: any, newValue: any): EventoAuditoria{
-        const evento = new EventoAuditoria();
-        evento.fechahora = new Date();
-        evento.idtabla = TablasAuditoriaList.CLIENTES.id;
-        evento.operacion = operacion;
-        evento.idusuario = idusuario;
-        evento.estadoanterior = oldValue;
-        evento.estadonuevo = newValue;
-        return evento;
-    }
-
     findAll(queries: {[name: string]: any}): Promise<ClienteView[]> {
         return this.getSelectQuery(queries).getMany();
     }
@@ -86,7 +75,7 @@ export class ClientesService {
 
         await this.datasource.transaction(async manager => {
             await manager.save(c);
-            await manager.save(this.getEventoAuditoria(idusuario, 'R', oldCli, c));
+            await manager.save(Cliente.getEventoAuditoria(idusuario, 'R', oldCli, c));
         });
     }
 
@@ -109,7 +98,7 @@ export class ClientesService {
 
         await this.datasource.transaction(async manager => {
             await manager.save(c);
-            await manager.save(this.getEventoAuditoria(idusuario, 'M', oldCliente, c));
+            await manager.save(Cliente.getEventoAuditoria(idusuario, 'M', oldCliente, c));            
             if(oldId != c.id) await manager.remove(oldCliente);
         });
     }
@@ -121,8 +110,22 @@ export class ClientesService {
 
         await this.datasource.transaction(async manager => {
             await manager.save(cliente);
-            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldCliente, cliente));
+            await manager.save(Cliente.getEventoAuditoria(idusuario, 'E', oldCliente, cliente));
         });
     }
-    
+
+    async editContacto(id: number, contacto: {email: string, telefono1: string, telefono2: string}, idusuario: number){
+        const cliente = await this.clienteRepo.findOneByOrFail({ id });
+        const oldCliente = { ...cliente };
+
+        cliente.telefono1 = contacto.telefono1;
+        cliente.telefono2 = contacto.telefono2;
+        cliente.email = contacto.email;
+        
+        await this.datasource.transaction(async manager => {
+            await manager.save(Cliente.getEventoAuditoria(idusuario, 'M', oldCliente, cliente));
+            await manager.save(cliente);
+        });
+    }
+
 }
