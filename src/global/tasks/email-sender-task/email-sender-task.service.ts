@@ -40,8 +40,10 @@ export class EmailSenderTaskService {
         private datoContribuyenteRepo: Repository<DatoContribuyente>        
     ){}
 
-    @Cron('* * * * *')
+    @Cron('*/30 * * * *')
     async enviar(){
+        if(process.env.EMAIL_SENDER_DISABLED == 'TRUE') return;
+
         if(!this.smtpConfigExists()){
             console.log('Parámetros SMTP no configurados en variables de entorno.');
             return;
@@ -49,7 +51,7 @@ export class EmailSenderTaskService {
         const facturas = await this.getFacturas();
         facturas.forEach((f, index) => {
             setTimeout(async() => {                
-                await this.sendMail(f);    
+               await this.sendMail(f);    
             }, (this.TIEMPO_ESPERA_MILIS * index));
         })
     }
