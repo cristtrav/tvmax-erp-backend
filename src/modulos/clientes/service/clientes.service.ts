@@ -1,10 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { Cliente } from '@database/entity/cliente.entity';
 import { ClienteView } from '@database/view/cliente.view';
-import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 
 @Injectable()
 export class ClientesService {
@@ -40,12 +38,13 @@ export class ClientesService {
         if(iddepartamento) query = query.andWhere(`${alias}.iddepartamento ${Array.isArray(iddepartamento) ? 'IN (:...iddepartamento)' : '= :iddepartamento'}`, {iddepartamento});
         if(ci) query = query.andWhere(`${alias}.ci = :ci`, {ci});
         if(excluidosorteo != null) query = query.andWhere(`${alias}.excluidosorteo = :excluidosorteo`, {excluidosorteo});
+
         if(search) query = query.andWhere(
             new Brackets(qb => {
+                qb = qb.orWhere(`${alias}.ci = :cisearch`, {cisearch: search});
                 qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombsearch`, { nombsearch: `%${search.toLowerCase()}%`});
                 qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellsearch`, {apellsearch: `%${search.toLowerCase()}%`});
                 qb = qb.orWhere(`LOWER(${alias}.razonsocial) LIKE :rssearch`, {rssearch: `%${search.toLowerCase()}%`});
-                qb = qb.orWhere(`${alias}.ci = :cisearch`, {cisearch: search});
                 if(Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
             })
         );
