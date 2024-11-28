@@ -22,13 +22,14 @@ import { Repository } from 'typeorm';
 import { ClienteView } from '@database/view/cliente.view';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
-import { xml2json } from 'xml-js';
-import { VentaView } from '@database/view/venta.view';
+import setApi from 'facturacionelectronicapy-setapi';
+import { SifenUtilService } from './sifen-util.service';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
 
     constructor(
+        private sifenUtilsSrv: SifenUtilService,
         @InjectRepository(DatoContribuyente)
         private datoContribuyenteRepo: Repository<DatoContribuyente>,
         @InjectRepository(ActividadEconomica)
@@ -40,9 +41,7 @@ export class FacturaElectronicaUtilsService {
         @InjectRepository(ClienteView)
         private clienteViewRepo: Repository<ClienteView>,
         @InjectRepository(CodigoSeguridadContribuyente)
-        private cscRepo: Repository<CodigoSeguridadContribuyente>,
-        @InjectRepository(VentaView)
-        private ventaViewRepo: Repository<VentaView>
+        private cscRepo: Repository<CodigoSeguridadContribuyente>
     ) { }
 
     public async generarDE(venta: Venta, detalles: DetalleVenta[]): Promise<string> {
@@ -54,7 +53,7 @@ export class FacturaElectronicaUtilsService {
         );
     }
 
-    private async getParams(timbrado: TimbradoView): Promise<DEParamsInterface> {
+    public async getParams(timbrado: TimbradoView): Promise<DEParamsInterface> {
         return {
             version: 150,
             ruc: (await this.datoContribuyenteRepo.findOneBy({clave: DatoContribuyente.RUC}))?.valor ?? '',
@@ -122,12 +121,33 @@ export class FacturaElectronicaUtilsService {
         }];
     }
 
+    private async consultarRazonSocialSifen(ci: string): Promise<string | null> {
+        if(this.sifenUtilsSrv.certDataExists()){
+            try{
+                const response = await setApi.consultaRUC(
+                    new Date().getTime(),
+                    ci,
+                    this.sifenUtilsSrv.getAmbiente(),
+                    this.sifenUtilsSrv.getCertData().certFullPath,
+                    this.sifenUtilsSrv.getCertData().certPassword
+                );
+                const codigoRespuesta = response['ns2:rResEnviConsRUC']['ns2:dCodRes'];
+                if(codigoRespuesta == '0500' || codigoRespuesta == '0501') return null;
+                return response['ns2:rResEnviConsRUC']['ns2:xContRUC']['ns2:dRazCons'];
+            }catch(e){
+                console.error('Error al consultar datos de contribuyente', e);
+            }
+        }
+        return null;
+    }
+
     private async getCliente(idcliente: number): Promise<DEClienteInterface>{
         const cliente = await this.clienteViewRepo.findOneByOrFail({id: idcliente});
+
         const deCliente: DEClienteInterface = {
             contribuyente: cliente.dvruc != null,
             codigo: `${cliente.id}`,
-            razonSocial: cliente.razonsocial,
+            razonSocial: await this.consultarRazonSocialSifen(cliente.ci) ?? cliente.razonsocial,
             tipoOperacion: 2,
             tipoContribuyente: 1,
             pais: "PRY",
@@ -145,7 +165,7 @@ export class FacturaElectronicaUtilsService {
         const items: DEItemInterface[] = [];
         for(let detalle of detalles){
             items.push({
-                codigo: `${detalle.id}`,
+                codigo: `${detalle.idservicio}`,
                 descripcion: detalle.descripcion,
                 unidadMedida: 77,
                 cantidad: detalle.cantidad,
@@ -179,17 +199,20 @@ export class FacturaElectronicaUtilsService {
     }
 
     public async generarDEFirmado(xml: string): Promise<string>{
-        if(!process.env.SIFEN_CERT_FOLDER || process.env.SIFEN_CERT_FILENAME){
+        if(!this.sifenUtilsSrv.certDataExists()){
             console.log('SIFEN_CERT_FOLDER y/o SIFEN_CERT_FILENAME indefinidos en variables de entorno');
             return null;
         }
-        const certFilePath = `${process.env.SIFEN_CERT_FOLDER}/${process.env.SIFEN_CERT_FILENAME}`;
-        const certPassword = process.env.SIFEN_CERT_PASSWORD ?? '';
+
         try{
-            return await xmlsign.signXML(xml, certFilePath, certPassword, true);
+            return await xmlsign.signXML(
+                xml,
+                this.sifenUtilsSrv.getCertData().certFullPath,
+                this.sifenUtilsSrv.getCertData().certPassword,
+                true
+            );
         }catch(e){
-            console.error("Error al firmar digitalmente la factura:");
-            console.error(e);
+            console.error("Error al firmar digitalmente la factura", e);
             return null;
         }
     }
@@ -199,8 +222,8 @@ export class FacturaElectronicaUtilsService {
         if(!existsSync('tmp')) mkdirSync('tmp');
         if(!existsSync(`tmp/${timestamp}`)) mkdirSync(`tmp/${timestamp}`);
         
-        const xmlWitQR = await this.generarDEConQR(factElectronica.documentoElectronico);
-        
+        //const xmlWitQR = await this.generarDEConQR(factElectronica.documentoElectronico);
+        const ambienteSifen = process.env.SIFEN_AMBIENTE == 'test' ? '0' : '1';
         const javaPath = process.env.JAVA_PATH ?? '/usr/bin/java';
         const filename = `${timestamp}.xml`;
         const dteFilePath = `tmp/${filename}`;
@@ -209,14 +232,14 @@ export class FacturaElectronicaUtilsService {
         const urlLogo = `${process.cwd()}/src/assets/img/logo-tvmax.png`;
 
         //Escribir XML a archivo temporal (La libreria lee el archivo del disco)
-        await writeFile(dteFilePath, xmlWitQR ?? factElectronica.documentoElectronico);
+        await writeFile(dteFilePath, factElectronica.documentoElectronico);
         //Generar KUDE en PDF (La libreria genera en un archivo PDF en disco)
         await generateKUDE.generateKUDE(
             javaPath,
             dteFilePath,
             jasperPath,
             kudePath,
-            `{LOGO_URL: '${urlLogo}', ambiente: '${xmlWitQR ? '1' : '0'}'}`
+            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}'}`
         );
         //Leer archivo PDF para retornar al cliente con GET
         const filesKudeArr = await readdir(kudePath);
@@ -233,32 +256,16 @@ export class FacturaElectronicaUtilsService {
         return new StreamableFile(kudePdfFile);
     }
 
-    private async generarDEConQR(signedXml: string): Promise<string>{
+    public async generarDEConQR(signedXml: string): Promise<string>{
         try{
             const csc = await this.cscRepo.findOneByOrFail({activo: true});
-            return await qrgen.generateQR(signedXml, `${csc.id}`, `${csc.codigoSeguridad}`, "prod");
+            return await qrgen.generateQR(signedXml, `${csc.id}`, `${csc.codigoSeguridad}`, this.sifenUtilsSrv.getAmbiente());
         }catch(e){
             console.error("Error al generar y agregar QR a la factura electrónica");
             console.error(e);
             return null;
         }
         
-    }
-
-    public async getCancelacion(idevento: number, factura: FacturaElectronica): Promise<string>{
-        const data = {
-            cdc: this.getCDC(factura),
-            motivo: 'Cancelación de CDC'
-        }
-        const venta = await this.ventaViewRepo.findOneByOrFail({ id: factura.idventa });
-        const timbrado = await this.timbradoViewRepo.findOneByOrFail({ id: venta.idtimbrado });
-        const documentoXML = await xmlgen.generateXMLEventoCancelacion(idevento, await this.getParams(timbrado), data);
-        return documentoXML;
-    }
-
-    private getCDC(factura: FacturaElectronica): string {
-        const deJson = JSON.parse(xml2json(factura.documentoElectronico));
-        return deJson.elements[0].elements[1].attributes.Id;
     }
       
 }

@@ -20,6 +20,7 @@ import { Establecimiento } from '@database/entity/facturacion/establecimiento.en
 import { ClienteView } from '@database/view/cliente.view';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { VentaView } from '@database/view/venta.view';
+import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { VentaView } from '@database/view/venta.view';
     TimbradosTasksService,
     CuotasService,
     EmailSenderTaskService,
-    FacturaElectronicaUtilsService
+    FacturaElectronicaUtilsService,
+    SifenUtilService
   ]
 })
 export class TasksModule {}

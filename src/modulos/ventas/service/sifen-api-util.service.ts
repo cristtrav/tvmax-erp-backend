@@ -1,15 +1,17 @@
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import setApi from 'facturacionelectronicapy-setapi';
 import { EntityManager, Repository } from 'typeorm';
 import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SifenUtilService } from './sifen-util.service';
 
 @Injectable()
-export class SifenUtilsService {
+export class SifenApiUtilService {
 
     constructor(
+        private sifenUtilSrv: SifenUtilService,
         @InjectRepository(FacturaElectronica)
         private facturaElectronicaRepo: Repository<FacturaElectronica>,
         @InjectRepository(EstadoDocumentoSifen)
@@ -27,27 +29,28 @@ export class SifenUtilsService {
             if(manager) await manager.save(factElectronica);
             return;
         }
-        const certPath = process.env.SIFEN_CERT_FOLDER;
-        const certFileName = process.env.SIFEN_CERT_FILENAME;
-        const certPassword = process.env.SIFEN_CERT_PASSWORD ?? '';
-        if(!certPath || !certFileName){
+
+        if(!this.sifenUtilSrv.certDataExists()){
             console.log(factElectronica.idventa, 'No se envia a SIFEN, no se encuentra el certificado digital');
             factElectronica.observacion = `${factElectronica.idventa} - No se envia a SIFEN, no se encuentra el certificado digital`;
             if(manager) await manager.save(factElectronica);
         }
-        const sifenEnv: 'test' | 'prod' = <'test' | 'prod'> process.env.SIFEN_AMBIENTE ?? 'test';
-        const certFullPath = `${certPath}/${certFileName}`;
         
-        const respuesta = await setApi.recibe(
+        const response = await setApi.recibe(
             Number(`${factElectronica.idventa}${factElectronica.version}`),
             factElectronica.documentoElectronico,
-            sifenEnv,
-            certFullPath,
-            certPassword
+            this.sifenUtilSrv.getAmbiente(),
+            this.sifenUtilSrv.getCertData().certFullPath,
+            this.sifenUtilSrv.getCertData().certPassword
         );
-        console.log("RESPUESTA SIFEN >>>");
-        console.log(respuesta);
+        const estado = this.sifenUtilSrv.getEstadoApiDE(response);
+
+        if(estado == 'Rechazado') throw new HttpException({
+            message: this.sifenUtilSrv.getResumenEstadoApiDE(response)
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+
         factElectronica.fechaCambioEstado = new Date();
+        factElectronica.observacion = this.sifenUtilSrv.getResumenEstadoApiDE(response);
         factElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
         await manager.save(factElectronica);
     }
@@ -62,39 +65,29 @@ export class SifenUtilsService {
             return;
         }
         
-        if(!this.certDataExists()){
+        if(!this.sifenUtilSrv.certDataExists()){
             cancelacion.observacion = `No se encuentra el certificado digital. No se envía a SIFEN`;
             await entityManager.save(cancelacion);
             return;
         }
-        
-        const certData = this.getCertData();
+    
         cancelacion.fechaHoraEnvio = new Date();
-        const response = await setApi.evento(Number(cancelacion.id), cancelacion.documento, this.getSifenEnv(), certData.certFullPath, certData.certPassword);
-        cancelacion.envioCorrecto = false;
-        cancelacion.observacion = response;
+        const response = await setApi.evento(
+            Number(cancelacion.id),
+            cancelacion.documento, 
+            this.sifenUtilSrv.getAmbiente(),
+            this.sifenUtilSrv.getCertData().certFullPath,
+            this.sifenUtilSrv.getCertData().certPassword
+        );
+        
+        const estado = this.sifenUtilSrv.getEstadoApiEvento(response);
+        if(estado == 'Rechazado') throw new HttpException({
+            message: this.sifenUtilSrv.getResumenEstadoApiEvento(response)
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        cancelacion.envioCorrecto = true;
+        cancelacion.observacion = this.sifenUtilSrv.getResumenEstadoApiEvento(response);
         await entityManager.save(cancelacion);
     }
 
-    private getSifenEnv(): 'test' | 'prod' {
-        return <'test' | 'prod'> process.env.SIFEN_AMBIENTE ?? 'test';
-    }
-
-    private certDataExists(): boolean {
-        const certData = this.getCertData();
-        return certData.certPath != null && certData.certFileName != null &&  certData.certPassword != null;
-    }
-
-    private getCertData(): CertDataType {
-        const certData: CertDataType = {
-            certPath: process.env.SIFEN_CERT_FOLDER,
-            certFileName: process.env.SIFEN_CERT_FILENAME,
-            certPassword: process.env.SIFEN_CERT_PASSWORD ?? ''
-        }
-        if(certData.certPath && certData.certFileName) certData.certFullPath = `${certData.certPath}/${certData.certFileName}`
-        return certData;
-    }
-
 }
-
-type CertDataType = { certPath?: string, certFileName?: string, certPassword?: string, certFullPath?: string; }

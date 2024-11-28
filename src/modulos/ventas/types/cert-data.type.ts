@@ -1,0 +1,1 @@
+export type CertDataType = { certPath: string, certFileName: string, certPassword: string, certFullPath: string; }

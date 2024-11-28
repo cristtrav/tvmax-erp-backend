@@ -12,9 +12,11 @@ import { Cliente } from '@database/entity/cliente.entity';
 import { FacturaElectronicaUtilsService } from './factura-electronica-utils.service';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
-import { SifenUtilsService } from './sifen-utils.service';
+import { SifenApiUtilService } from './sifen-api-util.service';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
+import { SifenUtilService } from './sifen-util.service';
+import { SifenEventosUtilService } from './sifen-eventos-util.service';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -44,7 +46,8 @@ export class VentasService {
         private cobroRepo: Repository<Cobro>,
         private datasource: DataSource,
         private facturaElectronicaUtilSrv: FacturaElectronicaUtilsService,
-        private sifenUtilsSrv: SifenUtilsService,
+        private sifenApiUtilSrv: SifenApiUtilService,
+        private sifenEventosUtil: SifenEventosUtilService,
         @InjectRepository(FacturaElectronica)
         private facturaElectronicaRepo: Repository<FacturaElectronica>
     ) { }
@@ -155,15 +158,19 @@ export class VentasService {
                 facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
                 facturaElectronica.version = 1;
                 facturaElectronica.fechaCambioEstado = new Date();
+                
                 const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
                 const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
-                facturaElectronica.documentoElectronico = signedXmlDE ?? xmlDE;
+                const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
+                
+                facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
                 facturaElectronica.firmado = signedXmlDE != null;
                 facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
                 facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
                 facturaElectronica.intentoEnvioEmail = 0;
+
                 await manager.save(facturaElectronica);
-                await this.sifenUtilsSrv.enviar(facturaElectronica, manager);
+                await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
             }
         });
         return idventa
@@ -276,7 +283,13 @@ export class VentasService {
 
     async anular(idventa: number, anulado: boolean, idusuario: number) {
         const venta = await this.ventaRepo.findOneOrFail({ where: { id: idventa }, relations: { detalles: true } });
+        const timbrado = await this.timbradoRepo.findOneByOrFail({id: venta.idtimbrado});
         const oldVenta = { ...venta };
+        
+        if(timbrado.electronico && !anulado) throw new HttpException({
+            message: 'No se puede revertir anulación de F. Electrónica'
+        }, HttpStatus.BAD_REQUEST);
+
         venta.anulado = anulado;
 
         await this.datasource.transaction(async manager => {
@@ -297,15 +310,16 @@ export class VentasService {
             const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
             if(factElectronica != null){
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
-                const documentoXml = await this.facturaElectronicaUtilSrv.getCancelacion(idevento, factElectronica)
+                const eventoXml = await this.sifenEventosUtil.getCancelacion(idevento, factElectronica)
+                const eventoXmlSigned = await this.sifenEventosUtil.getEventoFirmado(eventoXml);
                 const cancelacion = new CancelacionFactura();
                 cancelacion.id = idevento;
-                cancelacion.documento = documentoXml;
+                cancelacion.documento = eventoXmlSigned ?? eventoXml;
                 cancelacion.fechaHora = new Date();
                 cancelacion.idventa = venta.id;
                 cancelacion.envioCorrecto = false;
                 await manager.save(cancelacion);
-                await this.sifenUtilsSrv.enviarCancelacion(cancelacion, manager);
+                await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
             }
 
         });

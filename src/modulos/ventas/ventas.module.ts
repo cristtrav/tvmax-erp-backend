@@ -26,9 +26,11 @@ import { TimbradoView } from '@database/view/timbrado.view';
 import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/factura-electronica.service';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
-import { SifenUtilsService } from './service/sifen-utils.service';
+import { SifenApiUtilService } from './service/sifen-api-util.service';
 import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
+import { SifenUtilService } from './service/sifen-util.service';
+import { SifenEventosUtilService } from './service/sifen-eventos-util.service';
 
 @Module({
   imports: [
@@ -60,7 +62,9 @@ import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-docume
     DetallesVentasService,
     FacturaElectronicaUtilsService,
     FacturaElectronicaService,
-    SifenUtilsService
+    SifenApiUtilService,
+    SifenUtilService,
+    SifenEventosUtilService
   ],
   controllers: [VentasController, DetallesVentasController]
 })
