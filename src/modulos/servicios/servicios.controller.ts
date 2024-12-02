@@ -27,6 +27,7 @@ export class ServiciosController {
         Permissions.SUSCRIPCIONES.ACCESOFORMULARIO,
         Permissions.PAGOSCLIENTES.ACCESOMODULO,
         Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO,
         Permissions.VENTAS.ACCESOMODULO
     )
     async findAll(

@@ -37,7 +37,8 @@ export class TimbradosController {
     @Get()
     @AllowedIn(
         Permissions.TIMBRADOS.CONSULTAR,
-        Permissions.POS.ACCESOMODULO
+        Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO
     )
     findAll(
         @Query() queries: {[name: string]: any}
@@ -61,7 +62,10 @@ export class TimbradosController {
     }
 
     @Get(':id/formatoimpresion')
-    @AllowedIn(Permissions.POS.ACCESOMODULO)
+    @AllowedIn(
+        Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO
+    )
     findFormatoByIdtimbrado(
         @Param('id') idtimbrado: number
     ): Promise<FormatoFactura>{
@@ -71,7 +75,8 @@ export class TimbradosController {
     @Get(':id')
     @AllowedIn(
         Permissions.TIMBRADOS.ACCESOFORMULARIO,
-        Permissions.POS.ACCESOMODULO
+        Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO
     )
     async findById(
         @Param('id') id: number

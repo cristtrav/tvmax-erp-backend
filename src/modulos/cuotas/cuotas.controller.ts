@@ -22,7 +22,11 @@ export class CuotasController {
     ){}
 
     @Get()
-    @AllowedIn(Permissions.CUOTAS.CONSULTAR)
+    @AllowedIn(
+        Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO,
+        Permissions.CUOTAS.CONSULTAR
+    )
     async findAll(
         @Query() queries: {[name: string]: any}
     ): Promise<CuotaView[]>{

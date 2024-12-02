@@ -116,7 +116,8 @@ export class SuscripcionesController {
     @Get(':id/cuotas/servicios')
     @AllowedIn(
         Permissions.CUOTAS.ACCESOMODULO,
-        Permissions.POS.ACCESOMODULO
+        Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO
     )
     async getServiciosByCuotas(
         @Param('id') idsuscripcion: number,

@@ -29,7 +29,8 @@ export class ClientesController {
         Permissions.CLIENTES.CONSULTAR,
         Permissions.DOMICILIOS.ACCESOFORMULARIO,
         Permissions.SUSCRIPCIONES.ACCESOFORMULARIO,
-        Permissions.POS.ACCESOMODULO
+        Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO
     )
     findAll(
         @Query() queries: {[name: string]: any}
@@ -67,6 +68,7 @@ export class ClientesController {
     @AllowedIn(
         Permissions.CLIENTES.ACCESOFORMULARIO,
         Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO,
         Permissions.SORTEOS.REALIZARSORTEO
     )
     findById(
@@ -101,7 +103,8 @@ export class ClientesController {
     @Get(':id/suscripciones')
     @AllowedIn(
         Permissions.PAGOSCLIENTES.ACCESOMODULO,
-        Permissions.POS.ACCESOMODULO
+        Permissions.POS.ACCESOMODULO,
+        Permissions.POSMOVIL.ACCESOMODULO
     )
     findSuscripcionesPorCliente(
         @Param('id') idcliente: number,
