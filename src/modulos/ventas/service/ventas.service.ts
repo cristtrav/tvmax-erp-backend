@@ -112,6 +112,12 @@ export class VentasService {
     }
 
     async create(venta: Venta, detalles: DetalleVenta[], idusuario: number): Promise<number> {
+        
+        const timbrado = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado })
+        const oldTimbrado = { ...timbrado };
+
+        if(timbrado.electronico) venta.nroFactura = Number(timbrado.ultimoNroUsado) + 1;
+
         if (await this.ventaRepo.findOneBy({
             nroFactura: venta.nroFactura,
             idtimbrado: venta.idtimbrado,
@@ -132,8 +138,6 @@ export class VentasService {
             await manager.save(cobro);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'R', null, cobro));
 
-            const timbrado = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado })
-            const oldTimbrado = { ...timbrado };
             timbrado.ultimoNroUsado = venta.nroFactura;
             await manager.save(timbrado);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbrado, timbrado));
@@ -152,7 +156,7 @@ export class VentasService {
             }
             
             if(timbrado.electronico){
-                console.log("FACTURA ELECTRONICA");
+                //console.log("FACTURA ELECTRONICA");
                 const facturaElectronica = new FacturaElectronica();
                 facturaElectronica.idventa = venta.id;
                 facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
@@ -163,6 +167,10 @@ export class VentasService {
                 const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
                 const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
                 
+                //console.log('Factura XML sin firma generada', xmlDE != null);
+                //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
+                //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
+
                 facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
                 facturaElectronica.firmado = signedXmlDE != null;
                 facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
@@ -170,7 +178,9 @@ export class VentasService {
                 facturaElectronica.intentoEnvioEmail = 0;
 
                 await manager.save(facturaElectronica);
-                await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
+
+                if(process.env.SIFEN_DISABLED != 'TRUE')
+                    await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
             }
         });
         return idventa
@@ -318,8 +328,17 @@ export class VentasService {
                 cancelacion.fechaHora = new Date();
                 cancelacion.idventa = venta.id;
                 cancelacion.envioCorrecto = false;
+                if(
+                    factElectronica.idestadoDocumentoSifen == 1  ||
+                    factElectronica.idestadoDocumentoSifen == 2
+                ) cancelacion.observacion = 'Documento sin aprobación, no se envia evento a SIFEN'
                 await manager.save(cancelacion);
-                await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
+
+                if(
+                    (factElectronica.idestadoDocumentoSifen == 1  ||
+                    factElectronica.idestadoDocumentoSifen == 2) &&
+                    process.env.SIFEN_DISABLED != 'TRUE'
+                ) await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
             }
 
         });
