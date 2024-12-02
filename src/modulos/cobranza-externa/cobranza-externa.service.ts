@@ -154,7 +154,7 @@ export class CobranzaExternaService {
             cuota.pagado = true;
             await manager.save(cuota);
             
-            const venta = await manager.save(this.getVenta(detalleCobranza));
+            const venta = await manager.save(await this.getVenta(detalleCobranza));
             const detalle = await this.getDetalleVenta(detalleCobranza, venta, cuotaView);
             await manager.save(detalle);
 
