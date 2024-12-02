@@ -7,7 +7,7 @@ export class TimbradoDTO {
     nrotimbrado: number | null = null;
     fechainicio: string | null = null;
     fechavencimiento: string | null = null;
-    ultnrousado: number | null = null;
+    ultimonrousado: number | null = null;
     activo: boolean | null = true;
     idformatofactura: number | null = null;
     electronico: boolean = false;
