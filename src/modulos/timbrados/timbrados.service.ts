@@ -19,12 +19,13 @@ export class TimbradosService {
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<TimbradoView> {
-        const { eliminado, activo, sort, offset, limit } = queries;
+        const { eliminado, activo, electronico, sort, offset, limit } = queries;
         const alias: string = 'timbrado';
         let query: SelectQueryBuilder<TimbradoView> = this.timbradoViewRepo.createQueryBuilder(alias);
 
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
         if (activo != null) query = query.andWhere(`${alias}.activo = :activo`, { activo });
+        if (electronico != null) query = query.andWhere(`${alias}.electronico`, {electronico});
         if (offset) query = query.skip(offset);
         if (limit) query = query.take(limit);
         if (sort) {
