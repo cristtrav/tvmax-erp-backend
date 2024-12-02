@@ -331,4 +331,8 @@ export class Permissions {
         ELIMINAR: 1144
     }
 
+    static readonly POSMOVIL = {
+        ACCESOMODULO: 1180
+    }
+
 }
