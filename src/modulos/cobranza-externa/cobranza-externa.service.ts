@@ -298,7 +298,7 @@ export class CobranzaExternaService {
         const timbradoElectronico = await this.timbradoRepo.findOneBy({ eliminado: false, electronico: true, activo: true });
         if(timbradoElectronico){
             venta.idtimbrado = timbradoElectronico.id;
-            venta.nroFactura = Number(timbradoElectronico.ultimoNroUsado) + 1
+            venta.nroFactura = Number(timbradoElectronico.ultimoNroUsado ?? 0) + 1
         }
         return venta;
     }

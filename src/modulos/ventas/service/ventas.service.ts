@@ -116,7 +116,7 @@ export class VentasService {
         const timbrado = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado })
         const oldTimbrado = { ...timbrado };
 
-        if(timbrado.electronico) venta.nroFactura = Number(timbrado.ultimoNroUsado) + 1;
+        if(timbrado.electronico) venta.nroFactura = Number(timbrado.ultimoNroUsado ?? 0) + 1;
 
         if (await this.ventaRepo.findOneBy({
             nroFactura: venta.nroFactura,
