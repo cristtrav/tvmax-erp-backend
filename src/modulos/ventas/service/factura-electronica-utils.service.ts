@@ -121,7 +121,7 @@ export class FacturaElectronicaUtilsService {
         }];
     }
 
-    private async consultarRazonSocialSifen(ci: string): Promise<string | null> {
+    private async consultarRazonSocialSifen(ci: string): Promise<string | null> {        
         if(this.sifenUtilsSrv.certDataExists()){
             try{
                 const response = await setApi.consultaRUC(
@@ -166,7 +166,10 @@ export class FacturaElectronicaUtilsService {
         for(let detalle of detalles){
             items.push({
                 codigo: `${detalle.idservicio}`,
-                descripcion: detalle.descripcion,
+                descripcion:
+                    this.sifenUtilsSrv.getAmbiente() == 'prod' ?
+                    detalle.descripcion :
+                    'DOCUMENTO ELECTRÓNICO SIN VALOR COMERCIAL NI FISCAL - GENERADO EN AMBIENTE DE PRUEBA',
                 unidadMedida: 77,
                 cantidad: detalle.cantidad,
                 precioUnitario: detalle.monto,
