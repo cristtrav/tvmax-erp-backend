@@ -19,6 +19,15 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { AnulacionRequestDTO } from './dto/anulacion-request.dto';
+import { Timbrado } from '@database/entity/timbrado.entity';
+import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
+import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
+import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
+import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
+import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
+import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-util.service';
+import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
 
 @Injectable()
 export class CobranzaExternaService {
@@ -40,7 +49,15 @@ export class CobranzaExternaService {
         private cobroRepo: Repository<Cobro>,
         @InjectRepository(Venta)
         private ventaRepo: Repository<Venta>,
-        private datasource: DataSource
+        @InjectRepository(Timbrado)
+        private timbradoRepo: Repository<Timbrado>,
+        @InjectRepository(FacturaElectronica)
+        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        private datasource: DataSource,
+        private facturaElectronicaUtilSrv: FacturaElectronicaUtilsService,
+        private sifenApiUtilSrv: SifenApiUtilService,
+        private sifenEventosUtil: SifenEventosUtilService
+        
     ) { }
 
     async consultar(request: ConsultaRequestDTO): Promise<GenericoResponseDTO | ConsultaResponseDTO> {
@@ -144,6 +161,34 @@ export class CobranzaExternaService {
             const cobro = this.getCobro(venta, usuarioCobranza, cobrador);
             cobro.codTransaccionCobranzaExterna = request.codTransaccion;
             await manager.save(cobro);
+
+            if(venta.idtimbrado != null){
+                //console.log("FACTURA ELECTRONICA");
+                const facturaElectronica = new FacturaElectronica();
+                facturaElectronica.idventa = venta.id;
+                facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
+                facturaElectronica.version = 1;
+                facturaElectronica.fechaCambioEstado = new Date();
+                
+                const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, [detalle]);
+                const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
+                const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
+                
+                //console.log('Factura XML sin firma generada', xmlDE != null);
+                //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
+                //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
+
+                facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+                facturaElectronica.firmado = signedXmlDE != null;
+                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
+                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+                facturaElectronica.intentoEnvioEmail = 0;
+
+                await manager.save(facturaElectronica);
+
+                if(process.env.SIFEN_DISABLED != 'TRUE')
+                    await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
+            }
         });
 
         return {
@@ -202,6 +247,30 @@ export class CobranzaExternaService {
                 detalle.codTransaccionAnulacion = anularReq.codTransaccion;
                 await manager.save(detalle);
             }
+
+            const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
+            if(factElectronica != null){
+                const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
+                const eventoXml = await this.sifenEventosUtil.getCancelacion(idevento, factElectronica)
+                const eventoXmlSigned = await this.sifenEventosUtil.getEventoFirmado(eventoXml);
+                const cancelacion = new CancelacionFactura();
+                cancelacion.id = idevento;
+                cancelacion.documento = eventoXmlSigned ?? eventoXml;
+                cancelacion.fechaHora = new Date();
+                cancelacion.idventa = venta.id;
+                cancelacion.envioCorrecto = false;
+                if(
+                    factElectronica.idestadoDocumentoSifen == 1  ||
+                    factElectronica.idestadoDocumentoSifen == 2
+                ) cancelacion.observacion = 'Documento sin aprobación, no se envia evento a SIFEN'
+                await manager.save(cancelacion);
+
+                if(
+                    (factElectronica.idestadoDocumentoSifen == 1  ||
+                    factElectronica.idestadoDocumentoSifen == 2) &&
+                    process.env.SIFEN_DISABLED != 'TRUE'
+                ) await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
+            }
         })
 
         return {
@@ -212,7 +281,7 @@ export class CobranzaExternaService {
         }
     }
 
-    private getVenta(detalleCobranza: DetalleConsultaCobranzaExterna): Venta {
+    private async getVenta(detalleCobranza: DetalleConsultaCobranzaExterna): Promise<Venta> {
         const venta = new Venta();
         venta.anulado = false;
         venta.pagado = true;
@@ -225,6 +294,12 @@ export class CobranzaExternaService {
         venta.totalGravadoIva10 = detalleCobranza.iva10;
         venta.totalGravadoIva5 = detalleCobranza.iva5;
         venta.fechaFactura = new Date();
+
+        const timbradoElectronico = await this.timbradoRepo.findOneBy({ eliminado: false, electronico: true, activo: true });
+        if(timbradoElectronico){
+            venta.idtimbrado = timbradoElectronico.id;
+            venta.nroFactura = Number(timbradoElectronico.ultimoNroUsado) + 1
+        }
         return venta;
     }
 
