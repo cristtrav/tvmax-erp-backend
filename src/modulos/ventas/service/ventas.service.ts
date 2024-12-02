@@ -345,6 +345,14 @@ export class VentasService {
     }
 
     async delete(id: number, idusuario: number) {
+        const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: id });
+        if(factElectronica &&
+            (factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO ||
+             factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO_CON_OBS)
+        ) throw new HttpException({
+            message: 'No se puede eliminar: Factura electrónica enviada a tributación'
+        }, HttpStatus.BAD_REQUEST)
+
         const venta = await this.ventaRepo.findOneOrFail({ where: { id }, relations: { detalles: true } })
         const oldVenta = { ...venta };
         venta.eliminado = true;
