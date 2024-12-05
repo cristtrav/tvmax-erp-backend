@@ -157,25 +157,8 @@ export class VentasService {
             }
             
             if(timbrado.electronico){
-                //console.log("FACTURA ELECTRONICA");
                 const facturaElectronica = await this.generarFacturaElectronica(venta, detalles);
-                /*facturaElectronica.idventa = venta.id;
-                facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
-                facturaElectronica.version = 1;
-                facturaElectronica.fechaCambioEstado = new Date();
-                
-                const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
-                const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
-                const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
-
-                facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
-                facturaElectronica.firmado = signedXmlDE != null;
-                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
-                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-                facturaElectronica.intentoEnvioEmail = 0;
-
-                await manager.save(facturaElectronica);*/
-
+                await manager.save(await this.generarFacturaElectronica(venta, detalles));
                 if(
                     !this.sifenUtilsSrv.isDisabled() &&
                     this.sifenUtilsSrv.getModo() == 'sync'
