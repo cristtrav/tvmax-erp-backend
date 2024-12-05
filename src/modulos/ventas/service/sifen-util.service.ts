@@ -21,17 +21,27 @@ export class SifenUtilService {
     }
 
     public getAmbiente(): 'test' | 'prod' {
-        return <'test' | 'prod'> process.env.SIFEN_AMBIENTE ?? 'test';
+        if(process.env.SIFEN_AMBIENTE == 'prod') return 'prod'
+        return 'test';
+    }
+
+    public isDisabled(): boolean {
+        return process.env.SIFEN_DISABLED == 'TRUE';
+    }
+
+    public getModo(): 'sync' | 'async' {
+        if(process.env.SIFEN_MODO == 'sync') return 'sync';
+        return 'async';
+    }
+
+    public isEnvioLoteAutoDisabled(): boolean {
+        return process.env.SIFEN_ENVIO_AUTO_LOTE_DISABLED == 'TRUE';
     }
 
     public getCDC(factura: FacturaElectronica): string {
         const deJson = JSON.parse(xml2json(factura.documentoElectronico));
         return deJson.elements[0].elements[1].attributes.Id;
     }
-
-    /*public getMensajeEvento(response: string): string {
-
-    }*/
 
     public getEstadoApiEvento(response: string): string {
         //Aprobado, Rechazado, etc...

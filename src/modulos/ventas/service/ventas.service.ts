@@ -47,7 +47,8 @@ export class VentasService {
         private datasource: DataSource,
         private facturaElectronicaUtilSrv: FacturaElectronicaUtilsService,
         private sifenApiUtilSrv: SifenApiUtilService,
-        private sifenEventosUtil: SifenEventosUtilService,
+        private sifenEventosUtilSrv: SifenEventosUtilService,
+        private sifenUtilsSrv: SifenUtilService,
         @InjectRepository(FacturaElectronica)
         private facturaElectronicaRepo: Repository<FacturaElectronica>
     ) { }
@@ -179,8 +180,10 @@ export class VentasService {
 
                 await manager.save(facturaElectronica);
 
-                if(process.env.SIFEN_DISABLED != 'TRUE')
-                    await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
+                if(
+                    !this.sifenUtilsSrv.isDisabled() &&
+                    this.sifenUtilsSrv.getModo() == 'sync'
+                ) await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);   
             }
         });
         return idventa
@@ -320,8 +323,8 @@ export class VentasService {
             const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
             if(factElectronica != null){
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
-                const eventoXml = await this.sifenEventosUtil.getCancelacion(idevento, factElectronica)
-                const eventoXmlSigned = await this.sifenEventosUtil.getEventoFirmado(eventoXml);
+                const eventoXml = await this.sifenEventosUtilSrv.getCancelacion(idevento, factElectronica)
+                const eventoXmlSigned = await this.sifenEventosUtilSrv.getEventoFirmado(eventoXml);
                 const cancelacion = new CancelacionFactura();
                 cancelacion.id = idevento;
                 cancelacion.documento = eventoXmlSigned ?? eventoXml;

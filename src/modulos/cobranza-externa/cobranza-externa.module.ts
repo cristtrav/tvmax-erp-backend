@@ -26,6 +26,8 @@ import { FacturaElectronica } from '@database/entity/facturacion/factura-electro
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-util.service';
 import { VentaView } from '@database/view/venta.view';
+import { Lote } from '@database/entity/facturacion/lote.entity';
+import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
 
 @Module({
   imports: [
@@ -49,7 +51,8 @@ import { VentaView } from '@database/view/venta.view';
       CodigoSeguridadContribuyente,
       FacturaElectronica,
       EstadoDocumentoSifen,
-      VentaView
+      VentaView,
+      Lote
     ])
   ],
   providers: [
@@ -57,7 +60,8 @@ import { VentaView } from '@database/view/venta.view';
     FacturaElectronicaUtilsService,
     SifenApiUtilService,
     SifenUtilService,
-    SifenEventosUtilService
+    SifenEventosUtilService,
+    SifenLoteMessageService
   ],
   controllers: [CobranzaExternaController]
 })

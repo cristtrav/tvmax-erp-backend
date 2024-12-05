@@ -5,6 +5,9 @@ import { Rol } from "./rol.entity";
 @Entity()
 export class Usuario {
 
+    public static readonly ID_USUARIO_ADMIN = 2;
+    public static readonly ID_USUARIO_SISTEMA = 3;
+
     @PrimaryColumn()
     id: number;
 

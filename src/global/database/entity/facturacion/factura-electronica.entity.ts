@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryColumn } from "typeorm";
+import { Lote } from "./lote.entity";
+import { Venta } from "../venta.entity";
 
 @Entity({schema: "facturacion"})
 export class FacturaElectronica {
@@ -35,5 +37,19 @@ export class FacturaElectronica {
 
     @Column({name: 'observacion_envio_email', type: 'text'})
     observacionEnvioEmail: string;
+
+    @ManyToMany(() => Lote, (lote) => lote.facturas)
+    @JoinTable({
+        name: 'lote_factura',
+        joinColumn: {
+            name: 'idventa',
+            referencedColumnName: 'idventa'
+        },
+        inverseJoinColumn: {
+            name: 'idlote',
+            referencedColumnName: 'id'
+        }
+    })
+    lotes: Lote[];
 
 }

@@ -21,6 +21,12 @@ import { ClienteView } from '@database/view/cliente.view';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { VentaView } from '@database/view/venta.view';
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
+import { SifenTaskService } from './sifen-task/sifen-task.service';
+import { LoteSifenService } from '@modulos/sifen/lote-sifen/services/lote-sifen.service';
+import { Lote } from '@database/entity/facturacion/lote.entity';
+import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
+import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
+import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 
 @Module({
   imports: [
@@ -39,7 +45,9 @@ import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
       TimbradoView,
       Establecimiento,
       ClienteView,
-      CodigoSeguridadContribuyente
+      CodigoSeguridadContribuyente,
+      Lote,
+      EstadoDocumentoSifen
     ]),
   ],
   providers: [
@@ -48,7 +56,11 @@ import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
     CuotasService,
     EmailSenderTaskService,
     FacturaElectronicaUtilsService,
-    SifenUtilService
+    SifenUtilService,
+    SifenTaskService,
+    LoteSifenService,
+    SifenApiUtilService,
+    SifenLoteMessageService
   ]
 })
 export class TasksModule {}
