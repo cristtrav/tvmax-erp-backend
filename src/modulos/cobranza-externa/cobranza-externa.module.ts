@@ -28,6 +28,8 @@ import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-u
 import { VentaView } from '@database/view/venta.view';
 import { Lote } from '@database/entity/facturacion/lote.entity';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
+import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
+import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 
 @Module({
   imports: [
@@ -61,7 +63,9 @@ import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sife
     SifenApiUtilService,
     SifenUtilService,
     SifenEventosUtilService,
-    SifenLoteMessageService
+    SifenLoteMessageService,
+    ConsultaRucService,
+    ConsultaRucMessageService
   ],
   controllers: [CobranzaExternaController]
 })

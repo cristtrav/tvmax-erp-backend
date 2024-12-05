@@ -24,6 +24,9 @@ import { Establecimiento } from '@database/entity/facturacion/establecimiento.en
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
 import setApi from 'facturacionelectronicapy-setapi';
 import { SifenUtilService } from './sifen-util.service';
+import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
+import { response } from 'express';
+import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
@@ -41,7 +44,8 @@ export class FacturaElectronicaUtilsService {
         @InjectRepository(ClienteView)
         private clienteViewRepo: Repository<ClienteView>,
         @InjectRepository(CodigoSeguridadContribuyente)
-        private cscRepo: Repository<CodigoSeguridadContribuyente>
+        private cscRepo: Repository<CodigoSeguridadContribuyente>,
+        private consultaRucSrv: ConsultaRucService
     ) { }
 
     public async generarDE(venta: Venta, detalles: DetalleVenta[]): Promise<string> {
@@ -121,22 +125,14 @@ export class FacturaElectronicaUtilsService {
         }];
     }
 
-    private async consultarRazonSocialSifen(ci: string): Promise<string | null> {        
-        if(this.sifenUtilsSrv.certDataExists()){
-            try{
-                const response = await setApi.consultaRUC(
-                    new Date().getTime(),
-                    ci,
-                    this.sifenUtilsSrv.getAmbiente(),
-                    this.sifenUtilsSrv.getCertData().certFullPath,
-                    this.sifenUtilsSrv.getCertData().certPassword
-                );
-                const codigoRespuesta = response['ns2:rResEnviConsRUC']['ns2:dCodRes'];
-                if(codigoRespuesta == '0500' || codigoRespuesta == '0501') return null;
-                return response['ns2:rResEnviConsRUC']['ns2:xContRUC']['ns2:dRazCons'];
-            }catch(e){
-                console.error('Error al consultar datos de contribuyente', e);
-            }
+    private async consultarRazonSocialSifen(ci: string): Promise<string | null> {
+        try{
+            const response = await this.consultaRucSrv.consultar(ci);
+            if(response.codigo == ConsultaRucMessageService.COD_ENCONTRADO)
+                return response.detalleRuc.razonSocial;
+            else return null;
+        }catch(e){
+            console.log('Error al consultar ruc', e);
         }
         return null;
     }

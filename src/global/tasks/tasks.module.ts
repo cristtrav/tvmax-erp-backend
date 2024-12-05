@@ -27,6 +27,9 @@ import { Lote } from '@database/entity/facturacion/lote.entity';
 import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
+import { ConsultaRucController } from '@modulos/sifen/consulta-ruc/controller/consulta-ruc.controller';
+import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
+import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 
 @Module({
   imports: [
@@ -60,7 +63,9 @@ import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-docume
     SifenTaskService,
     LoteSifenService,
     SifenApiUtilService,
-    SifenLoteMessageService
+    SifenLoteMessageService,
+    ConsultaRucService,
+    ConsultaRucMessageService
   ]
 })
 export class TasksModule {}

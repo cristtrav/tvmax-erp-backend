@@ -34,6 +34,8 @@ import { SifenEventosUtilService } from './service/sifen-eventos-util.service';
 import { Lote } from '@database/entity/facturacion/lote.entity';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
 import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
+import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
+import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 
 @Module({
   imports: [
@@ -70,7 +72,9 @@ import { FacturaElectronicaView } from '@database/view/facturacion/factura-elect
     SifenApiUtilService,
     SifenUtilService,
     SifenEventosUtilService,
-    SifenLoteMessageService
+    SifenLoteMessageService,
+    ConsultaRucService,
+    ConsultaRucMessageService
   ],
   controllers: [VentasController, DetallesVentasController]
 })
