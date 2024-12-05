@@ -23,7 +23,7 @@ import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyen
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { TimbradoView } from '@database/view/timbrado.view';
-import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/factura-electronica.service';
+import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/services/factura-electronica.service';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { SifenApiUtilService } from './service/sifen-api-util.service';
@@ -33,6 +33,7 @@ import { SifenUtilService } from './service/sifen-util.service';
 import { SifenEventosUtilService } from './service/sifen-eventos-util.service';
 import { Lote } from '@database/entity/facturacion/lote.entity';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
+import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
 
 @Module({
   imports: [
@@ -56,7 +57,8 @@ import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sife
       CodigoSeguridadContribuyente,
       CancelacionFactura,
       EstadoDocumentoSifen,
-      Lote
+      Lote,
+      FacturaElectronicaView
     ])
   ],
   providers: [

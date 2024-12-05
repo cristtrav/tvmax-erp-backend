@@ -8,10 +8,11 @@ import { VentaView } from '@database/view/venta.view';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { LoginGuard } from '@auth/guards/login.guard';
-import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/factura-electronica.service';
+import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/services/factura-electronica.service';
 import { FacturaElectronicaUtilsService } from '../service/factura-electronica-utils.service';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { VentaDTO } from '@dto/venta.dto';
+import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
 
 @Controller('ventas')
 @UseGuards(LoginGuard)
@@ -143,5 +144,13 @@ export class VentasController {
         @Param('id') id: number
     ): Promise<StreamableFile>{
         return await this.facturaElectronicaUtilsSrv.generateKude(await this.facturaElectronicaSrv.findById(id));
+    }
+
+    @Get(':idventa/facturaelectronica')
+    @AllowedIn(Permissions.VENTAS.CONSULTAR)
+    findDetailsById(
+        @Param('idventa') idventa: number
+    ): Promise<FacturaElectronicaView> {
+        return this.facturaElectronicaSrv.findDetailsById(idventa);
     }
 }

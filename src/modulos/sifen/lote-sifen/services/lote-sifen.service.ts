@@ -113,15 +113,15 @@ export class LoteSifenService {
                 }
                 if(resultadoProc.estado == 'Aprobado'){
                     factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
-                    factura.fechaCambioEstado = new Date();
+                    factura.fechaCambioEstado = respuestaLote.fecha;
                 }
                 if(resultadoProc.estado == 'Rechazado'){
                     factura.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
-                    factura.fechaCambioEstado = new Date();
+                    factura.fechaCambioEstado = respuestaLote.fecha;
                 }
                 if(resultadoProc.estado == 'Aprobado con observación'){
                     factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO_CON_OBS
-                    factura.fechaCambioEstado = new Date();
+                    factura.fechaCambioEstado = respuestaLote.fecha;
                 }
                 factura.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
                 await manager.save(factura);
