@@ -158,8 +158,8 @@ export class VentasService {
             
             if(timbrado.electronico){
                 //console.log("FACTURA ELECTRONICA");
-                const facturaElectronica = new FacturaElectronica();
-                facturaElectronica.idventa = venta.id;
+                const facturaElectronica = await this.generarFacturaElectronica(venta, detalles);
+                /*facturaElectronica.idventa = venta.id;
                 facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
                 facturaElectronica.version = 1;
                 facturaElectronica.fechaCambioEstado = new Date();
@@ -167,10 +167,6 @@ export class VentasService {
                 const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
                 const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
                 const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
-                
-                //console.log('Factura XML sin firma generada', xmlDE != null);
-                //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
-                //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
 
                 facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
                 facturaElectronica.firmado = signedXmlDE != null;
@@ -178,7 +174,7 @@ export class VentasService {
                 facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
                 facturaElectronica.intentoEnvioEmail = 0;
 
-                await manager.save(facturaElectronica);
+                await manager.save(facturaElectronica);*/
 
                 if(
                     !this.sifenUtilsSrv.isDisabled() &&
@@ -190,6 +186,15 @@ export class VentasService {
     }
 
     async edit(venta: Venta, detalleVenta: DetalleVenta[], idusuario: number) {
+        const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
+        if(factElectronica &&
+            (factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.RECHAZADO &&
+             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.NO_ENVIADO &&
+             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.ANULADO_NO_ENVIADO)
+        ) throw new HttpException({
+            message: 'No se puede editar: Factura electrónica enviada a tributación'
+        }, HttpStatus.BAD_REQUEST);
+
         const oldVenta = await this.ventaRepo.createQueryBuilder('venta')
         .where(`venta.id = :id`, {id: venta.id})
         .andWhere(`venta.eliminado = FALSE`)
@@ -282,6 +287,14 @@ export class VentasService {
                 await manager.save(timbradoAnterior);
                 await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbradoAnterior, timbradoAnterior));
             }
+            if(timbradoActual.electronico){
+                const facturaElectronica = await this.regenerarFacturaElectronica(venta, detalleVenta);
+                await manager.save(factElectronica);
+
+                if(!this.sifenUtilsSrv.isDisabled() &&
+                    this.sifenUtilsSrv.getModo() == 'sync'
+                )await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
+            }
         })
 
     }
@@ -331,17 +344,10 @@ export class VentasService {
                 cancelacion.fechaHora = new Date();
                 cancelacion.idventa = venta.id;
                 cancelacion.envioCorrecto = false;
-                if(
-                    factElectronica.idestadoDocumentoSifen == 1  ||
-                    factElectronica.idestadoDocumentoSifen == 2
-                ) cancelacion.observacion = 'Documento sin aprobación, no se envia evento a SIFEN'
                 await manager.save(cancelacion);
 
-                if(
-                    (factElectronica.idestadoDocumentoSifen == 1  ||
-                    factElectronica.idestadoDocumentoSifen == 2) &&
-                    process.env.SIFEN_DISABLED != 'TRUE'
-                ) await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
+                if(process.env.SIFEN_DISABLED != 'TRUE')
+                    await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
             }
 
         });
@@ -350,11 +356,12 @@ export class VentasService {
     async delete(id: number, idusuario: number) {
         const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: id });
         if(factElectronica &&
-            (factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO ||
-             factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO_CON_OBS)
+            (factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.RECHAZADO &&
+             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.NO_ENVIADO &&
+             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.ANULADO_NO_ENVIADO)
         ) throw new HttpException({
             message: 'No se puede eliminar: Factura electrónica enviada a tributación'
-        }, HttpStatus.BAD_REQUEST)
+        }, HttpStatus.BAD_REQUEST);
 
         const venta = await this.ventaRepo.findOneOrFail({ where: { id }, relations: { detalles: true } })
         const oldVenta = { ...venta };
@@ -399,6 +406,55 @@ export class VentasService {
             )
             .where('detalle.idcuota = :idcuota', { idcuota });
         return (await detalleQuery.getCount()) != 0;
-    }    
+    }
+    
+    private async generarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
+        const facturaElectronica = new FacturaElectronica();
+        facturaElectronica.idventa = venta.id;
+        facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
+        facturaElectronica.version = 1;
+        facturaElectronica.fechaCambioEstado = new Date();
+        
+        const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
+        const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
+        const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
+        
+        //console.log('Factura XML sin firma generada', xmlDE != null);
+        //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
+        //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
+
+        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        facturaElectronica.firmado = signedXmlDE != null;
+        facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
+        facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+        facturaElectronica.intentoEnvioEmail = 0;
+
+        return facturaElectronica;
+    }
+
+    private async regenerarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
+        
+        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ idventa: venta.id });
+        facturaElectronica.version = facturaElectronica.version + 1;
+        
+        facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
+        facturaElectronica.fechaCambioEstado = new Date();
+        
+        const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
+        const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
+        const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
+        
+        //console.log('Factura XML sin firma generada', xmlDE != null);
+        //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
+        //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
+
+        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        facturaElectronica.firmado = signedXmlDE != null;
+        facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
+        facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+        facturaElectronica.intentoEnvioEmail = 0;
+
+        return facturaElectronica;
+    }
 
 }
