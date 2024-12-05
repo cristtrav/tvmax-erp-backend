@@ -9,7 +9,11 @@ import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.serv
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenLoteMessageService } from './lote-sifen/services/sifen-lote-message.service';
-import { Venta } from '@database/entity/venta.entity';
+import { ConsultaRucService } from './consulta-ruc/services/consulta-ruc.service';
+import { ConsultaRucController } from './consulta-ruc/controller/consulta-ruc.controller';
+import { ConsultaRucMessageService } from './consulta-ruc/services/consulta-ruc-message.service';
+import { Permiso } from '@database/entity/permiso.entity';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
   imports: [
@@ -17,15 +21,19 @@ import { Venta } from '@database/entity/venta.entity';
     TypeOrmModule.forFeature([
       FacturaElectronica,
       Lote,
-      EstadoDocumentoSifen
+      EstadoDocumentoSifen,
+      Permiso
     ])
   ],
   providers: [
     LoteSifenService,
     SifenApiUtilService,
     SifenUtilService,
-    SifenLoteMessageService
+    SifenLoteMessageService,
+    ConsultaRucService,
+    ConsultaRucMessageService,
+    JwtUtilsService
   ],
-  controllers: [LoteSifenController],
+  controllers: [LoteSifenController, ConsultaRucController],
 })
 export class SifenModule {}

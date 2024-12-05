@@ -142,4 +142,22 @@ export class SifenApiUtilService {
         return this.sifenLoteMessageSrv.buildResultadoProcesamientoLote(response);
     }
 
+    public async consultarRuc(ci: string): Promise<string | null> {
+        if(!this.sifenUtilSrv.certDataExists()){
+            console.log('No existen datos de firma digital, no se puede consultar RUC');
+            return;
+        }
+        
+        return await setApi.consultaRUC(
+            new Date().getTime(),
+            ci,
+            this.sifenUtilSrv.getAmbiente(),
+            this.sifenUtilSrv.getCertData().certFullPath,
+            this.sifenUtilSrv.getCertData().certPassword
+        );
+        /*const codigoRespuesta = response['ns2:rResEnviConsRUC']['ns2:dCodRes'];
+        if(codigoRespuesta == '0500' || codigoRespuesta == '0501') return null;
+        return response['ns2:rResEnviConsRUC']['ns2:xContRUC']['ns2:dRazCons'];*/
+    }
+
 }
