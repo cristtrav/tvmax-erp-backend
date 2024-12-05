@@ -88,6 +88,9 @@ export class VentaView{
     usuarioregistrocobro: string;
 
     @ViewColumn()
+    idestadofacturaelectronica: number;
+
+    @ViewColumn()
     eliminado: boolean;
 
 }
