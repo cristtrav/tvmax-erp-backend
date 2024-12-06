@@ -17,6 +17,9 @@ export class Venta {
     @Column({ name: 'fecha_factura', type: 'date' })
     fechaFactura: Date;
 
+    @Column({name: 'fecha_hora_factura', type: 'timestamp with time zone'})
+    fechaHoraFactura: Date;
+
     @Column({ nullable: false })
     idcliente: number;
 

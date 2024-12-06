@@ -10,6 +10,9 @@ export class VentaView{
     fechafactura: Date;
 
     @ViewColumn()
+    fechahorafactura: Date;
+
+    @ViewColumn()
     totalgravadoiva10: number;
 
     @ViewColumn()

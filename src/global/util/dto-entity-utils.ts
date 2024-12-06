@@ -136,23 +136,6 @@ export class DTOEntityUtis {
         return timbrado;
     }
 
-    /*public static clienteDtoToEntity(clienteDto: ClienteDTO): Cliente {
-        const cliente = new Cliente();
-        cliente.id = clienteDto.id;
-        cliente.nombres = clienteDto.nombres;
-        cliente.apellidos = clienteDto.apellidos;
-        cliente.razonSocial = clienteDto.razonsocial;
-        cliente.telefono1 = clienteDto.telefono1;
-        cliente.telefono2 = clienteDto.telefono2;
-        cliente.email = clienteDto.email;
-        cliente.idcobrador = clienteDto.idcobrador;
-        cliente.dvRuc = clienteDto.dvruc;
-        cliente.ci = clienteDto.ci;
-        if(clienteDto.eliminado != null) cliente.eliminado = clienteDto.eliminado;
-        if(clienteDto.excluidosorteo != null) cliente.excluidoSorteo = clienteDto.excluidosorteo;
-        return cliente;
-    }*/
-
     public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio {        
         const domicilio = new Domicilio();
         domicilio.id = domicilioDto.id;
@@ -187,12 +170,17 @@ export class DTOEntityUtis {
     }
 
     public static ventaDtoToEntity(ventaDto: VentaDTO): Venta{
+        const fechaStr = ventaDto.fechafactura;
         const venta = new Venta();
         if(ventaDto.id != null) venta.id = ventaDto.id;
         venta.anulado = ventaDto.anulado;
         venta.pagado = ventaDto.pagado;
         venta.eliminado = ventaDto.eliminado;
-        venta.fechaFactura = ventaDto.fechafactura;
+        venta.fechaFactura =
+            fechaStr ?
+            new Date(Number(fechaStr.split('-')[0]), Number(fechaStr.split('-')[1]), Number(fechaStr.split('-')[2])) :
+            null;
+        venta.fechaHoraFactura = ventaDto.fechahorafactura ? new Date(ventaDto.fechahorafactura) : null;
         venta.idcliente = ventaDto.idcliente;
         venta.idtimbrado = ventaDto.idtimbrado;
         venta.idusuarioRegistroFactura = ventaDto.idusuarioregistrofactura;
@@ -214,7 +202,6 @@ export class DTOEntityUtis {
         detalleVenta.idcuota = detalleVentaDto.idcuota;
         detalleVenta.idservicio = detalleVentaDto.idservicio;
         detalleVenta.idsuscripcion = detalleVentaDto.idsuscripcion;
-        //detalleVenta.idventa = detalleVentaDto.idventa;
         detalleVenta.monto = detalleVentaDto.monto;
         detalleVenta.montoIva = detalleVentaDto.montoiva;
         detalleVenta.porcentajeIva = detalleVentaDto.porcentajeiva;

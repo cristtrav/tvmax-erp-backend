@@ -78,7 +78,7 @@ export class FacturaElectronicaUtilsService {
             punto: `${timbrado.codpuntoemision}`.padStart(3, '0'),
             numero: `${venta.nroFactura}`.padStart(7, '0'),
             codigoSeguridadAleatorio: this.generarCodigoSeguridadAleatorio(),
-            fecha: this.formatDate(new Date()),
+            fecha: this.formatDate(venta.fechaHoraFactura ?? venta.fechaFactura ?? new Date()),
             tipoEmision: 1,
             tipoTransaccion: 2,
             tipoImpuesto: 1,

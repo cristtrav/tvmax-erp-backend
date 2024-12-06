@@ -13,7 +13,8 @@ export class VentaDTO {
     totaliva10: number = 0;
     totaliva5: number = 0;
     total: number = 0;
-    fechafactura: Date | null = null;
+    fechafactura: string | null = null;
+    fechahorafactura: string | null = null;
     idcliente: number | null = null;
     prefijofactura: string | null = null;
     nrofactura: number | null = null;
