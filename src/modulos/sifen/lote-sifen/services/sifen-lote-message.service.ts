@@ -58,8 +58,9 @@ export class SifenLoteMessageService {
             fecha: fechaStr != null && (<string>fechaStr).length > 0 ? new Date(fechaStr) : null,
             mensaje: data['ns2:rResEnviConsLoteDe']['ns2:dMsgResLot'],
             resultados: 
-            (Array.isArray(resultadoLote) ? resultadoLote : [resultadoLote])
-            .map(res => this.buildResultadoProcesamientoDE(res))
+                data['ns2:rResEnviConsLoteDe']['ns2:dCodResLot'] != SifenLoteMessageService.COD_LOTE_INEXISTENTE ?
+                (Array.isArray(resultadoLote) ? resultadoLote : [resultadoLote]).map(res => this.buildResultadoProcesamientoDE(res)) :
+                null
         }
     }
 
