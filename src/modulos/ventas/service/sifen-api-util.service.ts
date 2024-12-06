@@ -131,7 +131,8 @@ export class SifenApiUtilService {
         }
         const response = await setApi.consultaLote(
             lote.id,
-            Number(lote.nroLoteSifen),
+            //@ts-ignore
+            lote.nroLoteSifen,
             this.sifenUtilSrv.getAmbiente(),
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
