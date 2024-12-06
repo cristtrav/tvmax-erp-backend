@@ -222,7 +222,10 @@ export class FacturaElectronicaUtilsService {
         if(!existsSync(`tmp/${timestamp}`)) mkdirSync(`tmp/${timestamp}`);
         
         //const xmlWitQR = await this.generarDEConQR(factElectronica.documentoElectronico);
-        const ambienteSifen = process.env.SIFEN_AMBIENTE == 'test' ? '0' : '1';
+        let ambienteSifen = '-1';
+        if(this.sifenUtilsSrv.isDisabled()) ambienteSifen = '0';
+        else if(this.sifenUtilsSrv.getAmbiente() == 'test') ambienteSifen = '1';
+
         const javaPath = process.env.JAVA_PATH ?? '/usr/bin/java';
         const filename = `${timestamp}.xml`;
         const dteFilePath = `tmp/${filename}`;
