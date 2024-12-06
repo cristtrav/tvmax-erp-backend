@@ -331,6 +331,7 @@ export class VentasService {
 
                 if(process.env.SIFEN_DISABLED != 'TRUE')
                     await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
+                else console.log('OBS Anulación: SIFEN DESACTIVADO');
             }
 
         });

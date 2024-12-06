@@ -155,9 +155,6 @@ export class SifenApiUtilService {
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
         );
-        /*const codigoRespuesta = response['ns2:rResEnviConsRUC']['ns2:dCodRes'];
-        if(codigoRespuesta == '0500' || codigoRespuesta == '0501') return null;
-        return response['ns2:rResEnviConsRUC']['ns2:xContRUC']['ns2:dRazCons'];*/
     }
 
 }
