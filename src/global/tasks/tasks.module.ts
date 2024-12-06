@@ -30,6 +30,7 @@ import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-docume
 import { ConsultaRucController } from '@modulos/sifen/consulta-ruc/controller/consulta-ruc.controller';
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
+import { LoteView } from '@database/view/facturacion/lote.view';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/
       ClienteView,
       CodigoSeguridadContribuyente,
       Lote,
+      LoteView,
       EstadoDocumentoSifen
     ]),
   ],

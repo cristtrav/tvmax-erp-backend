@@ -9,6 +9,7 @@ import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResultadoProcesamientoLoteType } from '../types/resultado-procesamiento-lote.type';
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { SifenLoteMessageService } from './sifen-lote-message.service';
+import { LoteView } from '@database/view/facturacion/lote.view';
 
 @Injectable()
 export class LoteSifenService {
@@ -17,7 +18,9 @@ export class LoteSifenService {
 
     constructor(
         @InjectRepository(Lote)
-        private lotesSrv: Repository<Lote>,
+        private lotesRepo: Repository<Lote>,
+        @InjectRepository(LoteView)
+        private loteViewRepo: Repository<LoteView>,
         @InjectRepository(FacturaElectronica)
         private facturaElectronicaSrv: Repository<FacturaElectronica>,
         private sifenUtilSrv: SifenUtilService,
@@ -27,7 +30,7 @@ export class LoteSifenService {
     private getSelectQuery(queries: QueriesType): SelectQueryBuilder<Lote>{
         const { enviado, consultado, aprobado, sort } = queries;
         const alias = 'lote';
-        let query = this.lotesSrv.createQueryBuilder(alias);
+        let query = this.lotesRepo.createQueryBuilder(alias);
         query = query.leftJoinAndSelect(`${alias}.facturas`, `factura`);
         if(enviado != null) query = query.andWhere(`${alias}.enviado = :enviado`, { enviado });
         if(consultado != null) query = query.andWhere(`${alias}.consultado = :consultado`, { consultado });
@@ -45,10 +48,35 @@ export class LoteSifenService {
     }
 
     async findById(id: number): Promise<Lote>{
-        return await this.lotesSrv.findOneOrFail({
+        return await this.lotesRepo.findOneOrFail({
             where: { id },
             relations: { facturas: true }
         });
+    }
+
+    private getSelectQueryView(queries: QueriesType): SelectQueryBuilder<LoteView>{
+        const { enviado, consultado, aprobado, sort, offset, limit } = queries;
+        const alias = 'lote';
+        let query = this.loteViewRepo.createQueryBuilder(alias);
+        if(enviado != null) query = query.andWhere(`${alias}.enviado = :enviado`, { enviado });
+        if(consultado != null) query = query.andWhere(`${alias}.consultado = :consultado`, { consultado });
+        if(aprobado != null) query = query.andWhere(`${alias}.aprobado = :aprobado`, { aprobado });
+        if(offset) query = query.skip(offset);
+        if(limit) query = query.take(limit);
+        if(sort){
+            const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) == '-' ? 'DESC' : 'ASC';
+            const sortColumn = sort.substring(1);
+            query = query.orderBy(`${alias}.${sortColumn}`, sortOrder); 
+        }
+        return query;
+    }
+
+    async findAllView(queries: QueriesType): Promise<LoteView[]>{
+        return this.getSelectQueryView(queries).getMany();
+    }
+
+    async countView(queries: QueriesType): Promise<number>{
+        return this.getSelectQueryView(queries).getCount();
     }
 
     async generarLotes(): Promise<Lote[]>{
@@ -92,7 +120,6 @@ export class LoteSifenService {
                 lote.consultado = false;
                 lote.observacion = respuestaLote.mensaje;
                 await manager.save(lote);
-                return;
             }
             if(respuestaLote.codigo == SifenLoteMessageService.COD_LOTE_EN_PROCESO){
                 console.log(`Lote id:${respuestaLote.idlote} aún en proceso`);
@@ -100,36 +127,40 @@ export class LoteSifenService {
                 lote.consultado = false;
                 lote.observacion = respuestaLote.mensaje;
                 await manager.save(lote);
-                return;
             }
 
-            for(let factura of lote.facturas){
-                console.log(`Procesar factura electronica ${factura.idventa}`);
-                const resultadoProc = respuestaLote.resultados.find(r => r.cdc == this.sifenUtilSrv.getCDC(factura))
-                console.log('Resultado procesamiento para factura', resultadoProc);
-                if(resultadoProc == null){
-                    console.log(`No se encontró el resultado de PROC  idventa:${factura.idventa}, lote: ${lote.id}`);
-                    continue;
+            if(
+                respuestaLote.codigo != SifenLoteMessageService.COD_LOTE_INEXISTENTE &&
+                respuestaLote.codigo != SifenLoteMessageService.COD_LOTE_EN_PROCESO
+            ){
+                for(let factura of lote.facturas){
+                    console.log(`Procesar factura electronica ${factura.idventa}`);
+                    const resultadoProc = respuestaLote.resultados.find(r => r.cdc == this.sifenUtilSrv.getCDC(factura))
+                    console.log('Resultado procesamiento para factura', resultadoProc);
+                    if(resultadoProc == null){
+                        console.log(`No se encontró el resultado de PROC  idventa:${factura.idventa}, lote: ${lote.id}`);
+                        continue;
+                    }
+                    if(resultadoProc.estado == 'Aprobado'){
+                        factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
+                        factura.fechaCambioEstado = respuestaLote.fecha;
+                    }
+                    if(resultadoProc.estado == 'Rechazado'){
+                        factura.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
+                        factura.fechaCambioEstado = respuestaLote.fecha;
+                    }
+                    if(resultadoProc.estado == 'Aprobado con observación'){
+                        factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO_CON_OBS
+                        factura.fechaCambioEstado = respuestaLote.fecha;
+                    }
+                    factura.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
+                    await manager.save(factura);
                 }
-                if(resultadoProc.estado == 'Aprobado'){
-                    factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
-                    factura.fechaCambioEstado = respuestaLote.fecha;
-                }
-                if(resultadoProc.estado == 'Rechazado'){
-                    factura.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
-                    factura.fechaCambioEstado = respuestaLote.fecha;
-                }
-                if(resultadoProc.estado == 'Aprobado con observación'){
-                    factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO_CON_OBS
-                    factura.fechaCambioEstado = respuestaLote.fecha;
-                }
-                factura.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
-                await manager.save(factura);
+                lote.consultado = true;
+                lote.fechaHoraConsulta = new Date();
+                lote.observacion = respuestaLote.mensaje;
+                await manager.save(lote);
             }
-            lote.consultado = true;
-            lote.fechaHoraConsulta = new Date();
-            lote.observacion = respuestaLote.mensaje;
-            await manager.save(lote);
         });
     }
 }

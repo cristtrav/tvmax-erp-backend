@@ -335,4 +335,12 @@ export class Permissions {
         ACCESOMODULO: 1180
     }
 
+    static readonly LOTESFACTURAS = {
+        ACCESSOMODULO: 1220,
+        CONSULTAR: 1221,
+        GENERAR: 1222,
+        ENVIARSIFEN: 1223,
+        CONSULTARSIFEN: 1224
+    }
+
 }

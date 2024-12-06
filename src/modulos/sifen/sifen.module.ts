@@ -14,6 +14,7 @@ import { ConsultaRucController } from './consulta-ruc/controller/consulta-ruc.co
 import { ConsultaRucMessageService } from './consulta-ruc/services/consulta-ruc-message.service';
 import { Permiso } from '@database/entity/permiso.entity';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { LoteView } from '@database/view/facturacion/lote.view';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
     TypeOrmModule.forFeature([
       FacturaElectronica,
       Lote,
+      LoteView,
       EstadoDocumentoSifen,
       Permiso
     ])
