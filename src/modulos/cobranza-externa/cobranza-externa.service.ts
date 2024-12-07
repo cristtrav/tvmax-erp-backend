@@ -288,10 +288,14 @@ export class CobranzaExternaService {
         venta.fechaFactura = new Date();
         venta.fechaHoraFactura = new Date();
 
-        const timbradoElectronico = await this.timbradoRepo.findOneBy({ eliminado: false, electronico: true, activo: true });
-        if(timbradoElectronico){
-            venta.idtimbrado = timbradoElectronico.id;
-            venta.nroFactura = Number(timbradoElectronico.ultimoNroUsado ?? 0) + 1
+        const timbrados = await this.timbradoRepo.findBy({ eliminado: false, electronico: true, activo: true });
+        if(timbrados.length > 0){
+            let timbrado = timbrados[0];
+            const puntoEmision = Number(process.env.PUNTO_EMISION_COBRANZA_EXT);
+            if(Number.isInteger(puntoEmision))
+                timbrado = timbrados.find(t => t.codPuntoEmision == puntoEmision) ?? timbrado;
+            venta.idtimbrado = timbrado.id;
+            venta.nroFactura = Number(timbrado.ultimoNroUsado ?? 0) + 1
         }
         return venta;
     }
