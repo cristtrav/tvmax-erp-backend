@@ -10,6 +10,7 @@ export class EstadoDocumentoSifen{
     public static readonly INVALIDADO = 5;
     public static readonly NO_ENVIADO = 30;
     public static readonly ANULADO_NO_ENVIADO = 31;
+    public static readonly ENVIADO = 32;
 
     @PrimaryColumn()
     id: number;

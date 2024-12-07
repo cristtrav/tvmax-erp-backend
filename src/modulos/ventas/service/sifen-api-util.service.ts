@@ -115,6 +115,14 @@ export class SifenApiUtilService {
         lote.nroLoteSifen = this.sifenLoteMessageSrv.getNroLoteSifenEnvio(response);
         lote.observacion = this.sifenLoteMessageSrv.getResumenEnvio(response);
         await this.datasource.transaction(async manager => {
+            
+            if(this.sifenLoteMessageSrv.isLoteAceptadoEnvio(response))
+                for(let factura of lote.facturas){
+                    factura.idestadoDocumentoSifen = EstadoDocumentoSifen.ENVIADO;
+                    factura.fechaCambioEstado = new Date();
+                    factura.observacion = `Enviado a SIFEN. Lote id: «${lote.id}», Nro. lote: «${lote.nroLoteSifen}»`;
+                    await manager.save(factura);
+                }
             await manager.save(lote);
             await manager.save(Lote.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldLote, lote));
         })
