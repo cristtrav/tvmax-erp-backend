@@ -157,8 +157,8 @@ export class VentasService {
             }
             
             if(timbrado.electronico){
-                const facturaElectronica = await this.generarFacturaElectronica(venta, detalles);
-                await manager.save(await this.generarFacturaElectronica(venta, detalles));
+                const facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles);
+                await manager.save(await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles));
                 if(
                     !this.sifenUtilsSrv.isDisabled() &&
                     this.sifenUtilsSrv.getModo() == 'sync'
@@ -271,7 +271,7 @@ export class VentasService {
                 await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbradoAnterior, timbradoAnterior));
             }
             if(timbradoActual.electronico){
-                const facturaElectronica = await this.regenerarFacturaElectronica(venta, detalleVenta);
+                const facturaElectronica = await this.facturaElectronicaUtilSrv.regenerarFacturaElectronica(venta, detalleVenta);
                 await manager.save(factElectronica);
 
                 if(!this.sifenUtilsSrv.isDisabled() &&
@@ -390,55 +390,6 @@ export class VentasService {
             )
             .where('detalle.idcuota = :idcuota', { idcuota });
         return (await detalleQuery.getCount()) != 0;
-    }
-    
-    private async generarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
-        const facturaElectronica = new FacturaElectronica();
-        facturaElectronica.idventa = venta.id;
-        facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
-        facturaElectronica.version = 1;
-        facturaElectronica.fechaCambioEstado = new Date();
-        
-        const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
-        const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
-        const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
-        
-        //console.log('Factura XML sin firma generada', xmlDE != null);
-        //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
-        //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
-
-        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
-        facturaElectronica.firmado = signedXmlDE != null;
-        facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
-        facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-        facturaElectronica.intentoEnvioEmail = 0;
-
-        return facturaElectronica;
-    }
-
-    private async regenerarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
-        
-        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ idventa: venta.id });
-        facturaElectronica.version = facturaElectronica.version + 1;
-        
-        facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
-        facturaElectronica.fechaCambioEstado = new Date();
-        
-        const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, detalles);
-        const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
-        const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
-        
-        //console.log('Factura XML sin firma generada', xmlDE != null);
-        //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
-        //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
-
-        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
-        facturaElectronica.firmado = signedXmlDE != null;
-        facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
-        facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-        facturaElectronica.intentoEnvioEmail = 0;
-
-        return facturaElectronica;
     }
 
 }

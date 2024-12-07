@@ -27,6 +27,8 @@ import { SifenUtilService } from './sifen-util.service';
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { response } from 'express';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
+import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
+import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
@@ -45,7 +47,9 @@ export class FacturaElectronicaUtilsService {
         private clienteViewRepo: Repository<ClienteView>,
         @InjectRepository(CodigoSeguridadContribuyente)
         private cscRepo: Repository<CodigoSeguridadContribuyente>,
-        private consultaRucSrv: ConsultaRucService
+        private consultaRucSrv: ConsultaRucService,
+        @InjectRepository(FacturaElectronica)
+        private facturaElectronicaRepo: Repository<FacturaElectronica>
     ) { }
 
     public async generarDE(venta: Venta, detalles: DetalleVenta[]): Promise<string> {
@@ -267,7 +271,55 @@ export class FacturaElectronicaUtilsService {
             console.error(e);
             return null;
         }
+    }
+
+    public async generarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
+        const facturaElectronica = new FacturaElectronica();
+        facturaElectronica.idventa = venta.id;
+        facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
+        facturaElectronica.version = 1;
+        facturaElectronica.fechaCambioEstado = new Date();
         
+        const xmlDE = await this.generarDE(venta, detalles);
+        const signedXmlDE = await this.generarDEFirmado(xmlDE);
+        const signedWithQRXmlDE = await this.generarDEConQR(signedXmlDE);
+        
+        //console.log('Factura XML sin firma generada', xmlDE != null);
+        //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
+        //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
+
+        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        facturaElectronica.firmado = signedXmlDE != null;
+        facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
+        facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+        facturaElectronica.intentoEnvioEmail = 0;
+
+        return facturaElectronica;
+    }
+
+    public async regenerarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
+        
+        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ idventa: venta.id });
+        facturaElectronica.version = facturaElectronica.version + 1;
+        
+        facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
+        facturaElectronica.fechaCambioEstado = new Date();
+        
+        const xmlDE = await this.generarDE(venta, detalles);
+        const signedXmlDE = await this.generarDEFirmado(xmlDE);
+        const signedWithQRXmlDE = await this.generarDEConQR(signedXmlDE);
+        
+        //console.log('Factura XML sin firma generada', xmlDE != null);
+        //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
+        //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
+
+        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        facturaElectronica.firmado = signedXmlDE != null;
+        facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
+        facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+        facturaElectronica.intentoEnvioEmail = 0;
+
+        return facturaElectronica;
     }
       
 }
