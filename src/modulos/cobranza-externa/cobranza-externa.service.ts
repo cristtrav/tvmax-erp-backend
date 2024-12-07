@@ -28,6 +28,7 @@ import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.serv
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-util.service';
 import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
+import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 
 @Injectable()
 export class CobranzaExternaService {
@@ -56,8 +57,8 @@ export class CobranzaExternaService {
         private datasource: DataSource,
         private facturaElectronicaUtilSrv: FacturaElectronicaUtilsService,
         private sifenApiUtilSrv: SifenApiUtilService,
-        private sifenEventosUtil: SifenEventosUtilService
-        
+        private sifenEventosUtil: SifenEventosUtilService,
+        private sifenUtilsSrv: SifenUtilService
     ) { }
 
     async consultar(request: ConsultaRequestDTO): Promise<GenericoResponseDTO | ConsultaResponseDTO> {
@@ -163,31 +164,22 @@ export class CobranzaExternaService {
             await manager.save(cobro);
 
             if(venta.idtimbrado != null){
-                //console.log("FACTURA ELECTRONICA");
-                const facturaElectronica = new FacturaElectronica();
-                facturaElectronica.idventa = venta.id;
-                facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
-                facturaElectronica.version = 1;
-                facturaElectronica.fechaCambioEstado = new Date();
+                const timbrado = await this.timbradoRepo.findOneByOrFail({id: venta.idtimbrado}); 
                 
-                const xmlDE = await this.facturaElectronicaUtilSrv.generarDE(venta, [detalle]);
-                const signedXmlDE = await this.facturaElectronicaUtilSrv.generarDEFirmado(xmlDE);
-                const signedWithQRXmlDE = await this.facturaElectronicaUtilSrv.generarDEConQR(signedXmlDE);
-                
-                //console.log('Factura XML sin firma generada', xmlDE != null);
-                //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
-                //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
+                if(timbrado.electronico){
+                    const oldTimbrado = { ...timbrado };
+                    timbrado.ultimoNroUsado = venta.nroFactura;
+                    await manager.save(timbrado);
+                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(Usuario.ID_USUARIO_SISTEMA, 'M', oldTimbrado, timbrado));
 
-                facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
-                facturaElectronica.firmado = signedXmlDE != null;
-                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
-                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-                facturaElectronica.intentoEnvioEmail = 0;
-
-                await manager.save(facturaElectronica);
-
-                if(process.env.SIFEN_DISABLED != 'TRUE')
-                    await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
+                    const facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, [detalle]);
+                    await manager.save(facturaElectronica);
+                    
+                    if(
+                        !this.sifenUtilsSrv.isDisabled() &&
+                        this.sifenUtilsSrv.getModo() == 'sync'
+                    ) await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);   
+                }                
             }
         });
 
@@ -266,8 +258,8 @@ export class CobranzaExternaService {
                 await manager.save(cancelacion);
 
                 if(
-                    (factElectronica.idestadoDocumentoSifen == 1  ||
-                    factElectronica.idestadoDocumentoSifen == 2) &&
+                    (factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO ||
+                    factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO_CON_OBS) &&
                     process.env.SIFEN_DISABLED != 'TRUE'
                 ) await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
             }
@@ -294,6 +286,7 @@ export class CobranzaExternaService {
         venta.totalGravadoIva10 = detalleCobranza.iva10;
         venta.totalGravadoIva5 = detalleCobranza.iva5;
         venta.fechaFactura = new Date();
+        venta.fechaHoraFactura = new Date();
 
         const timbradoElectronico = await this.timbradoRepo.findOneBy({ eliminado: false, electronico: true, activo: true });
         if(timbradoElectronico){
