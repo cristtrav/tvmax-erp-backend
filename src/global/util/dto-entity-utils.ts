@@ -178,7 +178,7 @@ export class DTOEntityUtis {
         venta.eliminado = ventaDto.eliminado;
         venta.fechaFactura =
             fechaStr ?
-            new Date(Number(fechaStr.split('-')[0]), Number(fechaStr.split('-')[1]), Number(fechaStr.split('-')[2])) :
+            new Date(Number(fechaStr.split('-')[0]), Number(fechaStr.split('-')[1]) - 1, Number(fechaStr.split('-')[2])) :
             null;
         venta.fechaHoraFactura = ventaDto.fechahorafactura ? new Date(ventaDto.fechahorafactura) : null;
         venta.idcliente = ventaDto.idcliente;
