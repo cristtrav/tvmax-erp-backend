@@ -155,8 +155,8 @@ export class FacturaElectronicaUtilsService {
             documentoTipo: 1,
             documentoNumero: cliente.ci
         }
-        if(cliente.dvruc) deCliente.ruc = `${cliente.ci}-${cliente.dvruc}`;
-        if(cliente.telefono1) deCliente.celular = cliente.telefono1;
+        if(cliente.dvruc != null) deCliente.ruc = `${cliente.ci}-${cliente.dvruc}`;
+        if(cliente.telefono1) deCliente.telefono = cliente.telefono1;
         if(cliente.email) deCliente.email = cliente.email;
         return deCliente;
     }
