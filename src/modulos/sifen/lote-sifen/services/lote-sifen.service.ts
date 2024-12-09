@@ -28,13 +28,15 @@ export class LoteSifenService {
     ){}
 
     private getSelectQuery(queries: QueriesType): SelectQueryBuilder<Lote>{
-        const { enviado, consultado, aprobado, sort } = queries;
+        const { enviado, consultado, aprobado, sort, offset, limit } = queries;
         const alias = 'lote';
         let query = this.lotesRepo.createQueryBuilder(alias);
         query = query.leftJoinAndSelect(`${alias}.facturas`, `factura`);
         if(enviado != null) query = query.andWhere(`${alias}.enviado = :enviado`, { enviado });
         if(consultado != null) query = query.andWhere(`${alias}.consultado = :consultado`, { consultado });
         if(aprobado != null) query = query.andWhere(`${alias}.aprobado = :aprobado`, { aprobado });
+        if(offset != null) query = queries.skip(offset);
+        if(limit != null) query = query.take(limit);
         if(sort){
             const sortOrder: 'ASC' | 'DESC' = sort.charAt(0) == '-' ? 'DESC' : 'ASC';
             const sortColumn = sort.substring(1);
