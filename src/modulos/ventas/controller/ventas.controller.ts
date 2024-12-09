@@ -97,6 +97,7 @@ export class VentasController {
     }
 
     @Get(':id/detalles')
+    @AllowedIn(Permissions.VENTAS.CONSULTAR)
     async getDetallesByIdventa(
         @Param('id') id: number
     ): Promise<DetalleVentaView[]>{
