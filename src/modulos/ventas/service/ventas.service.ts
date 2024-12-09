@@ -13,7 +13,6 @@ import { FacturaElectronicaUtilsService } from './factura-electronica-utils.serv
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenApiUtilService } from './sifen-api-util.service';
-import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
 import { SifenUtilService } from './sifen-util.service';
 import { SifenEventosUtilService } from './sifen-eventos-util.service';
@@ -171,9 +170,12 @@ export class VentasService {
     async edit(venta: Venta, detalleVenta: DetalleVenta[], idusuario: number) {
         const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
         if(factElectronica &&
-            (factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.RECHAZADO &&
-             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.NO_ENVIADO &&
-             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.ANULADO_NO_ENVIADO)
+            (
+                factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO ||
+                factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO_CON_OBS ||
+                factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.ENVIADO ||
+                factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.CANCELADO
+            )
         ) throw new HttpException({
             message: 'No se puede editar: Factura electrónica enviada a tributación'
         }, HttpStatus.BAD_REQUEST);

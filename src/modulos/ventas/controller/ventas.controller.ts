@@ -13,9 +13,10 @@ import { FacturaElectronicaUtilsService } from '../service/factura-electronica-u
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { VentaDTO } from '@dto/venta.dto';
 import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
+import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 
 @Controller('ventas')
-@UseGuards(LoginGuard)
+@UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
 export class VentasController {
 
