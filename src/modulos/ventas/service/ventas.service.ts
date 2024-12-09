@@ -121,8 +121,7 @@ export class VentasService {
         if (await this.ventaRepo.findOneBy({
             nroFactura: venta.nroFactura,
             idtimbrado: venta.idtimbrado,
-            eliminado: false,
-            anulado: false
+            eliminado: false
         })) throw new HttpException({
             message: `El número de factura «${venta.nroFactura}» ya está registrado.`
         }, HttpStatus.BAD_REQUEST);
@@ -190,6 +189,17 @@ export class VentasService {
         if(!oldVenta) throw new HttpException({
             message: `No se encuentra la venta con código «${venta.id}».`
         }, HttpStatus.NOT_FOUND);
+
+        if(venta.nroFactura != oldVenta.nroFactura || venta.idtimbrado != oldVenta.idtimbrado){
+            const nroFacturaExiste = await this.ventaRepo.createQueryBuilder('venta')
+            .where(`venta.eliminado = FALSE`)
+            .andWhere(`venta.idtimbrado = :idtimbrado`, { idtimbrado: venta.idtimbrado})
+            .andWhere(`venta.nroFactura = :nrofactura`, { nrofactura: venta.nroFactura })
+            .getOne();
+            if(nroFacturaExiste) throw new HttpException({
+                message: `La factura ${nroFacturaExiste.nroFactura} ya está registrada.`
+            }, HttpStatus.BAD_REQUEST)
+        }
 
         await this.datasource.transaction(async manager => {
             //Se guarda la venta y el evento en auditoria
@@ -273,12 +283,12 @@ export class VentasService {
                 await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbradoAnterior, timbradoAnterior));
             }
             if(timbradoActual.electronico){
-                const facturaElectronica = await this.facturaElectronicaUtilSrv.regenerarFacturaElectronica(venta, detalleVenta);
-                await manager.save(factElectronica);
+                const factElectRegen = await this.facturaElectronicaUtilSrv.regenerarFacturaElectronica(venta, detalleVenta);
+                await manager.save(factElectRegen);
 
                 if(!this.sifenUtilsSrv.isDisabled() &&
                     this.sifenUtilsSrv.getModo() == 'sync'
-                )await this.sifenApiUtilSrv.enviar(facturaElectronica, manager);
+                )await this.sifenApiUtilSrv.enviar(factElectRegen, manager);
             }
         })
 
