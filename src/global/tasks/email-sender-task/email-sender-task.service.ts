@@ -40,7 +40,7 @@ export class EmailSenderTaskService {
         private datoContribuyenteRepo: Repository<DatoContribuyente>        
     ){}
 
-    @Cron('*/30 * * * *')
+    @Cron('*/30 7-21 * * *')
     async enviar(){
         if(process.env.EMAIL_SENDER_DISABLED == 'TRUE') return;
 
