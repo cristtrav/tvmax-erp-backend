@@ -146,7 +146,7 @@ export class FacturaElectronicaUtilsService {
 
         const deCliente: DEClienteInterface = {
             contribuyente: cliente.dvruc != null,
-            codigo: `${cliente.id}`,
+            codigo: `${cliente.id}`.padStart(3, '0'),
             razonSocial: await this.consultarRazonSocialSifen(cliente.ci) ?? cliente.razonsocial,
             tipoOperacion: 2,
             tipoContribuyente: 1,
