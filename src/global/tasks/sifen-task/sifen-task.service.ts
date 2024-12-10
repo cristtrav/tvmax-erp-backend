@@ -13,7 +13,7 @@ export class SifenTaskService {
         private sifenUtilSrv: SifenUtilService
     ){}
 
-    @Cron('0 22 * * *')
+    @Cron('0 22,0,3 * * *')
     async generarEnviarLote(){
         if(this.sifenUtilSrv.isEnvioLoteAutoDisabled() || this.sifenUtilSrv.isDisabled()){
             console.log(`Generacion y envio automático de lote desactivado.`);
@@ -31,7 +31,7 @@ export class SifenTaskService {
         });
     }
 
-    @Cron('0 6 * * *')
+    @Cron('0 6,12,18 * * *')
     async consultarLotes(){
         if(this.sifenUtilSrv.isEnvioLoteAutoDisabled() || this.sifenUtilSrv.isDisabled()){
             console.log(`Consulta automátoca de lote desactivada.`);
