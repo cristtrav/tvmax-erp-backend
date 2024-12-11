@@ -17,7 +17,6 @@ import { TimbradosModule } from './modulos/timbrados/timbrados.module';
 import { VentasModule } from './modulos/ventas/ventas.module';
 import { PermisosModule } from './modulos/permisos/permisos.module';
 import { AuditoriaModule } from './modulos/auditoria/auditoria.module';
-import { UtilModule } from './util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RolesModule } from './modulos/roles/roles.module';
 import { ResumenesSuscripcionesModule } from './modulos/estadisticas/resumenes-suscripciones/resumenes-suscripciones.module';
@@ -76,7 +75,6 @@ import { EstadoFacturaElectronicaModule } from './modulos/facturacion/estado-doc
     VentasModule,
     PermisosModule,
     AuditoriaModule,
-    UtilModule,
     RolesModule,
     ResumenesSuscripcionesModule,
     CobrosModule,

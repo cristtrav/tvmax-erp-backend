@@ -5,7 +5,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Sorteo } from '@database/entity/sorteos/sorteo.entity';
 import { Premio } from '@database/entity/sorteos/premio.entity';
-import { UtilModule } from '@util/util.module';
 import { PremiosService } from '@modulos/premios/premios.service';
 import { PremioView } from '@database/view/sorteos/premio.view';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
@@ -14,10 +13,10 @@ import { ParticipanteView } from '@database/view/sorteos/participante.view';
 import { Participante } from '@database/entity/sorteos/participante.entity';
 import { SorteoView } from '@database/view/sorteos/sorteo.view';
 import { Permiso } from '@database/entity/permiso.entity';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
   imports: [
-    UtilModule,
     JwtModule.register({}),
     TypeOrmModule.forFeature([
       Sorteo,
@@ -32,6 +31,6 @@ import { Permiso } from '@database/entity/permiso.entity';
     ])
   ],
   controllers: [SorteosController],
-  providers: [SorteosService, PremiosService]
+  providers: [SorteosService, PremiosService, JwtUtilsService]
 })
 export class SorteosModule {}

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { MovimientosMaterialesService } from './movimientos-materiales.service';
 import { MovimientosMaterialesController } from './movimientos-materiales.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { UtilModule } from '@util/util.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DetallesMovimientosMaterialesService } from './detalles-movimientos-materiales/detalles-movimientos-materiales.service';
 import { DetallesMovimientosMaterialesController } from './detalles-movimientos-materiales/detalles-movimientos-materiales.controller';
@@ -14,11 +13,11 @@ import { MovimientoMaterialView } from '@database/view/depositos/movimiento-mate
 import { Material } from '@database/entity/depositos/material.entity';
 import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
 import { Permiso } from '@database/entity/permiso.entity';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    UtilModule,
     TypeOrmModule.forFeature([
       MovimientoMaterial,
       DetalleMovimientoMaterial,
@@ -29,7 +28,11 @@ import { Permiso } from '@database/entity/permiso.entity';
       Permiso
     ])
   ],
-  providers: [MovimientosMaterialesService, DetallesMovimientosMaterialesService],
+  providers: [
+    MovimientosMaterialesService,
+    DetallesMovimientosMaterialesService,
+    JwtUtilsService
+  ],
   controllers: [MovimientosMaterialesController, DetallesMovimientosMaterialesController]
 })
 export class MovimientosMaterialesModule {}

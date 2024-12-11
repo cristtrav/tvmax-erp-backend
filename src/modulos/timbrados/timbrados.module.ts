@@ -4,17 +4,16 @@ import { TimbradoView } from '@database/view/timbrado.view';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UtilModule } from '@util/util.module';
 import { TimbradosController } from './timbrados.controller';
 import { TimbradosService } from './timbrados.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
     imports: [
         JwtModule.register({}),
-        UtilModule,
         TypeOrmModule.forFeature([Timbrado, TimbradoView, Permiso])
     ],
     controllers: [TimbradosController],
-    providers: [TimbradosService]
+    providers: [TimbradosService, JwtUtilsService]
 })
 export class TimbradosModule { }

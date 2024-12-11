@@ -3,7 +3,6 @@ import { VentasService } from './service/ventas.service';
 import { VentasController } from './controller/ventas.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientesService } from '../clientes/service/clientes.service';
-import { UtilModule } from '@util/util.module';
 import { DetallesVentasService } from './service/detalles-ventas.service';
 import { DetallesVentasController } from './controller/detalles-ventas.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -36,11 +35,11 @@ import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sife
 import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
+import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    UtilModule,
     TypeOrmModule.forFeature([
       Cliente,
       ClienteView,
@@ -74,7 +73,8 @@ import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/
     SifenEventosUtilService,
     SifenLoteMessageService,
     ConsultaRucService,
-    ConsultaRucMessageService
+    ConsultaRucMessageService,
+    JwtUtilsService
   ],
   controllers: [VentasController, DetallesVentasController]
 })
