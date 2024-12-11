@@ -355,8 +355,7 @@ export class VentasService {
         const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: id });
         if(factElectronica &&
             (factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.RECHAZADO &&
-             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.NO_ENVIADO &&
-             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.ANULADO_NO_ENVIADO)
+             factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.NO_ENVIADO)
         ) throw new HttpException({
             message: 'No se puede eliminar: Factura electrónica enviada a tributación'
         }, HttpStatus.BAD_REQUEST);
