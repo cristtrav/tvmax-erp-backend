@@ -118,13 +118,12 @@ export class VentasService {
         const timbrado = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado })
         const oldTimbrado = { ...timbrado };
 
-        if(timbrado.electronico) venta.nroFactura = Number(timbrado.ultimoNroUsado ?? 0) + 1;
-
-        if (await this.ventaRepo.findOneBy({
-            nroFactura: venta.nroFactura,
-            idtimbrado: venta.idtimbrado,
-            eliminado: false
-        })) throw new HttpException({
+        if(timbrado.electronico){
+            //Buscar un nro de factura disponible
+            do venta.nroFactura = Number(timbrado.ultimoNroUsado ?? 0) + 1;
+            while(!await this.facturaYaRegistrada(timbrado.id, venta.nroFactura))
+        }else if (await this.facturaYaRegistrada(venta.idtimbrado, venta.nroFactura))
+            throw new HttpException({
             message: `El número de factura «${venta.nroFactura}» ya está registrado.`
         }, HttpStatus.BAD_REQUEST);
 
@@ -413,4 +412,14 @@ export class VentasService {
         return (await detalleQuery.getCount()) != 0;
     }
 
+
+    private async facturaYaRegistrada(idtimbrado: number, nroFactura: number): Promise<boolean>{
+        return (
+            await this.ventaRepo.findOneBy({
+            nroFactura,
+            idtimbrado,
+            eliminado: false
+            })
+        ) != null;
+    }
 }
