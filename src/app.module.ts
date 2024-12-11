@@ -48,6 +48,7 @@ import { FacturaElectronicaModule } from './modulos/facturacion/factura-electron
 import { CodigoSeguridadContribuyenteModule } from './modulos/facturacion/codigo-seguridad-contribuyente/codigo-seguridad-contribuyente.module';
 import { UbicacionesSifenModule } from './modulos/ubicaciones-sifen/ubicaciones-sifen.module';
 import { SifenModule } from './modulos/sifen/sifen.module';
+import { EstadoFacturaElectronicaModule } from './modulos/facturacion/estado-documento-factura-electronica/estado-factura-electronica.module';
 
 @Module({
   imports: [
@@ -104,7 +105,8 @@ import { SifenModule } from './modulos/sifen/sifen.module';
     FacturaElectronicaModule,
     CodigoSeguridadContribuyenteModule,
     UbicacionesSifenModule,
-    SifenModule
+    SifenModule,
+    EstadoFacturaElectronicaModule
   ],
   controllers: [AppController],
   providers: [AppService, AppInitService],

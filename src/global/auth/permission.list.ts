@@ -343,4 +343,8 @@ export class Permissions {
         CONSULTARSIFEN: 1224
     }
 
+    static readonly ESTADOFACTURAELECTRONICA = {
+        CONSULTAR: 1260
+    }
+
 }

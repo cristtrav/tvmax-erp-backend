@@ -68,7 +68,8 @@ export class VentasService {
             offset,
             limit,
             idtimbrado,
-            nrofactura
+            nrofactura,
+            idestadofacturaelectronica
         } = queries;
 
         const alias: string = 'venta';
@@ -83,6 +84,7 @@ export class VentasService {
         if (fechafincobro) query = query.andWhere(`${alias}.fechacobro <= :fechafincobro`, { fechafincobro });
         if (nrofactura) query = query.andWhere(`${alias}.nrofactura = :nrofactura`, { nrofactura });
         if (idtimbrado) query = query.andWhere(`${alias}.idtimbrado = :idtimbrado`, { idtimbrado });
+        if (idestadofacturaelectronica) query = query.andWhere(`${alias}.idestadofacturaelectronica = :idestadofacturaelectronica`, {idestadofacturaelectronica});
         if (idcobradorcomision)
             if (Array.isArray(idcobradorcomision)) query = query.andWhere(`${alias}.idcobradorcomision IN (:...idcobradorcomision)`, { idcobradorcomision });
             else query = query.andWhere(`${alias}.idcobradorcomision = :idcobradorcomision`, { idcobradorcomision });
