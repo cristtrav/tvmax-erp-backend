@@ -307,16 +307,24 @@ export class VentasService {
     async anular(idventa: number, anulado: boolean, idusuario: number) {
         const venta = await this.ventaRepo.findOneOrFail({ where: { id: idventa }, relations: { detalles: true } });
         const timbrado = await this.timbradoRepo.findOneByOrFail({id: venta.idtimbrado});
+        const factElectronica = await this.facturaElectronicaRepo.findOneBy({idventa: idventa});
         const oldVenta = { ...venta };
         
         if(timbrado.electronico && !anulado) throw new HttpException({
             message: 'No se puede revertir anulación de F. Electrónica'
         }, HttpStatus.BAD_REQUEST);
 
-        venta.anulado = anulado;
+        if(
+            factElectronica && 
+            factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.APROBADO &&
+            factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.APROBADO_CON_OBS
+        ) throw new HttpException({
+            message: 'No se puede anular. Factura electrónica no aprobada por SIFEN'
+        }, HttpStatus.BAD_REQUEST)
 
         await this.datasource.transaction(async manager => {
             
+            venta.anulado = anulado;    
             await manager.save(venta);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'M', oldVenta, venta));
 
