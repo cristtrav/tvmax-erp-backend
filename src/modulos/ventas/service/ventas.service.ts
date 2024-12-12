@@ -119,9 +119,9 @@ export class VentasService {
         const oldTimbrado = { ...timbrado };
 
         if(timbrado.electronico){
-            //Buscar un nro de factura disponible
-            do venta.nroFactura = Number(timbrado.ultimoNroUsado ?? 0) + 1;
-            while(!await this.facturaYaRegistrada(timbrado.id, venta.nroFactura))
+            venta.nroFactura = Number(timbrado.ultimoNroUsado ?? '0');
+            do venta.nroFactura = venta.nroFactura + 1;
+            while(await this.facturaYaRegistrada(timbrado.id, venta.nroFactura));
         }else if (await this.facturaYaRegistrada(venta.idtimbrado, venta.nroFactura))
             throw new HttpException({
             message: `El número de factura «${venta.nroFactura}» ya está registrado.`
@@ -420,6 +420,6 @@ export class VentasService {
             idtimbrado,
             eliminado: false
             })
-        ) != null;
+        ) != null
     }
 }
