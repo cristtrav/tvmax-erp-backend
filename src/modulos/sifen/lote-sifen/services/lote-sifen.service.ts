@@ -84,7 +84,6 @@ export class LoteSifenService {
     async generarLotes(): Promise<Lote[]>{
         const lotes: Lote[] = [];
         const queryFacturas = this.facturaElectronicaSrv.createQueryBuilder('factura')
-        .leftJoinAndSelect(`factura.lotes`, `lote`)
         .leftJoin(Venta, 'venta', 'venta.id = factura.idventa')
         .where(`factura.idestadoDocumentoSifen = :idestado`, {idestado: EstadoDocumentoSifen.NO_ENVIADO})
         .andWhere(`factura.firmado = TRUE`)
@@ -92,7 +91,7 @@ export class LoteSifenService {
         .andWhere(`venta.anulado = FALSE`)
         .orderBy(`factura.idventa`, 'ASC');
 
-        let facturas = (await queryFacturas.getMany()).filter(f => f.lotes.length == 0);
+        let facturas = await queryFacturas.getMany();
 
         await this.datasource.transaction(async manager => {
             while(facturas.length > 0){
