@@ -29,7 +29,8 @@ export class JwtUtilsService {
         })
         if (crearRefresh) {
             sesToken.refreshToken = this.jwtSrv.sign({ sub: usr.id }, {
-                secret: process.env.REFRESH_TOKEN_SECRET
+                secret: process.env.REFRESH_TOKEN_SECRET,
+                expiresIn: '12h'
             })
         }
         return sesToken;
