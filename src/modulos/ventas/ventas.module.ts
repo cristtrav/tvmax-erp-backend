@@ -36,6 +36,7 @@ import { FacturaElectronicaView } from '@database/view/facturacion/factura-elect
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
 
 @Module({
   imports: [
@@ -74,7 +75,8 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
     SifenLoteMessageService,
     ConsultaRucService,
     ConsultaRucMessageService,
-    JwtUtilsService
+    JwtUtilsService,
+    DigitoVerificadorRucService
   ],
   controllers: [VentasController, DetallesVentasController]
 })

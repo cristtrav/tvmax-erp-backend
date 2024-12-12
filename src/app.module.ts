@@ -48,6 +48,7 @@ import { CodigoSeguridadContribuyenteModule } from './modulos/facturacion/codigo
 import { UbicacionesSifenModule } from './modulos/ubicaciones-sifen/ubicaciones-sifen.module';
 import { SifenModule } from './modulos/sifen/sifen.module';
 import { EstadoFacturaElectronicaModule } from './modulos/facturacion/estado-documento-factura-electronica/estado-factura-electronica.module';
+import { DigitoVerificadorRucService } from './global/util/digito-verificador-ruc.service';
 
 @Module({
   imports: [
@@ -59,6 +60,11 @@ import { EstadoFacturaElectronicaModule } from './modulos/facturacion/estado-doc
       envFilePath: join(__dirname, '..', '.env'),
       isGlobal: true,
       load: [databaseConfig]
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({ ...configService.get('database') })
     }),
     GruposModule,
     SesionModule,
@@ -81,11 +87,6 @@ import { EstadoFacturaElectronicaModule } from './modulos/facturacion/estado-doc
     ResumenesVentasModule,
     FormatoFacturasModule,
     CobranzaExternaModule,
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({ ...configService.get('database') })
-    }),
     TasksModule,
     SorteosModule,
     PremiosModule,
@@ -107,6 +108,9 @@ import { EstadoFacturaElectronicaModule } from './modulos/facturacion/estado-doc
     EstadoFacturaElectronicaModule
   ],
   controllers: [AppController],
-  providers: [AppService, AppInitService],
+  providers: [
+    AppService,
+    AppInitService
+  ],
 })
 export class AppModule {}

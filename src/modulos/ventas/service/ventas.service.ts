@@ -16,6 +16,8 @@ import { SifenApiUtilService } from './sifen-api-util.service';
 import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
 import { SifenUtilService } from './sifen-util.service';
 import { SifenEventosUtilService } from './sifen-eventos-util.service';
+import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
+import { Usuario } from '@database/entity/usuario.entity';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -49,7 +51,8 @@ export class VentasService {
         private sifenEventosUtilSrv: SifenEventosUtilService,
         private sifenUtilsSrv: SifenUtilService,
         @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>
+        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        private dvRucSrv: DigitoVerificadorRucService
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<VentaView> {
@@ -129,6 +132,19 @@ export class VentasService {
 
         venta.idusuarioRegistroFactura = idusuario;
 
+        //Validar DV del RUC y corregir de ser necesario
+        const cli = await this.clienteRepo.findOneByOrFail({ id: venta.idcliente });
+        if(cli.dvRuc != null){
+            const dvGenerado = this.dvRucSrv.generar(cli.ci);
+            if(dvGenerado != cli.dvRuc)
+                await this.datasource.transaction(async mngr => {
+                    const oldCli = { ...cli };
+                    cli.dvRuc = dvGenerado;
+                    await mngr.save(cli);
+                    await mngr.save(Cliente.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldCli, cli));
+                });
+        }
+
         let idventa: number = -1;
         await this.datasource.transaction(async manager => {
             idventa = (await manager.save(venta)).id;
@@ -200,6 +216,19 @@ export class VentasService {
             if(nroFacturaExiste) throw new HttpException({
                 message: `La factura ${nroFacturaExiste.nroFactura} ya está registrada.`
             }, HttpStatus.BAD_REQUEST)
+        }
+
+        //Validar DV del RUC y corregir de ser necesario
+        const cli = await this.clienteRepo.findOneByOrFail({ id: venta.idcliente });
+        if(cli.dvRuc != null){
+            const dvGenerado = this.dvRucSrv.generar(cli.ci);
+            if(dvGenerado != cli.dvRuc)
+                await this.datasource.transaction(async mngr => {
+                    const oldCli = { ...cli };
+                    cli.dvRuc = dvGenerado;
+                    await mngr.save(cli);
+                    await mngr.save(Cliente.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldCli, cli));
+                });
         }
 
         await this.datasource.transaction(async manager => {
