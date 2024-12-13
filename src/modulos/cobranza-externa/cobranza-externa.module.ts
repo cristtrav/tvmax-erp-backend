@@ -30,6 +30,7 @@ import { Lote } from '@database/entity/facturacion/lote.entity';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
+import { KudeUtilsService } from '@globalutil/kude-utils.service';
 
 @Module({
   imports: [
@@ -65,7 +66,8 @@ import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/
     SifenEventosUtilService,
     SifenLoteMessageService,
     ConsultaRucService,
-    ConsultaRucMessageService
+    ConsultaRucMessageService,
+    KudeUtilsService
   ],
   controllers: [CobranzaExternaController]
 })

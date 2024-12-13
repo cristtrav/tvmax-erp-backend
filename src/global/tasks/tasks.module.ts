@@ -31,6 +31,7 @@ import { ConsultaRucController } from '@modulos/sifen/consulta-ruc/controller/co
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
+import { KudeUtilsService } from '@globalutil/kude-utils.service';
 
 @Module({
   imports: [
@@ -67,7 +68,8 @@ import { LoteView } from '@database/view/facturacion/lote.view';
     SifenApiUtilService,
     SifenLoteMessageService,
     ConsultaRucService,
-    ConsultaRucMessageService
+    ConsultaRucMessageService,
+    KudeUtilsService
   ]
 })
 export class TasksModule {}

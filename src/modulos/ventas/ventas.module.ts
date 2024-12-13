@@ -37,6 +37,7 @@ import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consult
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
+import { KudeUtilsService } from '@globalutil/kude-utils.service';
 
 @Module({
   imports: [
@@ -76,7 +77,8 @@ import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.
     ConsultaRucService,
     ConsultaRucMessageService,
     JwtUtilsService,
-    DigitoVerificadorRucService
+    DigitoVerificadorRucService,
+    KudeUtilsService
   ],
   controllers: [VentasController, DetallesVentasController]
 })

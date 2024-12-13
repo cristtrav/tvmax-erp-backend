@@ -29,6 +29,7 @@ import { response } from 'express';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
+import { KudeUtilsService } from '@globalutil/kude-utils.service';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
@@ -49,7 +50,8 @@ export class FacturaElectronicaUtilsService {
         private cscRepo: Repository<CodigoSeguridadContribuyente>,
         private consultaRucSrv: ConsultaRucService,
         @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>
+        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        private kudeUtils: KudeUtilsService
     ) { }
 
     public async generarDE(venta: Venta, detalles: DetalleVenta[]): Promise<string> {
@@ -234,19 +236,30 @@ export class FacturaElectronicaUtilsService {
         const filename = `${timestamp}.xml`;
         const dteFilePath = `tmp/${filename}`;
         const kudePath = `${process.cwd()}/tmp/${timestamp}/`;
-        const jasperPath = process.env.KUDE_JASPER_PATH ?? `node_modules/facturacionelectronicapy-kude/dist/DE/`;
+        //const jasperPath = process.env.KUDE_JASPER_PATH ?? `node_modules/facturacionelectronicapy-kude/dist/DE/`;
+        const jasperPath = `${process.cwd()}/src/assets/jasper/facturacion-electronica/`;
         const urlLogo = `${process.cwd()}/src/assets/img/logo-tvmax.png`;
 
         //Escribir XML a archivo temporal (La libreria lee el archivo del disco)
         await writeFile(dteFilePath, factElectronica.documentoElectronico);
         //Generar KUDE en PDF (La libreria genera en un archivo PDF en disco)
-        await generateKUDE.generateKUDE(
+
+        /*await generateKUDE.generateKUDE(
+            javaPath,
+            dteFilePath,
+            jasperPath,
+            kudePath,
+            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}'}`
+        );*/
+
+        await this.kudeUtils.generate(
             javaPath,
             dteFilePath,
             jasperPath,
             kudePath,
             `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}'}`
         );
+
         //Leer archivo PDF para retornar al cliente con GET
         const filesKudeArr = await readdir(kudePath);
         if(filesKudeArr.length == 0) throw new HttpException({
