@@ -2,11 +2,13 @@ import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { Permissions } from '@auth/permission.list';
+import { Lote } from '@database/entity/facturacion/lote.entity';
 import { LoteView } from '@database/view/facturacion/lote.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { LoteSifenService } from '@modulos/sifen/lote-sifen/services/lote-sifen.service';
 import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
-import { Controller, Get, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { SifenLoteMessageService } from '../services/sifen-lote-message.service';
 
 @Controller('lotesfacturas')
 @UseFilters(HttpExceptionFilter)
@@ -46,9 +48,7 @@ export class LoteSifenController {
     async enviarPorId(
         @Param('id') id: number
     ){
-        await this.sifenApiUtilsSrv.enviarLote(
-            await this.loteSifenSrv.findById(id)
-        );
+        await this.sifenApiUtilsSrv.enviarLote(id);
         return { restultado: 'ok'}
     }
 

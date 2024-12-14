@@ -10,6 +10,7 @@ import { Lote } from '@database/entity/facturacion/lote.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
 import { ResultadoProcesamientoLoteType } from '@modulos/sifen/lote-sifen/types/resultado-procesamiento-lote.type';
+import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
 
 @Injectable()
 export class SifenApiUtilService {
@@ -23,6 +24,8 @@ export class SifenApiUtilService {
         private estadoDocumentoSifenRepo: Repository<EstadoDocumentoSifen>,
         @InjectRepository(Lote)
         private loteRepo: Repository<Lote>,
+        @InjectRepository(DetalleLote)
+        private detalleLoteRepo: Repository<DetalleLote>,
         private datasource: DataSource
     ){}
 
@@ -98,11 +101,28 @@ export class SifenApiUtilService {
         await entityManager.save(cancelacion);
     }
 
-    public async enviarLote(lote: Lote){
-        console.log(`Envio de Lote ${lote.id} a SIFEN`);
+    public async enviarLote(id: number){
+        console.log(`Envio de Lote ${id} a SIFEN`);
+        
+        const lote = await this.loteRepo.findOneByOrFail({ id });
+        const detalles = await this.detalleLoteRepo.find({
+            where: { idlote: id },
+            relations: { facturaElectronica: true }
+        });
+
+        if(detalles.length == 0)
+            throw new HttpException({
+                message: 'Lotes sin detalles, no se puede enviar' 
+            }, HttpStatus.INTERNAL_SERVER_ERROR)
+
+        if(detalles.some(dl => dl.facturaElectronica == null))
+            throw new HttpException({
+                message: `No se pudo obtener factura electrónica de algun detalle del lote`
+            }, HttpStatus.INTERNAL_SERVER_ERROR);
+
         const response = await setApi.recibeLote(
             lote.id,
-            lote.facturas.map(f => f.documentoElectronico),
+            detalles.map(dl => dl.facturaElectronica.documentoElectronico),
             this.sifenUtilSrv.getAmbiente(),
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
@@ -117,7 +137,8 @@ export class SifenApiUtilService {
         await this.datasource.transaction(async manager => {
             
             if(this.sifenLoteMessageSrv.isLoteAceptadoEnvio(response))
-                for(let factura of lote.facturas){
+                for(let detalleLote of detalles){
+                    const factura = detalleLote.facturaElectronica;
                     factura.idestadoDocumentoSifen = EstadoDocumentoSifen.ENVIADO;
                     factura.fechaCambioEstado = new Date();
                     factura.observacion = `Enviado a SIFEN. Lote id: «${lote.id}», Nro. lote: «${lote.nroLoteSifen}»`;

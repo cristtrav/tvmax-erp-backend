@@ -32,6 +32,7 @@ import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consult
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
+import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { KudeUtilsService } from '@globalutil/kude-utils.service';
       CodigoSeguridadContribuyente,
       Lote,
       LoteView,
-      EstadoDocumentoSifen
+      EstadoDocumentoSifen,
+      DetalleLote
     ]),
   ],
   providers: [

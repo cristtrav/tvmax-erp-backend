@@ -15,6 +15,7 @@ import { ConsultaRucMessageService } from './consulta-ruc/services/consulta-ruc-
 import { Permiso } from '@database/entity/permiso.entity';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
+import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { LoteView } from '@database/view/facturacion/lote.view';
       Lote,
       LoteView,
       EstadoDocumentoSifen,
-      Permiso
+      Permiso,
+      DetalleLote
     ])
   ],
   providers: [

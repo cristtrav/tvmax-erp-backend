@@ -27,7 +27,7 @@ export class SifenTaskService {
         console.log(`Se van a enviar ${lotes.length} lotes.`);
         lotes.forEach(async lote => {
             console.log(`Enviando lote ${lote.id}...`);
-            await this.sifenApiUtilsSrv.enviarLote(lote);
+            await this.sifenApiUtilsSrv.enviarLote(lote.id);
         });
     }
 

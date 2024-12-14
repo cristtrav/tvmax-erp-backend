@@ -1,8 +1,8 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { FacturaElectronica } from "./factura-electronica.entity";
 import { TablaAuditoria } from "../tabla-auditoria.entity";
 import { EventoAuditoria } from "../evento-auditoria.entity";
-
+import { DetalleLote } from "./detalle-lote.entity";
 @Entity({schema: 'facturacion'})
 export class Lote {
 
@@ -39,21 +39,9 @@ export class Lote {
     
     @Column({type: 'text'})
     observacion: string;
-    
 
-    @ManyToMany(() => FacturaElectronica, (factura) => factura.lotes)
-    @JoinTable({
-        name: 'lote_factura',
-        joinColumn: {
-            name: 'idlote',
-            referencedColumnName: 'id'
-        },
-        inverseJoinColumn: {
-            name: 'idventa',
-            referencedColumnName: 'idventa'
-        }
-    })
-    facturas: FacturaElectronica[];
+    @OneToMany(() => DetalleLote, (detalleLote) => detalleLote.lote)
+    detallesLote: DetalleLote[]
 
     static getEventoAuditoria(
         idusuario: number,

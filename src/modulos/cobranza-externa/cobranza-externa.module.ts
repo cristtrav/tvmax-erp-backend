@@ -31,6 +31,7 @@ import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sife
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
+import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { KudeUtilsService } from '@globalutil/kude-utils.service';
       FacturaElectronica,
       EstadoDocumentoSifen,
       VentaView,
-      Lote
+      Lote,
+      DetalleLote
     ])
   ],
   providers: [

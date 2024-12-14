@@ -38,6 +38,7 @@ import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
+import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
 
 @Module({
   imports: [
@@ -61,7 +62,8 @@ import { KudeUtilsService } from '@globalutil/kude-utils.service';
       CancelacionFactura,
       EstadoDocumentoSifen,
       Lote,
-      FacturaElectronicaView
+      FacturaElectronicaView,
+      DetalleLote
     ])
   ],
   providers: [
