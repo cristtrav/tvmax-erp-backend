@@ -10,10 +10,9 @@ import { DEEstablecimientoInterface } from '../model/factura-electronica/interfa
 import { TimbradoView } from '@database/view/timbrado.view';
 import { DEClienteInterface } from '../model/factura-electronica/interfaces/de-cliente.interface';
 import { DEItemInterface } from '../model/factura-electronica/interfaces/de-item.interface';
-import generateKUDE from 'facturacionelectronicapy-kude/dist/KUDEGen';
 import qrgen from 'facturacionelectronicapy-qrgen';
 import xmlsign from 'facturacionelectronicapy-xmlsign';
-import { readdir, readFile, unlink, writeFile } from 'node:fs/promises';
+import { copyFile, readdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { existsSync, mkdirSync, rmdirSync } from 'node:fs';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,14 +21,13 @@ import { Repository } from 'typeorm';
 import { ClienteView } from '@database/view/cliente.view';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
-import setApi from 'facturacionelectronicapy-setapi';
 import { SifenUtilService } from './sifen-util.service';
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
-import { response } from 'express';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
+import { PDFDocument } from 'pdf-lib';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
@@ -222,7 +220,7 @@ export class FacturaElectronicaUtilsService {
         }
     }
       
-    public async generateKude(factElectronica: FacturaElectronica): Promise<StreamableFile>{
+    public async generateKude(factElectronica: FacturaElectronica, conDuplicado: boolean = false): Promise<StreamableFile>{
         const timestamp = `${new Date().getTime()}`;
         if(!existsSync('tmp')) mkdirSync('tmp');
         if(!existsSync(`tmp/${timestamp}`)) mkdirSync(`tmp/${timestamp}`);
@@ -232,28 +230,17 @@ export class FacturaElectronicaUtilsService {
         if(this.sifenUtilsSrv.isDisabled()) ambienteSifen = '0';
         else if(this.sifenUtilsSrv.getAmbiente() == 'test') ambienteSifen = '1';
 
-        const javaPath = process.env.JAVA_PATH ?? '/usr/bin/java';
         const filename = `${timestamp}.xml`;
-        const dteFilePath = `tmp/${filename}`;
+        const dteFilePath = `${process.cwd()}/tmp/${filename}`;
         const kudePath = `${process.cwd()}/tmp/${timestamp}/`;
-        //const jasperPath = process.env.KUDE_JASPER_PATH ?? `node_modules/facturacionelectronicapy-kude/dist/DE/`;
-        const jasperPath = `${process.cwd()}/src/assets/jasper/facturacion-electronica/`;
-        const urlLogo = `${process.cwd()}/src/assets/img/logo-tvmax.png`;
+        const jasperPath = `${process.cwd()}/src/assets/facturacion-electronica/jasper/`;
+        const urlLogo = `${process.cwd()}/src/assets/facturacion-electronica/img/logo-tvmax.png`;
 
         //Escribir XML a archivo temporal (La libreria lee el archivo del disco)
         await writeFile(dteFilePath, factElectronica.documentoElectronico);
+
         //Generar KUDE en PDF (La libreria genera en un archivo PDF en disco)
-
-        /*await generateKUDE.generateKUDE(
-            javaPath,
-            dteFilePath,
-            jasperPath,
-            kudePath,
-            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}'}`
-        );*/
-
         await this.kudeUtils.generate(
-            javaPath,
             dteFilePath,
             jasperPath,
             kudePath,
@@ -272,7 +259,23 @@ export class FacturaElectronicaUtilsService {
         await unlink(`${kudePath}/${filesKudeArr[0]}`);
         rmdirSync(kudePath);
 
-        return new StreamableFile(kudePdfFile);
+        if(conDuplicado){
+            const mergedPdf = await PDFDocument.create();
+
+            const pdfA = await PDFDocument.load(kudePdfFile);
+            const pdfB = await PDFDocument.load(kudePdfFile);
+
+            const copiedPagesA = await mergedPdf.copyPages(pdfA, pdfA.getPageIndices());
+            copiedPagesA.forEach((page) => mergedPdf.addPage(page));
+
+            const copiedPagesB = await mergedPdf.copyPages(pdfB, pdfB.getPageIndices());
+            copiedPagesB.forEach((page) => mergedPdf.addPage(page));
+
+            const mergedPdfFile = await mergedPdf.save();
+            return new StreamableFile(mergedPdfFile);
+        }else{
+            return new StreamableFile(kudePdfFile);
+        }
     }
 
     public async generarDEConQR(signedXml: string): Promise<string>{

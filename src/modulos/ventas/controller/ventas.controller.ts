@@ -143,9 +143,13 @@ export class VentasController {
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
     @Header('content-type', 'application/pdf')
     async getKUDEById(
-        @Param('id') id: number
+        @Param('id') id: number,
+        @Query('duplicado') duplicado: string
     ): Promise<StreamableFile>{
-        return await this.facturaElectronicaUtilsSrv.generateKude(await this.facturaElectronicaSrv.findById(id));
+        return await this.facturaElectronicaUtilsSrv.generateKude(
+            await this.facturaElectronicaSrv.findById(id),
+            duplicado == 'true'
+        );
     }
 
     @Get(':idventa/facturaelectronica')
