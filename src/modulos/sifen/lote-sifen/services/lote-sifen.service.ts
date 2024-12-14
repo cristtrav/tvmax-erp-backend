@@ -85,6 +85,7 @@ export class LoteSifenService {
         const lotes: Lote[] = [];
         const queryFacturas = this.facturaElectronicaSrv.createQueryBuilder('factura')
         .leftJoin(Venta, 'venta', 'venta.id = factura.idventa')
+        .leftJoinAndSelect('factura.lotes', 'lotes')
         .where(`factura.idestadoDocumentoSifen = :idestado`, {idestado: EstadoDocumentoSifen.NO_ENVIADO})
         .andWhere(`factura.firmado = TRUE`)
         .andWhere(`venta.eliminado = FALSE`)
