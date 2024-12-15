@@ -187,24 +187,22 @@ export class LoteSifenService {
                         factura.idestadoDocumentoSifen == EstadoDocumentoSifen.CANCELADO
                     ) {
                         console.log(`Factura electronica id ${factura.idventa} ya aprobada`)
-                        continue;
+                    }else {
+                        if(resultadoProc.estado == 'Aprobado'){
+                            factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
+                            factura.fechaCambioEstado = respuestaLote.fecha;
+                        }
+                        if(resultadoProc.estado == 'Aprobado con observación'){
+                            factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO_CON_OBS
+                            factura.fechaCambioEstado = respuestaLote.fecha;
+                        }
+                        if(resultadoProc.estado == 'Rechazado'){
+                            factura.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
+                            factura.fechaCambioEstado = respuestaLote.fecha;
+                        }
+                        factura.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
+                        await manager.save(factura);
                     }
-                    
-                    if(resultadoProc.estado == 'Aprobado'){
-                        factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
-                        factura.fechaCambioEstado = respuestaLote.fecha;
-                    }
-                    if(resultadoProc.estado == 'Aprobado con observación'){
-                        factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO_CON_OBS
-                        factura.fechaCambioEstado = respuestaLote.fecha;
-                    }
-                    if(resultadoProc.estado == 'Rechazado'){
-                        factura.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
-                        factura.fechaCambioEstado = respuestaLote.fecha;
-                    }
-                    factura.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
-                    await manager.save(factura);
-
                     detalleLote.codigoEstado = resultadoProc.detalle.codigo;
                     detalleLote.descripcion = resultadoProc.detalle.mensaje;
                     await manager.save(detalleLote);
