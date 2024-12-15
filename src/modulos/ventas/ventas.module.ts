@@ -39,6 +39,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
 import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
 @Module({
   imports: [
@@ -80,7 +81,8 @@ import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
     ConsultaRucMessageService,
     JwtUtilsService,
     DigitoVerificadorRucService,
-    KudeUtilsService
+    KudeUtilsService,
+    ConsultaDTEMessageService
   ],
   controllers: [VentasController, DetallesVentasController]
 })

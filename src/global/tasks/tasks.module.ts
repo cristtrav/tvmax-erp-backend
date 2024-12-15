@@ -34,6 +34,7 @@ import { LoteView } from '@database/view/facturacion/lote.view';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
 import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
 import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
+import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
 @Module({
   imports: [
@@ -73,7 +74,8 @@ import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
     SifenLoteMessageService,
     ConsultaRucService,
     ConsultaRucMessageService,
-    KudeUtilsService
+    KudeUtilsService,
+    ConsultaDTEMessageService
   ]
 })
 export class TasksModule {}

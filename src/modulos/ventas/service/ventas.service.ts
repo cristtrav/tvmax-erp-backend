@@ -18,6 +18,7 @@ import { SifenUtilService } from './sifen-util.service';
 import { SifenEventosUtilService } from './sifen-eventos-util.service';
 import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
 import { Usuario } from '@database/entity/usuario.entity';
+import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -450,5 +451,29 @@ export class VentasService {
             eliminado: false
             })
         ) != null
+    }
+
+    public async consultarFacturaSifen(idventa: number){
+        console.log('idventa a consultar', idventa)
+        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ idventa });
+
+        if(facturaElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.CANCELADO)
+            throw new HttpException({
+                message: 'Factura anulada (cancelada).'
+            }, HttpStatus.BAD_REQUEST)
+
+        const respuesta = await this.sifenApiUtilSrv.consultarDTE(facturaElectronica);
+        await this.datasource.transaction(async manager => {
+            facturaElectronica.fechaCambioEstado = new Date(respuesta.fecha);
+            facturaElectronica.observacion = respuesta.mensaje;
+            if(respuesta.codigo == ConsultaDTEMessageService.COD_ENCONTRADO)
+                facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
+            else if(respuesta.codigo == ConsultaDTEMessageService.COD_NO_ENCONTRADO){
+                facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
+            }else{
+                console.log(`idventa: ${idventa}, ${respuesta.codigo} - ${respuesta.mensaje}`);
+            }
+            await manager.save(facturaElectronica);
+        })
     }
 }

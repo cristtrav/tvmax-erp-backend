@@ -17,6 +17,7 @@ import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
 import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
 import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
+import { ConsultaDTEMessageService } from './consulta-dte/services/consulta-dte-message.service';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
     SifenLoteMessageService,
     ConsultaRucService,
     ConsultaRucMessageService,
-    JwtUtilsService
+    JwtUtilsService,
+    ConsultaDTEMessageService
   ],
   controllers: [LoteSifenController, ConsultaRucController],
 })

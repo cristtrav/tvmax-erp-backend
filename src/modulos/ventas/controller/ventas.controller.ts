@@ -159,4 +159,13 @@ export class VentasController {
     ): Promise<FacturaElectronicaView> {
         return this.facturaElectronicaSrv.findDetailsById(idventa);
     }
+
+    @Get(':idventa/consultarsifen')
+    @AllowedIn(Permissions.VENTAS.SINCRONIZARSIFEN)
+    async consultarFacturasifen(
+        @Param('idventa') idventa: number
+    ){
+        await this.ventasSrv.consultarFacturaSifen(idventa);
+        return { resultado: 'ok' };
+    }
 }

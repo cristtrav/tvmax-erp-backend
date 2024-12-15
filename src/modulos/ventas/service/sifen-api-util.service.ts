@@ -11,6 +11,8 @@ import { Usuario } from '@database/entity/usuario.entity';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
 import { ResultadoProcesamientoLoteType } from '@modulos/sifen/lote-sifen/types/resultado-procesamiento-lote.type';
 import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { ConsultaDTEResponse } from '@modulos/sifen/consulta-dte/interfaces/consulta-dte-response.interface';
+import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
 @Injectable()
 export class SifenApiUtilService {
@@ -18,6 +20,7 @@ export class SifenApiUtilService {
     constructor(
         private sifenUtilSrv: SifenUtilService,
         private sifenLoteMessageSrv: SifenLoteMessageService,
+        private sifenConsultaDTEMsgSrv: ConsultaDTEMessageService,
         @InjectRepository(FacturaElectronica)
         private facturaElectronicaRepo: Repository<FacturaElectronica>,
         @InjectRepository(EstadoDocumentoSifen)
@@ -185,6 +188,19 @@ export class SifenApiUtilService {
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
         );
+    }
+
+    public async consultarDTE(factura: FacturaElectronica): Promise<ConsultaDTEResponse> {
+        console.log('cdc a consultar', this.sifenUtilSrv.getCDC(factura));
+        const response = await setApi.consulta(
+            new Date().getTime(),
+            this.sifenUtilSrv.getCDC(factura),
+            this.sifenUtilSrv.getAmbiente(),
+            this.sifenUtilSrv.getCertData().certFullPath,
+            this.sifenUtilSrv.getCertData().certPassword
+        );
+        //console.log(response);
+        return this.sifenConsultaDTEMsgSrv.buildRespuesta(response);
     }
 
 }
