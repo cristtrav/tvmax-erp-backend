@@ -355,6 +355,7 @@ export class VentasService {
             
             venta.anulado = anulado;    
             await manager.save(venta);
+            
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'M', oldVenta, venta));
 
             for (let detalle of venta.detalles.filter(deta => deta.idcuota != null)) {
@@ -367,7 +368,6 @@ export class VentasService {
                 };
             }
 
-            const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
             if(factElectronica != null){
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
                 const eventoXml = await this.sifenEventosUtilSrv.getCancelacion(idevento, factElectronica)
@@ -383,8 +383,10 @@ export class VentasService {
                 if(process.env.SIFEN_DISABLED != 'TRUE')
                     await this.sifenApiUtilSrv.enviarCancelacion(cancelacion, manager);
                 else console.log('OBS Anulación: SIFEN DESACTIVADO');
-            }
 
+                factElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.CANCELADO;
+                await manager.save(factElectronica);
+            }
         });
     }
 
