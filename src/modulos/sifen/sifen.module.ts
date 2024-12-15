@@ -16,6 +16,7 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
 import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
       LoteView,
       EstadoDocumentoSifen,
       Permiso,
-      DetalleLote
+      DetalleLote,
+      DetalleLoteView
     ])
   ],
   providers: [

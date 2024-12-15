@@ -2,13 +2,12 @@ import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { Permissions } from '@auth/permission.list';
-import { Lote } from '@database/entity/facturacion/lote.entity';
 import { LoteView } from '@database/view/facturacion/lote.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { LoteSifenService } from '@modulos/sifen/lote-sifen/services/lote-sifen.service';
 import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
-import { Controller, Get, HttpException, HttpStatus, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { SifenLoteMessageService } from '../services/sifen-lote-message.service';
+import { Controller, Get, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
 
 @Controller('lotesfacturas')
 @UseFilters(HttpExceptionFilter)
@@ -26,6 +25,14 @@ export class LoteSifenController {
         @Query() queries: QueriesType
     ): Promise<LoteView[]>{
         return this.loteSifenSrv.findAllView(queries);
+    }
+
+    @Get(':id/detalles')
+    @AllowedIn(Permissions.LOTESFACTURAS.CONSULTAR)
+    findAllDetalles(
+        @Param('id') id: number
+    ): Promise<DetalleLoteView[]>{
+        return this.loteSifenSrv.findAllDetallesLotes(id, {});
     }
 
     @Get('total')

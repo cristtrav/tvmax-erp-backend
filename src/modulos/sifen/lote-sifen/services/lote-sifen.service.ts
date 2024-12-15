@@ -11,6 +11,7 @@ import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { SifenLoteMessageService } from './sifen-lote-message.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
 import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
 
 @Injectable()
 export class LoteSifenService {
@@ -26,6 +27,8 @@ export class LoteSifenService {
         private facturaElectronicaSrv: Repository<FacturaElectronica>,
         @InjectRepository(DetalleLote)
         private detalleLoteRepo: Repository<DetalleLote>,
+        @InjectRepository(DetalleLoteView)
+        private detalleLoteViewRepo: Repository<DetalleLoteView>,
         private sifenUtilSrv: SifenUtilService,
         private datasource: DataSource
     ){}
@@ -93,6 +96,13 @@ export class LoteSifenService {
 
     async countView(queries: QueriesType): Promise<number>{
         return this.getSelectQueryView(queries).getCount();
+    }
+
+    async findAllDetallesLotes(idlote: number, queries: QueriesType): Promise<DetalleLoteView[]>{
+        const alias = 'detalle';
+        let query = this.detalleLoteViewRepo.createQueryBuilder(alias);
+        query = query.andWhere(`${alias}.idlote = :idlote`, { idlote });
+        return query.getMany();
     }
 
     async generarLotes(): Promise<Lote[]>{
