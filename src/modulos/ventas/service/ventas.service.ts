@@ -462,6 +462,11 @@ export class VentasService {
                 message: 'Factura anulada (cancelada).'
             }, HttpStatus.BAD_REQUEST)
 
+        if(facturaElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.NO_ENVIADO)
+            throw new HttpException({
+                message: 'Factura pendiente de envío a SIFEN'
+            }, HttpStatus.BAD_REQUEST)
+
         const respuesta = await this.sifenApiUtilSrv.consultarDTE(facturaElectronica);
         await this.datasource.transaction(async manager => {
             facturaElectronica.fechaCambioEstado = new Date(respuesta.fecha);
