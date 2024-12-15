@@ -5,7 +5,7 @@ import { Usuario } from '@database/entity/usuario.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResultadoProcesamientoLoteType } from '../types/resultado-procesamiento-lote.type';
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { SifenLoteMessageService } from './sifen-lote-message.service';
@@ -37,7 +37,6 @@ export class LoteSifenService {
         const { enviado, consultado, aprobado, sort, offset, limit } = queries;
         const alias = 'lote';
         let query = this.lotesRepo.createQueryBuilder(alias);
-        query = query.leftJoinAndSelect(`${alias}.facturas`, `factura`);
         if(enviado != null) query = query.andWhere(`${alias}.enviado = :enviado`, { enviado });
         if(consultado != null) query = query.andWhere(`${alias}.consultado = :consultado`, { consultado });
         if(aprobado != null) query = query.andWhere(`${alias}.aprobado = :aprobado`, { aprobado });
