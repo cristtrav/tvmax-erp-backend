@@ -818,24 +818,24 @@
 			<element kind="rectangle" uuid="09e655d5-435c-48cf-abb8-10871eb5c87c" x="0" y="0" width="555" height="48" backcolor="#EBEBEB">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
-			<element kind="textField" uuid="b2568557-852f-42f2-afbd-6208e6d9d380" x="432" y="33" width="82" height="10" fontName="DejaVu Sans" fontSize="7.0" pattern="#,##0.###;(#,##0.###-)" vTextAlign="Middle">
+			<element kind="textField" uuid="b2568557-852f-42f2-afbd-6208e6d9d380" x="430" y="33" width="82" height="10" fontName="DejaVu Sans" fontSize="7.0" pattern="#,##0.###;(#,##0.###-)" vTextAlign="Middle">
 				<expression><![CDATA[$F{dIVA10}  +$F{dIVA5}]]></expression>
 			</element>
-			<element kind="textField" uuid="d827f690-3b21-4426-95cc-d0424d449e1e" x="308" y="33" width="82" height="10" fontName="DejaVu Sans" fontSize="7.0" pattern="#,##0.###;(#,##0.###-)" vTextAlign="Middle">
+			<element kind="textField" uuid="d827f690-3b21-4426-95cc-d0424d449e1e" x="303" y="33" width="82" height="10" fontName="DejaVu Sans" fontSize="7.0" pattern="#,##0.###;(#,##0.###-)" vTextAlign="Middle">
 				<expression><![CDATA[$F{dIVA10} == null ? 0:$F{dIVA10}]]></expression>
 			</element>
 			<element kind="textField" uuid="db2d8853-1da9-4277-a45c-bc86accbd7d8" x="189" y="33" width="86" height="10" fontName="DejaVu Sans" fontSize="7.0" evaluationTime="Report" pattern="#,##0.###;(#,##0.###-)" vTextAlign="Middle">
 				<expression><![CDATA[$F{dIVA5} == null? 0:$F{dIVA5}]]></expression>
 			</element>
 			<element kind="textField" uuid="7cdc7479-4575-4bf9-b610-028a0445ade5" x="505" y="0" width="50" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{dSub10}]]></expression>
+				<expression><![CDATA[new BigInteger($F{dSub10})]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
 			</element>
 			<element kind="textField" uuid="78327fe1-6d28-4ba9-b539-a6549f287983" x="455" y="0" width="50" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{dSub5}]]></expression>
+				<expression><![CDATA[new BigInteger($F{dSub5})]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -928,13 +928,15 @@
 			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 		</element>
-		<element kind="staticText" uuid="271ea843-106c-4c99-a086-c03b0de4e8d5" x="278" y="33" width="32" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+		<element kind="staticText" uuid="271ea843-106c-4c99-a086-c03b0de4e8d5" x="278" y="33" width="25" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 			<text><![CDATA[(10%)]]></text>
 			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 		</element>
-		<element kind="staticText" uuid="98bef27f-d248-4c99-92c4-98a50f55ff7a" x="386" y="33" width="51" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+		<element kind="staticText" uuid="98bef27f-d248-4c99-92c4-98a50f55ff7a" x="386" y="33" width="44" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 			<text><![CDATA[Total IVA :]]></text>
 			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 		</element>
 		<element kind="staticText" uuid="526605a2-5140-40fe-af56-43c48bfc8765" x="3" y="3" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 			<text><![CDATA[SUBTOTAL]]></text>
@@ -950,7 +952,7 @@
 			<expression><![CDATA[$F{dTotGralOpe}]]></expression>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-			<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+			<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
 		</element>
 		<element kind="staticText" uuid="4304c0a2-4c58-4c38-8081-d1f5cd6592e7" x="3" y="23" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 			<text><![CDATA[TOTAL EN GUARANIES]]></text>
