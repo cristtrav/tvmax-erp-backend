@@ -473,25 +473,25 @@
 		<element kind="frame" uuid="3a813032-cf69-47d4-a776-ea23c07dee17" mode="Opaque" x="0" y="0" width="555" height="75" forecolor="#000000">
 			<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<element kind="textField" uuid="314d420e-40fb-43e9-a204-4503ba6ac8fb" x="436" y="26" width="105" height="10" printWhenGroupChanges="cUniMed" fontSize="7.0" evaluationTime="Report" pattern="dd/MM/yyyy" blankWhenNull="true">
+			<element kind="textField" uuid="314d420e-40fb-43e9-a204-4503ba6ac8fb" x="443" y="26" width="98" height="10" printWhenGroupChanges="cUniMed" fontName="DejaVu Sans" fontSize="7.0" evaluationTime="Report" pattern="dd/MM/yyyy" blankWhenNull="true" vTextAlign="Middle">
 				<expression><![CDATA[$V{V_dFeIniT}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 			</element>
-			<element kind="textField" uuid="93380d7e-1e76-4f5e-8ecf-a55fc17f89d4" x="416" y="16" width="125" height="10" fontSize="7.0" blankWhenNull="true">
+			<element kind="textField" uuid="93380d7e-1e76-4f5e-8ecf-a55fc17f89d4" x="420" y="16" width="121" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" vTextAlign="Middle">
 				<expression><![CDATA[$F{dNumTim}]]></expression>
-				<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 			</element>
-			<element kind="textField" uuid="5c408e2f-851c-4c62-bdda-6e9890c80aca" x="380" y="46" width="161" height="10" fontSize="7.0" blankWhenNull="true">
+			<element kind="textField" uuid="5c408e2f-851c-4c62-bdda-6e9890c80aca" x="380" y="46" width="161" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" vTextAlign="Middle">
 				<expression><![CDATA[$F{dEst}+ "-" +   $F{dPunExp} + "-" +$F{dNumDoc}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="staticText" uuid="6ebc92a2-0cc8-4d8b-9052-196971db0969" x="366" y="46" width="14" height="10" fontSize="7.0" bold="true">
+			<element kind="staticText" uuid="6ebc92a2-0cc8-4d8b-9052-196971db0969" x="366" y="46" width="14" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 				<text><![CDATA[Nº:]]></text>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
@@ -529,29 +529,30 @@
 				<expression><![CDATA[$F{dDesDepEmi}]]></expression>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="textField" uuid="7e33cad9-f088-4695-9548-b692ac9eed14" x="366" y="36" width="175" height="10" fontSize="7.0" blankWhenNull="true" bold="true">
+			<element kind="textField" uuid="7e33cad9-f088-4695-9548-b692ac9eed14" x="366" y="36" width="175" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" bold="true" vTextAlign="Middle">
 				<expression><![CDATA[$F{dDesTiDE}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="staticText" uuid="21411e00-d25a-4f6f-a99d-bf2de4ba2f93" x="366" y="26" width="70" height="10" fontSize="7.0" bold="true">
+			<element kind="staticText" uuid="21411e00-d25a-4f6f-a99d-bf2de4ba2f93" x="366" y="26" width="77" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 				<text><![CDATA[Fecha de Vigencia:]]></text>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="staticText" uuid="e654f969-4e18-43fd-9646-59c43856867d" x="366" y="16" width="50" height="10" fontSize="7.0" bold="true">
+			<element kind="staticText" uuid="e654f969-4e18-43fd-9646-59c43856867d" x="366" y="16" width="54" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 				<text><![CDATA[Timbrado Nº:]]></text>
-				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="textField" uuid="b6281520-586f-4230-a4fc-400105f442c8" x="384" y="6" width="100" height="10" fontSize="7.0" blankWhenNull="true">
+			<element kind="textField" uuid="b6281520-586f-4230-a4fc-400105f442c8" x="388" y="6" width="100" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" vTextAlign="Middle">
 				<expression><![CDATA[$F{dRucEm} + "-"+ $F{dDVEmi}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 			</element>
-			<element kind="staticText" uuid="7b9fb1bb-709c-4560-b2b5-9cd6fad87327" x="366" y="6" width="18" height="10" fontSize="7.0" bold="true">
+			<element kind="staticText" uuid="7b9fb1bb-709c-4560-b2b5-9cd6fad87327" x="366" y="6" width="22" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 				<text><![CDATA[RUC:]]></text>
+				<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
 			<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
