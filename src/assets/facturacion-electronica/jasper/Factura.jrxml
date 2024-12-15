@@ -1,6 +1,6 @@
 <!-- Created with Jaspersoft Studio version 7.0.1.final using JasperReports Library version 7.0.1-573496633c2b4074e32f433154b543003f7d2498  -->
 <jasperReport name="Factura" language="java" columnCount="1" pageWidth="595" pageHeight="442" whenNoDataType="BlankPage" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="9d35ef5c-5869-4d1d-b843-9880d8432e96">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DTE-Test-Datasource"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DTE-Test2-Datasource"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -411,46 +411,60 @@
 		<expression><![CDATA[$F{dInfItem}]]></expression>
 	</group>
 	<background height="288" splitType="Stretch">
-		<element kind="line" uuid="369eaa94-8d6f-47b1-be5c-78f3302c7887" x="0" y="154" width="1" height="134">
+		<element kind="line" uuid="369eaa94-8d6f-47b1-be5c-78f3302c7887" x="0" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
-		<element kind="line" uuid="0ce56534-fe6e-417a-bbd3-b7819559a6f6" x="320" y="154" width="1" height="134">
+		<element kind="line" uuid="0ce56534-fe6e-417a-bbd3-b7819559a6f6" x="320" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
-		<element kind="line" uuid="d802eda5-c6b5-4ab7-bb62-eb96eacac0ba" x="370" y="154" width="1" height="134">
+		<element kind="line" uuid="d802eda5-c6b5-4ab7-bb62-eb96eacac0ba" x="370" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
-		<element kind="line" uuid="9a6e5c3c-afd2-406f-aec6-1ef5b8d6fd29" x="405" y="154" width="1" height="134">
+		<element kind="line" uuid="9a6e5c3c-afd2-406f-aec6-1ef5b8d6fd29" x="405" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
-		<element kind="line" uuid="0fce3e4c-b9af-42a9-b593-c0c86a6bc2bb" x="455" y="154" width="1" height="134">
+		<element kind="line" uuid="0fce3e4c-b9af-42a9-b593-c0c86a6bc2bb" x="455" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
-		<element kind="line" uuid="6fce2dbb-7d41-4e52-8010-1b5417c810e2" x="555" y="154" width="1" height="134">
+		<element kind="line" uuid="6fce2dbb-7d41-4e52-8010-1b5417c810e2" x="555" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
-		<element kind="line" uuid="eb754aef-a1e2-4c27-a719-c6218bd4d234" x="505" y="154" width="1" height="134">
+		<element kind="line" uuid="eb754aef-a1e2-4c27-a719-c6218bd4d234" x="505" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
-		<element kind="line" uuid="17584c96-f512-4eeb-8f4a-9529a7c7b85d" x="46" y="154" width="1" height="134">
+		<element kind="line" uuid="17584c96-f512-4eeb-8f4a-9529a7c7b85d" x="46" y="156" width="1" height="132">
 			<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<pen lineWidth="1.0"/>
 		</element>
 		<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -459,12 +473,12 @@
 		<element kind="frame" uuid="3a813032-cf69-47d4-a776-ea23c07dee17" mode="Opaque" x="0" y="0" width="555" height="75" forecolor="#000000">
 			<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<element kind="textField" uuid="314d420e-40fb-43e9-a204-4503ba6ac8fb" x="434" y="26" width="107" height="10" printWhenGroupChanges="cUniMed" fontSize="7.0" evaluationTime="Report" pattern="dd/MM/yyyy" blankWhenNull="true">
+			<element kind="textField" uuid="314d420e-40fb-43e9-a204-4503ba6ac8fb" x="436" y="26" width="105" height="10" printWhenGroupChanges="cUniMed" fontSize="7.0" evaluationTime="Report" pattern="dd/MM/yyyy" blankWhenNull="true">
 				<expression><![CDATA[$V{V_dFeIniT}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 			</element>
 			<element kind="textField" uuid="93380d7e-1e76-4f5e-8ecf-a55fc17f89d4" x="416" y="16" width="125" height="10" fontSize="7.0" blankWhenNull="true">
 				<expression><![CDATA[$F{dNumTim}]]></expression>
@@ -521,10 +535,10 @@
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="staticText" uuid="21411e00-d25a-4f6f-a99d-bf2de4ba2f93" x="366" y="26" width="68" height="10" fontSize="7.0" bold="true">
+			<element kind="staticText" uuid="21411e00-d25a-4f6f-a99d-bf2de4ba2f93" x="366" y="26" width="70" height="10" fontSize="7.0" bold="true">
 				<text><![CDATA[Fecha de Vigencia:]]></text>
-				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
 			<element kind="staticText" uuid="e654f969-4e18-43fd-9646-59c43856867d" x="366" y="16" width="50" height="10" fontSize="7.0" bold="true">
 				<text><![CDATA[Timbrado Nº:]]></text>
@@ -812,6 +826,27 @@
 			<element kind="textField" uuid="db2d8853-1da9-4277-a45c-bc86accbd7d8" x="189" y="33" width="86" height="10" fontName="DejaVu Sans" fontSize="7.0" evaluationTime="Report" pattern="#,##0.###;(#,##0.###-)" vTextAlign="Middle">
 				<expression><![CDATA[$F{dIVA5} == null? 0:$F{dIVA5}]]></expression>
 			</element>
+			<element kind="textField" uuid="7cdc7479-4575-4bf9-b610-028a0445ade5" x="505" y="0" width="50" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{dSub10}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
+			</element>
+			<element kind="textField" uuid="78327fe1-6d28-4ba9-b539-a6549f287983" x="455" y="0" width="50" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{dSub5}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
+			</element>
+			<element kind="textField" uuid="4bad5576-429d-4ff8-a54f-f19ddc586988" x="405" y="0" width="50" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{dSubExe}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
+			</element>
 			<box>
 				<pen lineWidth="1.5"/>
 				<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -838,14 +873,14 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="staticText" uuid="ce7aa940-904f-4b98-9672-77fc34615bab" x="130" y="54" width="410" height="10" fontSize="6.0" hTextAlign="Left" vTextAlign="Middle">
+			<element kind="staticText" uuid="ce7aa940-904f-4b98-9672-77fc34615bab" x="130" y="54" width="410" height="10" fontSize="5.0" hTextAlign="Left" vTextAlign="Middle">
 				<text><![CDATA[ Si su documento electrónico presenta algún error puede solicitar la modificación dentro de las 72 horas siguientes de la emisión de este comprobante.]]></text>
 				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="image" uuid="4cebc4fc-9070-493e-86ab-7e5cee408c10" stretchType="NoStretch" x="18" y="2" width="66" height="66" printWhenGroupChanges="dCodInt" scaleImage="FillFrame" onErrorType="Blank" evaluationTime="Report" linkType="None" linkTarget="Self" lazy="true" hImageAlign="Center" vImageAlign="Middle" fill="Solid">
+			<element kind="image" uuid="4cebc4fc-9070-493e-86ab-7e5cee408c10" stretchType="NoStretch" x="18" y="2" width="66" height="66" printWhenGroupChanges="dCodInt" scaleImage="FillFrame" onErrorType="Blank" evaluationTime="Report" linkType="None" linkTarget="Self" lazy="true" hImageAlign="Center" vImageAlign="Middle">
 				<expression><![CDATA[com.google.zxing.client.j2se.MatrixToImageWriter.toBufferedImage(
     new com.google.zxing.qrcode.QRCodeWriter().encode(
         $F{dCarQR},
@@ -905,18 +940,16 @@
 			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 		</element>
-		<element kind="textField" uuid="548c4ceb-42ed-4d86-b55f-96ac4ce844a7" x="466" y="3" width="86" height="10" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
-			<expression><![CDATA[$F{dTotOpe}]]></expression>
-			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-		</element>
 		<element kind="staticText" uuid="574c174d-b99d-47ac-a899-116a15da3dd7" x="3" y="13" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 			<text><![CDATA[TOTAL DE LA OPERACION]]></text>
 			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 		</element>
-		<element kind="textField" uuid="6dd6ffd9-113e-48d3-a7b1-54564d1d8848" x="466" y="13" width="86" height="10" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
+		<element kind="textField" uuid="6dd6ffd9-113e-48d3-a7b1-54564d1d8848" x="455" y="11" width="100" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
 			<expression><![CDATA[$F{dTotGralOpe}]]></expression>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
 		</element>
 		<element kind="staticText" uuid="4304c0a2-4c58-4c38-8081-d1f5cd6592e7" x="3" y="23" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 			<text><![CDATA[TOTAL EN GUARANIES]]></text>
