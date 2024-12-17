@@ -142,9 +142,11 @@ export class SifenApiUtilService {
             if(this.sifenLoteMessageSrv.isLoteAceptadoEnvio(response))
                 for(let detalleLote of detalles){
                     const factura = detalleLote.facturaElectronica;
+                    const oldFactura = { ...factura };
                     factura.idestadoDocumentoSifen = EstadoDocumentoSifen.ENVIADO;
                     factura.fechaCambioEstado = new Date();
                     factura.observacion = `Enviado a SIFEN. Lote id: «${lote.id}», Nro. lote: «${lote.nroLoteSifen}»`;
+                    await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactura, factura))
                     await manager.save(factura);
                 }
             await manager.save(lote);

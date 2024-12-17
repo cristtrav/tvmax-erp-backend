@@ -122,7 +122,7 @@ export class LoteSifenService {
 
         await this.datasource.transaction(async manager => {
             while(facturas.length > 0){
-                const lote = await manager.save(new Lote());
+                const lote = await manager.save(new Lote());                
                 lote.detallesLote = [];
                 facturas.slice(0, this.TAMANIO_LOTE).forEach(async factura => {
                     const detalleLote = new DetalleLote();
@@ -145,6 +145,7 @@ export class LoteSifenService {
         console.log('se van a actualizar los datos de facuturas segun resultado de lote');
         
         const lote = await this.lotesRepo.findOneByOrFail({id: respuestaLote.idlote})
+        const oldLote = { ...lote }; 
         const detalles = await this.detalleLoteRepo.find({
             where: { idlote: lote.id },
             relations: { facturaElectronica: true }
@@ -172,6 +173,7 @@ export class LoteSifenService {
             ){
                 for(let detalleLote of detalles){
                     const factura = detalleLote.facturaElectronica;
+                    const oldFactura = { ... factura };
                     console.log(`Procesar factura electronica ${factura.idventa}`);
 
                     const resultadoProc = respuestaLote.resultados.find(r => r.cdc == this.sifenUtilSrv.getCDC(factura))
@@ -201,6 +203,7 @@ export class LoteSifenService {
                             factura.fechaCambioEstado = respuestaLote.fecha;
                         }
                         factura.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
+                        await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactura, factura));
                         await manager.save(factura);
                     }
                     detalleLote.codigoEstado = resultadoProc.detalle.codigo;
@@ -210,6 +213,7 @@ export class LoteSifenService {
                 lote.consultado = true;
                 lote.fechaHoraConsulta = new Date();
                 lote.observacion = respuestaLote.mensaje;
+                await manager.save(Lote.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldLote, lote));
                 await manager.save(lote);
             }
         });

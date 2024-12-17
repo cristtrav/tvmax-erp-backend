@@ -1,10 +1,12 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
-import { Lote } from "./lote.entity";
-import { Venta } from "../venta.entity";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { DetalleLote } from "./detalle-lote.entity";
+import { EventoAuditoria } from "../evento-auditoria.entity";
+import { TablaAuditoria } from "../tabla-auditoria.entity";
 
 @Entity({schema: "facturacion"})
 export class FacturaElectronica {
+
+    static readonly TABLA_AUDITORIA = new TablaAuditoria().initialize(38, 'Factura Electrónica');
 
     @PrimaryColumn()
     idventa: number;
@@ -41,5 +43,21 @@ export class FacturaElectronica {
 
     @OneToMany(() => DetalleLote, (DetalleLote) => DetalleLote.facturaElectronica)
     detallesLote: DetalleLote[];
+
+    static getEventoAuditoria(
+        idusuario: number,
+        operacion: 'R' | 'M' | 'E',
+        oldValue: FacturaElectronica | null,
+        newValue: FacturaElectronica | null
+    ): EventoAuditoria {
+        const evento = new EventoAuditoria();
+        evento.idusuario = idusuario;
+        evento.operacion = operacion;
+        evento.fechahora = new Date();
+        evento.idtabla = FacturaElectronica.TABLA_AUDITORIA.id;
+        evento.estadoanterior = oldValue;
+        evento.estadonuevo = newValue;
+        return evento;
+    }
 
 }

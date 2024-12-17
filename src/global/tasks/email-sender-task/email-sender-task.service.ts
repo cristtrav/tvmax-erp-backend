@@ -7,10 +7,11 @@ import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, DataSource, Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
+import { Usuario } from '@database/entity/usuario.entity';
 
 @Injectable()
 export class EmailSenderTaskService {
@@ -37,7 +38,8 @@ export class EmailSenderTaskService {
         private ventaRepo: Repository<Venta>,
         private facturaElectronicaUtil: FacturaElectronicaUtilsService,
         @InjectRepository(DatoContribuyente)
-        private datoContribuyenteRepo: Repository<DatoContribuyente>        
+        private datoContribuyenteRepo: Repository<DatoContribuyente>,
+        private datasource: DataSource
     ){}
 
     @Cron('*/30 7-21 * * *')
@@ -125,6 +127,7 @@ export class EmailSenderTaskService {
     }
 
     private async sendMail(facturaElectronica: FacturaElectronica){
+        const oldFacturaElectronica = { ...facturaElectronica };
         const cliente = (
             await this.ventaRepo.findOne({
                 where: { id: facturaElectronica.idventa },
@@ -134,26 +137,33 @@ export class EmailSenderTaskService {
         if(cliente.email == null){
             console.log(facturaElectronica.idventa, "Cliente sin email");
             facturaElectronica.observacionEnvioEmail = "Correo no enviado. Cliente sin email";
-            await this.facturaElectronicaRepo.save(facturaElectronica);
+            await this.datasource.transaction(async manager => {
+                await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
+                await manager.save(facturaElectronica);
+            });
             return;
         };
         console.log(facturaElectronica.idventa, `Intentando enviar email a ${cliente.email}`);        
         const transporter = nodemailer.createTransport(this.getTransportConfig());
         facturaElectronica.intentoEnvioEmail = facturaElectronica.intentoEnvioEmail + 1;
-        try{
-            const info = await transporter.sendMail(await this.getMailOptions(facturaElectronica, cliente));
-            facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.ENVIADO;
-            facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-            facturaElectronica.observacionEnvioEmail = info.response;
-            await this.facturaElectronicaRepo.save(facturaElectronica);
-        }catch(e){
-            console.error(facturaElectronica.idventa, 'Error al enviar email');
-            console.error(e);
-            facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO ;
-            facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-            facturaElectronica.observacionEnvioEmail = e;
-            await this.facturaElectronicaRepo.save(facturaElectronica);
-        }
+        await this.datasource.transaction(async manager => {
+            try{
+                const info = await transporter.sendMail(await this.getMailOptions(facturaElectronica, cliente));
+                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.ENVIADO;
+                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+                facturaElectronica.observacionEnvioEmail = info.response;
+            }catch(e){
+                console.error(facturaElectronica.idventa, 'Error al enviar email');
+                console.error(e);
+                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO ;
+                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
+                facturaElectronica.observacionEnvioEmail = e;                
+            }
+
+            await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
+            await manager.save(facturaElectronica);
+        });
+        
         
     }
 }

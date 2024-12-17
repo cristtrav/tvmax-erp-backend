@@ -174,6 +174,7 @@ export class VentasService {
             
             if(timbrado.electronico){
                 const facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles);
+                await manager.save(FacturaElectronica.getEventoAuditoria(idusuario, 'R', null, facturaElectronica));
                 await manager.save(await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles));
                 if(
                     !this.sifenUtilsSrv.isDisabled() &&
@@ -316,7 +317,7 @@ export class VentasService {
             if(timbradoActual.electronico){
                 const factElectRegen = await this.facturaElectronicaUtilSrv.regenerarFacturaElectronica(venta, detalleVenta);
                 await manager.save(factElectRegen);
-
+                await manager.save(FacturaElectronica.getEventoAuditoria(idusuario, 'M', factElectronica, factElectRegen));
                 if(!this.sifenUtilsSrv.isDisabled() &&
                     this.sifenUtilsSrv.getModo() == 'sync'
                 )await this.sifenApiUtilSrv.enviar(factElectRegen, manager);
@@ -369,6 +370,7 @@ export class VentasService {
             }
 
             if(factElectronica != null){
+                const oldFactElectronica = { ...factElectronica };
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
                 const eventoXml = await this.sifenEventosUtilSrv.getCancelacion(idevento, factElectronica)
                 const eventoXmlSigned = await this.sifenEventosUtilSrv.getEventoFirmado(eventoXml);
@@ -385,6 +387,7 @@ export class VentasService {
                 else console.log('OBS Anulación: SIFEN DESACTIVADO');
 
                 factElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.CANCELADO;
+                await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactElectronica, factElectronica));
                 await manager.save(factElectronica);
             }
         });
@@ -458,6 +461,7 @@ export class VentasService {
     public async consultarFacturaSifen(idventa: number){
         console.log('idventa a consultar', idventa)
         const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ idventa });
+        const oldFacturaElectronica = {... facturaElectronica };
 
         if(facturaElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.CANCELADO)
             throw new HttpException({
@@ -480,6 +484,7 @@ export class VentasService {
             }else{
                 console.log(`idventa: ${idventa}, ${respuesta.codigo} - ${respuesta.mensaje}`);
             }
+            await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
             await manager.save(facturaElectronica);
         })
     }
