@@ -131,7 +131,8 @@ export class Permissions {
         ANULAR: 264,
         REVERTIRANUL: 265,
         ACCESOMODULO: 266,
-        SINCRONIZARSIFEN: 267
+        SINCRONIZARSIFEN: 267,
+        MODIFICARMONTO: 268
     }
 
     static readonly PERMISOS = {
