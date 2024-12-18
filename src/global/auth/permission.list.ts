@@ -132,7 +132,8 @@ export class Permissions {
         REVERTIRANUL: 265,
         ACCESOMODULO: 266,
         SINCRONIZARSIFEN: 267,
-        MODIFICARMONTO: 268
+        MODIFICARMONTO: 268,
+        MODIFICARDESCRIPCION: 269
     }
 
     static readonly PERMISOS = {
