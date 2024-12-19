@@ -39,7 +39,8 @@ export class CobrosService {
             search,
             sort,
             offset,
-            limit
+            limit,
+            sinsuscripcion
         } = queries;
 
         const alias = 'cobro';
@@ -85,6 +86,7 @@ export class CobrosService {
             qb = qb.orWhere(`LOWER(${alias}.cobrador) LIKE :searchcobrador`, { searchcobrador: `%${search.toLowerCase()}%`});
             qb = qb.orWhere(`LOWER(${alias}.usuario) LIKE :searchusuario`, { searchusuario: `%${search.toLowerCase()}%`});*/
         }));
+        if(sinsuscripcion) query = query.andWhere(`${alias}.idsuscripcion IS NULL`);
         if (limit) query = query.take(limit);
         if (offset) query = query.skip(offset);
         if (sort) {

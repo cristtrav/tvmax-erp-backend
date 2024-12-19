@@ -21,7 +21,7 @@ export class ServiciosService {
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<ServicioView> {
-        const { eliminado, idgrupo, suscribible, search, id, sort, offset, limit } = queries;
+        const { eliminado, idgrupo, suscribible, search, id, sort, offset, limit } = queries;        
         const alias: string = 'servicio';
         let queryBuilder: SelectQueryBuilder<ServicioView> = this.servicioViewRepo.createQueryBuilder(alias);
 

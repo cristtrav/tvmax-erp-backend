@@ -81,6 +81,7 @@ export class DTOEntityUtis {
         servicio.porcentajeIva = servicioDTO.porcentajeiva;
         servicio.precio = servicioDTO.precio;
         servicio.suscribible = servicioDTO.suscribible;
+        servicio.facturarSinSuscripcion = servicioDTO.facturarsinsuscripcion;
         return servicio;
     }
 

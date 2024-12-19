@@ -25,6 +25,9 @@ export class ServicioView{
     grupo: string;
 
     @ViewColumn()
+    facturarsinsuscripcion: boolean;
+
+    @ViewColumn()
     eliminado: boolean;
 
 }

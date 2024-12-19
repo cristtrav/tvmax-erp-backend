@@ -20,6 +20,9 @@ export class Servicio{
     @Column({name: 'porcentaje_iva', precision: 3, scale: 0})
     porcentajeIva: number;
 
+    @Column({name: 'facturar_sin_suscripcion', nullable: false, default: false})
+    facturarSinSuscripcion: boolean;
+
     @Column({default: false})
     eliminado: boolean;
 }
