@@ -38,13 +38,16 @@ export class ClientesService {
         if(iddepartamento) query = query.andWhere(`${alias}.iddepartamento ${Array.isArray(iddepartamento) ? 'IN (:...iddepartamento)' : '= :iddepartamento'}`, {iddepartamento});
         if(ci) query = query.andWhere(`${alias}.ci = :ci`, {ci});
         if(excluidosorteo != null) query = query.andWhere(`${alias}.excluidosorteo = :excluidosorteo`, {excluidosorteo});
-
+        
         if(search) query = query.andWhere(
             new Brackets(qb => {
                 qb = qb.orWhere(`${alias}.ci = :cisearch`, {cisearch: search});
                 qb = qb.orWhere(`LOWER(${alias}.nombres) LIKE :nombsearch`, { nombsearch: `%${search.toLowerCase()}%`});
                 qb = qb.orWhere(`LOWER(${alias}.apellidos) LIKE :apellsearch`, {apellsearch: `%${search.toLowerCase()}%`});
                 qb = qb.orWhere(`LOWER(${alias}.razonsocial) LIKE :rssearch`, {rssearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`LOWER(${alias}.email) LIKE :emailsearch`, {emailsearch: `%${search.toLowerCase()}%`});
+                qb = qb.orWhere(`${alias}.telefono1 LIKE :telefono1search`, { telefono1search: `%${search}%`});
+                qb = qb.orWhere(`${alias}.telefono2 LIKE :telefono2search`, { telefono2search: `%${search}%`});
                 if(Number.isInteger(Number(search))) qb = qb.orWhere(`${alias}.id = :idsearch`, {idsearch: Number(search)});
             })
         );
