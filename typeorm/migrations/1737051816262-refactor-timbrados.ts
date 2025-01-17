@@ -57,6 +57,10 @@ export class RefactorTimbrados1737051816262 implements MigrationInterface {
                 LEFT JOIN usuario usuariocobro ON cobro.cobrado_por = usuariocobro.id
                 LEFT JOIN facturacion.factura_electronica ON factura_electronica.idventa = venta.id;`
             );
+        await queryRunner.query(
+            `ALTER TABLE IF EXISTS facturacion.talonario RENAME CONSTRAINT fk_timbrado_establecimiento TO fk_talonario_establecimiento;
+            ALTER TABLE IF EXISTS facturacion.talonario RENAME CONSTRAINT fk_timbrado_formato_factura TO fk_talonario_formato_factura;`
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -114,7 +118,10 @@ export class RefactorTimbrados1737051816262 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE IF EXISTS public.timbrado SET SCHEMA public;`);
         await queryRunner.query(`UPDATE public.modulo SET descripcion = 'Timbrados' WHERE id = 13;`);
         await queryRunner.query(`ALTER TABLE IF EXISTS public.venta RENAME idtalonario TO idtimbrado;`)
-        
+        await queryRunner.query(
+            `ALTER TABLE IF EXISTS facturacion.talonario RENAME CONSTRAINT fk_talonario_establecimiento TO fk_timbrado_establecimiento;
+            ALTER TABLE IF EXISTS facturacion.talonario RENAME CONSTRAINT fk_talonario_formato_factura TO fk_timbrado_formato_factura;`
+        );
     }
 
 }
