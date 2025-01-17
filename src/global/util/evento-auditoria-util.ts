@@ -43,14 +43,6 @@ export class EventoAuditoriaUtil{
             return this.getEventoAuditoria(TablasAuditoriaList.CUOTAS.id, idusuario, operacion, oldValue, newValue);
     }
 
-    public static getEventoAuditoriaTimbrado(
-        idusuario: number,
-        operacion: 'R' | 'M' | 'E',
-        oldValue: any,
-        newValue: any): EventoAuditoria{
-            return this.getEventoAuditoria(TablasAuditoriaList.TIMBRADOS.id, idusuario, operacion, oldValue, newValue);
-    }
-
     public static getEventoAuditoriaCobro(
         idusuario: number,
         operacion: 'R' | 'M' | 'E',

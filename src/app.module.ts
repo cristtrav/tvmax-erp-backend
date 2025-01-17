@@ -13,7 +13,7 @@ import { UsuariosModule } from './modulos/usuarios/usuarios.module';
 import { SuscripcionesModule } from './modulos/suscripciones/suscripciones.module';
 import { DomiciliosModule } from './modulos/domicilios/domicilios.module';
 import { CuotasModule } from './modulos/cuotas/cuotas.module';
-import { TimbradosModule } from './modulos/timbrados/timbrados.module';
+import { TalonariosModule } from './modulos/talonarios/talonarios.module';
 import { VentasModule } from './modulos/ventas/ventas.module';
 import { PermisosModule } from './modulos/permisos/permisos.module';
 import { AuditoriaModule } from './modulos/auditoria/auditoria.module';
@@ -77,7 +77,7 @@ import { DigitoVerificadorRucService } from './global/util/digito-verificador-ru
     SuscripcionesModule,
     DomiciliosModule,
     CuotasModule,
-    TimbradosModule,
+    TalonariosModule,
     VentasModule,
     PermisosModule,
     AuditoriaModule,

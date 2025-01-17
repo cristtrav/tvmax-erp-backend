@@ -7,7 +7,7 @@ import { DEDataInterface } from '../model/factura-electronica/interfaces/de-data
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { DEActividadEconomicaInterface } from '../model/factura-electronica/interfaces/de-actividad-economica.interface';
 import { DEEstablecimientoInterface } from '../model/factura-electronica/interfaces/de-establecimiento.interface';
-import { TimbradoView } from '@database/view/timbrado.view';
+import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { DEClienteInterface } from '../model/factura-electronica/interfaces/de-cliente.interface';
 import { DEItemInterface } from '../model/factura-electronica/interfaces/de-item.interface';
 import qrgen from 'facturacionelectronicapy-qrgen';
@@ -38,8 +38,8 @@ export class FacturaElectronicaUtilsService {
         private datoContribuyenteRepo: Repository<DatoContribuyente>,
         @InjectRepository(ActividadEconomica)
         private actividadEconomicaRepo: Repository<ActividadEconomica>,
-        @InjectRepository(TimbradoView)
-        private timbradoViewRepo: Repository<TimbradoView>,
+        @InjectRepository(TalonarioView)
+        private talonarioViewRepo: Repository<TalonarioView>,
         @InjectRepository(Establecimiento)
         private establecimientoRepo: Repository<Establecimiento>,
         @InjectRepository(ClienteView)
@@ -53,33 +53,33 @@ export class FacturaElectronicaUtilsService {
     ) { }
 
     public async generarDE(venta: Venta, detalles: DetalleVenta[]): Promise<string> {
-        const timbrado = await this.timbradoViewRepo.findOneByOrFail({id: venta.idtimbrado});
+        const talonario = await this.talonarioViewRepo.findOneByOrFail({id: venta.idtalonario});
         return await xmlgen.generateXMLDE(
-            await this.getParams(timbrado),
-            await this.getData(venta, detalles, timbrado),
+            await this.getParams(talonario),
+            await this.getData(venta, detalles, talonario),
             { test: false, redondeoSedeco: false }
         );
     }
 
-    public async getParams(timbrado: TimbradoView): Promise<DEParamsInterface> {
+    public async getParams(talonario: TalonarioView): Promise<DEParamsInterface> {
         return {
             version: 150,
             ruc: (await this.datoContribuyenteRepo.findOneBy({clave: DatoContribuyente.RUC}))?.valor ?? '',
             razonSocial: (await this.datoContribuyenteRepo.findOneBy({clave: DatoContribuyente.RAZON_SOCIAL}))?.valor ?? '',
             actividadesEconomicas: await this.getActividadesEconomicas(),
-            timbradoNumero: `${timbrado.nrotimbrado}`.padStart(8, '0'),
-            timbradoFecha: timbrado.fechainicio,
+            timbradoNumero: `${talonario.nrotimbrado}`.padStart(8, '0'),
+            timbradoFecha: talonario.fechainicio,
             tipoContribuyente: 1,
             tipoRegimen: 8,
-            establecimientos: await this.getEstablecimientos(timbrado.codestablecimiento)
+            establecimientos: await this.getEstablecimientos(talonario.codestablecimiento)
         }
     }
 
-    private async getData(venta: Venta, detalles: DetalleVenta[], timbrado: TimbradoView): Promise<DEDataInterface> {
+    private async getData(venta: Venta, detalles: DetalleVenta[], talonario: TalonarioView): Promise<DEDataInterface> {
         return {
             tipoDocumento: 1,
-            establecimiento: `${timbrado.codestablecimiento}`.padStart(3, '0'),
-            punto: `${timbrado.codpuntoemision}`.padStart(3, '0'),
+            establecimiento: `${talonario.codestablecimiento}`.padStart(3, '0'),
+            punto: `${talonario.codpuntoemision}`.padStart(3, '0'),
             numero: `${venta.nroFactura}`.padStart(7, '0'),
             codigoSeguridadAleatorio: this.generarCodigoSeguridadAleatorio(),
             fecha: this.formatDate(venta.fechaHoraFactura ?? venta.fechaFactura ?? new Date()),

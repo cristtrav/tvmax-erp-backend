@@ -4,7 +4,7 @@ import { Venta } from '@database/entity/venta.entity';
 import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { DetalleVenta } from '@database/entity/detalle-venta.entity';
 import { VentaView } from '@database/view/venta.view';
-import { Timbrado } from '@database/entity/timbrado.entity';
+import { Talonario } from '@database/entity/facturacion/talonario.entity';
 import { Cuota } from '@database/entity/cuota.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { Cobro } from '@database/entity/cobro.entity';
@@ -38,8 +38,8 @@ export class VentasService {
         private ventaViewRepo: Repository<VentaView>,
         @InjectRepository(DetalleVenta)
         private detalleVentaRepo: Repository<DetalleVenta>,
-        @InjectRepository(Timbrado)
-        private timbradoRepo: Repository<Timbrado>,
+        @InjectRepository(Talonario)
+        private talonarioRepo: Repository<Talonario>,
         @InjectRepository(Cuota)
         private cuotaRepo: Repository<Cuota>,
         @InjectRepository(Cliente)
@@ -71,7 +71,7 @@ export class VentasService {
             sort,
             offset,
             limit,
-            idtimbrado,
+            idtalonario,
             nrofactura,
             idestadofacturaelectronica
         } = queries;
@@ -87,7 +87,7 @@ export class VentasService {
         if (fechainiciocobro) query = query.andWhere(`${alias}.fechacobro >= :fechainiciocobro`, { fechainiciocobro });
         if (fechafincobro) query = query.andWhere(`${alias}.fechacobro <= :fechafincobro`, { fechafincobro });
         if (nrofactura) query = query.andWhere(`${alias}.nrofactura = :nrofactura`, { nrofactura });
-        if (idtimbrado) query = query.andWhere(`${alias}.idtimbrado = :idtimbrado`, { idtimbrado });
+        if (idtalonario) query = query.andWhere(`${alias}.idtalonario = :idtalonario`, { idtalonario });
         if (idestadofacturaelectronica) query = query.andWhere(`${alias}.idestadofacturaelectronica = :idestadofacturaelectronica`, {idestadofacturaelectronica});
         if (idcobradorcomision)
             if (Array.isArray(idcobradorcomision)) query = query.andWhere(`${alias}.idcobradorcomision IN (:...idcobradorcomision)`, { idcobradorcomision });
@@ -119,14 +119,14 @@ export class VentasService {
 
     async create(venta: Venta, detalles: DetalleVenta[], idusuario: number): Promise<number> {
         
-        const timbrado = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado })
-        const oldTimbrado = { ...timbrado };
+        const talonario = await this.talonarioRepo.findOneByOrFail({ id: venta.idtalonario })
+        const oldTalonario = { ...talonario };
 
-        if(timbrado.electronico){
-            venta.nroFactura = Number(timbrado.ultimoNroUsado ?? '0');
+        if(talonario.electronico){
+            venta.nroFactura = Number(talonario.ultimoNroUsado ?? '0');
             do venta.nroFactura = venta.nroFactura + 1;
-            while(await this.facturaYaRegistrada(timbrado.id, venta.nroFactura));
-        }else if (await this.facturaYaRegistrada(venta.idtimbrado, venta.nroFactura))
+            while(await this.facturaYaRegistrada(talonario.id, venta.nroFactura));
+        }else if (await this.facturaYaRegistrada(venta.idtalonario, venta.nroFactura))
             throw new HttpException({
             message: `El número de factura «${venta.nroFactura}» ya está registrado.`
         }, HttpStatus.BAD_REQUEST);
@@ -155,9 +155,9 @@ export class VentasService {
             await manager.save(cobro);
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'R', null, cobro));
 
-            timbrado.ultimoNroUsado = venta.nroFactura;
-            await manager.save(timbrado);
-            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbrado, timbrado));
+            talonario.ultimoNroUsado = venta.nroFactura;
+            await manager.save(talonario);
+            await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonario, talonario));
 
             for (let detalle of detalles) {
                 detalle.venta = venta;
@@ -172,7 +172,7 @@ export class VentasService {
                 }
             }
             
-            if(timbrado.electronico){
+            if(talonario.electronico){
                 const facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles);
                 await manager.save(FacturaElectronica.getEventoAuditoria(idusuario, 'R', null, facturaElectronica));
                 await manager.save(await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles));
@@ -209,10 +209,10 @@ export class VentasService {
             message: `No se encuentra la venta con código «${venta.id}».`
         }, HttpStatus.NOT_FOUND);
 
-        if(venta.nroFactura != oldVenta.nroFactura || venta.idtimbrado != oldVenta.idtimbrado){
+        if(venta.nroFactura != oldVenta.nroFactura || venta.idtalonario != oldVenta.idtalonario){
             const nroFacturaExiste = await this.ventaRepo.createQueryBuilder('venta')
             .where(`venta.eliminado = FALSE`)
-            .andWhere(`venta.idtimbrado = :idtimbrado`, { idtimbrado: venta.idtimbrado})
+            .andWhere(`venta.idtalonario = :idtalonario`, { idtalonario: venta.idtalonario})
             .andWhere(`venta.nroFactura = :nrofactura`, { nrofactura: venta.nroFactura })
             .getOne();
             if(nroFacturaExiste) throw new HttpException({
@@ -295,26 +295,26 @@ export class VentasService {
                 .select('MAX(venta.nroFactura)', 'ultimonro')
                 .where('venta.eliminado = false')
                 .andWhere('venta.anulado = false')
-                .andWhere('venta.idtimbrado = :idtimbrado');
-            ventaNroFacturaQuery.setParameter('idtimbrado', venta.idtimbrado);
-            const ultimoNroTimbradoActual = (await ventaNroFacturaQuery.getRawOne()).ultimonro;
+                .andWhere('venta.idtalonario = :idtalonario');
+            ventaNroFacturaQuery.setParameter('idtalonario', venta.idtalonario);
+            const ultimoNroTalonarioActual = (await ventaNroFacturaQuery.getRawOne()).ultimonro;
 
-            const timbradoActual = await this.timbradoRepo.findOneByOrFail({ id: venta.idtimbrado });
-            const oldTimbradoActual = { ...timbradoActual };
-            timbradoActual.ultimoNroUsado = ultimoNroTimbradoActual;
-            await manager.save(timbradoActual);
-            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbradoActual, timbradoActual));
+            const talonarioActual = await this.talonarioRepo.findOneByOrFail({ id: venta.idtalonario });
+            const oldTalonarioActual = { ...talonarioActual };
+            talonarioActual.ultimoNroUsado = ultimoNroTalonarioActual;
+            await manager.save(talonarioActual);
+            await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonarioActual, talonarioActual));
 
-            if (venta.idtimbrado != oldVenta.idtimbrado) {
-                ventaNroFacturaQuery.setParameter('idtimbrado', oldVenta.idtimbrado);
-                const ultimoNroTimbradoAnterior = (await ventaNroFacturaQuery.getRawOne()).ultimonro;
-                const timbradoAnterior = await this.timbradoRepo.findOneByOrFail({ id: oldVenta.idtimbrado });
-                const oldTimbradoAnterior = { ...timbradoAnterior };
-                timbradoAnterior.ultimoNroUsado = ultimoNroTimbradoAnterior;
-                await manager.save(timbradoAnterior);
-                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(3, 'M', oldTimbradoAnterior, timbradoAnterior));
+            if (venta.idtalonario != oldVenta.idtalonario) {
+                ventaNroFacturaQuery.setParameter('idtalonario', oldVenta.idtalonario);
+                const ultimoNroTalonarioAnterior = (await ventaNroFacturaQuery.getRawOne()).ultimonro;
+                const talonarioAnterior = await this.talonarioRepo.findOneByOrFail({ id: oldVenta.idtalonario });
+                const oldTalonarioAnterior = { ...talonarioAnterior };
+                talonarioAnterior.ultimoNroUsado = ultimoNroTalonarioAnterior;
+                await manager.save(talonarioAnterior);
+                await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonarioAnterior, talonarioAnterior));
             }
-            if(timbradoActual.electronico){
+            if(talonarioActual.electronico){
                 const factElectRegen = await this.facturaElectronicaUtilSrv.regenerarFacturaElectronica(venta, detalleVenta);
                 await manager.save(factElectRegen);
                 await manager.save(FacturaElectronica.getEventoAuditoria(idusuario, 'M', factElectronica, factElectRegen));
@@ -336,11 +336,11 @@ export class VentasService {
 
     async anular(idventa: number, anulado: boolean, idusuario: number) {
         const venta = await this.ventaRepo.findOneOrFail({ where: { id: idventa }, relations: { detalles: true } });
-        const timbrado = await this.timbradoRepo.findOneByOrFail({id: venta.idtimbrado});
+        const talonario = await this.talonarioRepo.findOneByOrFail({id: venta.idtalonario});
         const factElectronica = await this.facturaElectronicaRepo.findOneBy({idventa: idventa});
         const oldVenta = { ...venta };
         
-        if(timbrado.electronico && !anulado) throw new HttpException({
+        if(talonario.electronico && !anulado) throw new HttpException({
             message: 'No se puede revertir anulación de F. Electrónica'
         }, HttpStatus.BAD_REQUEST);
 
@@ -448,11 +448,11 @@ export class VentasService {
     }
 
 
-    private async facturaYaRegistrada(idtimbrado: number, nroFactura: number): Promise<boolean>{
+    private async facturaYaRegistrada(idtalonario: number, nroFactura: number): Promise<boolean>{
         return (
             await this.ventaRepo.findOneBy({
             nroFactura,
-            idtimbrado,
+            idtalonario,
             eliminado: false
             })
         ) != null

@@ -27,7 +27,7 @@ export class Venta {
     nroFactura: number;
 
     @Column({ nullable: false })
-    idtimbrado: number;
+    idtalonario: number;
 
     @Column({ name: 'idusuario_registro_factura', nullable: false })
     idusuarioRegistroFactura: number;

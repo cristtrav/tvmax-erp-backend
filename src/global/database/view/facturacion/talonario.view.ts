@@ -1,7 +1,14 @@
+import { Schemas } from "@database/meta/schemas";
 import { ViewColumn, ViewEntity } from "typeorm";
 
-@ViewEntity({name: 'vw_timbrados', expression: 'SELECT * FROM public.vw_timbrados'})
-export class TimbradoView{
+const VIEW_NAME = 'vw_talonarios'
+
+@ViewEntity({
+    name: VIEW_NAME,
+    schema: Schemas.FACTURACION,
+    expression: `SELECT * FROM ${Schemas.FACTURACION}.${VIEW_NAME}`
+})
+export class TalonarioView{
 
     @ViewColumn()
     id: number;

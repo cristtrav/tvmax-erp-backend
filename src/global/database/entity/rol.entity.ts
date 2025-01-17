@@ -1,8 +1,13 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 import { Usuario } from "./usuario.entity";
+import { RolDTO } from "@dto/rol.dto";
 
 @Entity()
 export class Rol{
+
+    constructor(rolDto?: RolDTO){
+        if(rolDto != null) this.loadDTO(rolDto);
+    }
 
     @PrimaryColumn()
     id: number;
@@ -29,5 +34,11 @@ export class Rol{
         }
     })
     usuarios: Usuario[];
+
+    private loadDTO(rolDTO: RolDTO): void {
+        this.id = rolDTO.id;
+        this.descripcion = rolDTO.descripcion;
+        if (rolDTO.eliminado != null) this.eliminado = rolDTO.eliminado;
+    }
 
 }

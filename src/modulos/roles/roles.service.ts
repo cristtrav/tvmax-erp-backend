@@ -103,7 +103,7 @@ export class RolesService {
             message: `El Rol «${rol.descripcion}» no se puede eliminar.`
         }, HttpStatus.FORBIDDEN);
 
-        const oldRol: Rol = {...rol};
+        const oldRol = {...rol};
         rol.eliminado = true;
         await this.datasource.transaction(async manager => {
             await manager.save(rol);

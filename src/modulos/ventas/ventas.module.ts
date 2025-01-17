@@ -12,7 +12,7 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { DetalleVenta } from '@database/entity/detalle-venta.entity';
 import { VentaView } from '@database/view/venta.view';
-import { Timbrado } from '@database/entity/timbrado.entity';
+import { Talonario } from '@database/entity/facturacion/talonario.entity';
 import { Cuota } from '@database/entity/cuota.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
@@ -21,7 +21,7 @@ import { FacturaElectronicaUtilsService } from './service/factura-electronica-ut
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
-import { TimbradoView } from '@database/view/timbrado.view';
+import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/services/factura-electronica.service';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
@@ -51,8 +51,8 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       Venta,
       VentaView,
       DetalleVenta, DetalleVentaView,
-      Timbrado,
-      TimbradoView,
+      Talonario,
+      TalonarioView,
       Cuota, CobroCuotasView,
       Cobro,
       DatoContribuyente,

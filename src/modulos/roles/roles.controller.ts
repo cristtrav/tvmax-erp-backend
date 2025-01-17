@@ -39,7 +39,7 @@ export class RolesController {
         @Headers('authorization') auth: string
     ){
         await this.rolesSrv.create(
-            DTOEntityUtis.rolDtoToEntity(rol),
+            new Rol(rol),
             this.jwtUtils.extractJwtSub(auth)
         );
     }
@@ -75,7 +75,7 @@ export class RolesController {
     ){
         await this.rolesSrv.edit(
             oldId,
-            DTOEntityUtis.rolDtoToEntity(rol),
+            new Rol(rol),
             this.jwtUtils.extractJwtSub(auth)
         );
     }

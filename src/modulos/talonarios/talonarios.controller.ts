@@ -1,64 +1,64 @@
 import { Permissions } from '@auth/permission.list';
-import { TimbradoDTO } from 'src/global/dto/timbrado.dto';
+import { TalonarioDTO } from '@dto/talonario.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
-import { TimbradosService } from './timbrados.service';
-import { TimbradoView } from '@database/view/timbrado.view';
+import { TalonariosService } from './talonarios.service';
+import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { FormatoFactura } from '@database/entity/formato-factura.entity';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { Talonario } from '@database/entity/facturacion/talonario.entity';
 
-@Controller('timbrados')
+@Controller('talonarios')
 @UseGuards(LoginGuard, AllowedInGuard)
 @UseFilters(HttpExceptionFilter)
-export class TimbradosController {
+export class TalonariosController {
 
     constructor(
-        private timbradosSrv: TimbradosService,
+        private talonariosSrv: TalonariosService,
         private jwtUtil: JwtUtilsService
     ) { }
 
     @Post()
-    @AllowedIn(Permissions.TIMBRADOS.REGISTRAR)
+    @AllowedIn(Permissions.TALONARIOS.REGISTRAR)
     async create(
-        @Body() t: TimbradoDTO,
+        @Body() t: TalonarioDTO,
         @Headers('authorization') auth: string
         
     ) {
-        await this.timbradosSrv.create(
-            DTOEntityUtis.timbradoDtoToEntity(t),
+        await this.talonariosSrv.create(
+            new Talonario(t),
             this.jwtUtil.extractJwtSub(auth)
         )
     }
 
     @Get()
     @AllowedIn(
-        Permissions.TIMBRADOS.CONSULTAR,
+        Permissions.TALONARIOS.CONSULTAR,
         Permissions.POS.ACCESOMODULO,
         Permissions.POSMOVIL.ACCESOMODULO
     )
     findAll(
         @Query() queries: {[name: string]: any}
-    ): Promise<TimbradoView[]> {
-        return this.timbradosSrv.findAll(queries);
+    ): Promise<TalonarioView[]> {
+        return this.talonariosSrv.findAll(queries);
     }
 
     @Get('total')
-    @AllowedIn(Permissions.TIMBRADOS.CONSULTAR)
+    @AllowedIn(Permissions.TALONARIOS.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number>{
-        return this.timbradosSrv.count(queries);
+        return this.talonariosSrv.count(queries);
     }
 
     @Get('ultimoid')
-    @AllowedIn(Permissions.TIMBRADOS.ACCESOFORMULARIO)
+    @AllowedIn(Permissions.TALONARIOS.ACCESOFORMULARIO)
     getLastId(): Promise<number>
     {
-        return this.timbradosSrv.getLastId();
+        return this.talonariosSrv.getLastId();
     }
 
     @Get(':id/formatoimpresion')
@@ -66,44 +66,44 @@ export class TimbradosController {
         Permissions.POS.ACCESOMODULO,
         Permissions.POSMOVIL.ACCESOMODULO
     )
-    findFormatoByIdtimbrado(
-        @Param('id') idtimbrado: number
+    findFormatoByIdtalonario(
+        @Param('id') idtalonario: number
     ): Promise<FormatoFactura>{
-        return this.timbradosSrv.findFormatoByIdtimbrado(idtimbrado)
+        return this.talonariosSrv.findFormatoByIdtalonario(idtalonario)
     }
 
     @Get(':id')
     @AllowedIn(
-        Permissions.TIMBRADOS.ACCESOFORMULARIO,
+        Permissions.TALONARIOS.ACCESOFORMULARIO,
         Permissions.POS.ACCESOMODULO,
         Permissions.POSMOVIL.ACCESOMODULO
     )
     async findById(
         @Param('id') id: number
-    ): Promise<TimbradoView> {
-        return this.timbradosSrv.findById(id);
+    ): Promise<TalonarioView> {
+        return this.talonariosSrv.findById(id);
     }
 
     @Put(':id')
-    @AllowedIn(Permissions.TIMBRADOS.EDITAR)
+    @AllowedIn(Permissions.TALONARIOS.EDITAR)
     async edit(
         @Param('id') oldid: number,
-        @Body() t: TimbradoDTO,
+        @Body() t: TalonarioDTO,
         @Headers('authorization') auth: string
     ) {
-        await this.timbradosSrv.edit(
+        await this.talonariosSrv.edit(
             oldid,
-            DTOEntityUtis.timbradoDtoToEntity(t),
+            new Talonario(t),
             this.jwtUtil.extractJwtSub(auth)
         )
     }
 
     @Delete(':id')
-    @AllowedIn(Permissions.TIMBRADOS.ELIMINAR)
+    @AllowedIn(Permissions.TALONARIOS.ELIMINAR)
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
     ) {
-        await this.timbradosSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
+        await this.talonariosSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
     }
 }

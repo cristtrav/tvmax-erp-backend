@@ -18,7 +18,7 @@ export class VentaDTO {
     idcliente: number | null = null;
     prefijofactura: string | null = null;
     nrofactura: number | null = null;
-    idtimbrado: number | null = null;
+    idtalonario: number | null = null;
     timbrado: number | null = null;
     vencimientotimbrado: Date | null = null;
     iniciovigenciatimbrado: Date | null = null;

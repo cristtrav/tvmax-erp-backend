@@ -113,7 +113,7 @@ export class Permissions {
         ACCESOMODULO: 225,
         GENERARCUOTASMES: 226
     }
-    static readonly TIMBRADOS = {
+    static readonly TALONARIOS = {
         CONSULTAR: 240,
         REGISTRAR: 241,
         EDITAR: 242,

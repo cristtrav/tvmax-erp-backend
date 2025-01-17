@@ -4,8 +4,7 @@ import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CuotasScheduleService } from './cuotas-schedule/cuotas-schedule.service';
-import { TimbradosTasksService } from './timbrados-tasks/timbrados-tasks.service';
-import { Timbrado } from '@database/entity/timbrado.entity';
+import { Talonario } from '@database/entity/facturacion/talonario.entity';
 import { CuotasService } from '@modulos/cuotas/cuotas.service';
 import { CuotaView } from '@database/view/cuota.view';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
@@ -15,7 +14,7 @@ import { Venta } from '@database/entity/venta.entity';
 import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
-import { TimbradoView } from '@database/view/timbrado.view';
+import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { ClienteView } from '@database/view/cliente.view';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
@@ -42,7 +41,7 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       Suscripcion,
       Cuota,
       GeneracionCuotas,
-      Timbrado,
+      Talonario,
       CuotaView,
       CobroCuotasView,
       FacturaElectronica,
@@ -50,7 +49,7 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       Venta,
       DatoContribuyente,
       ActividadEconomica,
-      TimbradoView,
+      TalonarioView,
       Establecimiento,
       ClienteView,
       CodigoSeguridadContribuyente,
@@ -63,7 +62,6 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
   ],
   providers: [
     CuotasScheduleService,
-    TimbradosTasksService,
     CuotasService,
     EmailSenderTaskService,
     FacturaElectronicaUtilsService,

@@ -41,11 +41,7 @@ export class TablasAuditoriaList{
         nombre: 'usuario',
         descripcion: 'Usuarios'
     };
-    public static TIMBRADOS: TablaAuditoriaDTO = {
-        id: 9,
-        nombre: 'timbrado',
-        descripcion: 'Timbrados'
-    };
+
     public static VENTA: TablaAuditoriaDTO = {
         id: 10,
         nombre: 'venta',

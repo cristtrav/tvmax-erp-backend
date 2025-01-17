@@ -11,7 +11,7 @@ import { GrupoDTO } from "src/global/dto/grupo.dto";
 import { RolDTO } from "src/global/dto/rol.dto";
 import { ServicioDTO } from "src/global/dto/servicio.dto";
 import { SuscripcionDTO } from "src/global/dto/suscripcion.dto";
-import { TimbradoDTO } from "src/global/dto/timbrado.dto";
+import { TalonarioDTO } from "@dto/talonario.dto";
 import { UsuarioDTO } from "src/global/dto/usuario.dto";
 import { VentaDTO } from "src/global/dto/venta.dto";
 import { Barrio } from "../database/entity/barrio.entity";
@@ -25,7 +25,7 @@ import { Grupo } from "../database/entity/grupo.entity";
 import { Rol } from "../database/entity/rol.entity";
 import { Servicio } from "../database/entity/servicio.entity";
 import { Suscripcion } from "../database/entity/suscripcion.entity";
-import { Timbrado } from "../database/entity/timbrado.entity";
+import { Talonario } from "../database/entity/facturacion/talonario.entity";
 import { Usuario } from "../database/entity/usuario.entity";
 import { Venta } from "../database/entity/venta.entity";
 import { Sorteo } from "@database/entity/sorteos/sorteo.entity";
@@ -99,14 +99,6 @@ export class DTOEntityUtis {
         return cuota;
     }
 
-    public static rolDtoToEntity(rolDTO: RolDTO): Rol {
-        const rol: Rol = new Rol();
-        rol.id = rolDTO.id;
-        rol.descripcion = rolDTO.descripcion;
-        if (rolDTO.eliminado != null) rol.eliminado = rolDTO.eliminado;
-        return rol;
-    }
-
     public static usuarioDtoToEntity(usuarioDTO: UsuarioDTO): Usuario {
         const usuario: Usuario = new Usuario();
         usuario.id = usuarioDTO.id;
@@ -118,23 +110,6 @@ export class DTOEntityUtis {
         usuario.password = usuarioDTO.password;
         usuario.accesoSistema = usuarioDTO.accesosistema;
         return usuario;
-    }
-
-    public static timbradoDtoToEntity(timbradoDTO: TimbradoDTO): Timbrado {
-        const timbrado: Timbrado = new Timbrado();
-        timbrado.id = timbradoDTO.id;
-        timbrado.codEstablecimiento = timbradoDTO.codestablecimiento;
-        timbrado.codPuntoEmision = timbradoDTO.codpuntoemision;
-        timbrado.fechaInicioVigencia = new Date(`${timbradoDTO.fechainicio}T00:00:00`);
-        if (timbradoDTO.fechavencimiento) timbrado.fechaVencimiento = new Date(`${timbradoDTO.fechavencimiento}T00:00:00`);
-        timbrado.nroInicio = timbradoDTO.nroinicio;
-        if (timbradoDTO.nrofin) timbrado.nroFin = timbradoDTO.nrofin;
-        timbrado.nroTimbrado = timbradoDTO.nrotimbrado;
-        timbrado.ultimoNroUsado = timbradoDTO.ultimonrousado;
-        timbrado.activo = timbradoDTO.activo;
-        timbrado.idformatoFactura = timbradoDTO.idformatofactura;
-        timbrado.electronico = timbradoDTO.electronico;
-        return timbrado;
     }
 
     public static domicilioDtoToEntity(domicilioDto: DomicilioDTO): Domicilio {        
@@ -183,7 +158,7 @@ export class DTOEntityUtis {
             null;
         venta.fechaHoraFactura = ventaDto.fechahorafactura ? new Date(ventaDto.fechahorafactura) : null;
         venta.idcliente = ventaDto.idcliente;
-        venta.idtimbrado = ventaDto.idtimbrado;
+        venta.idtalonario = ventaDto.idtalonario;
         venta.idusuarioRegistroFactura = ventaDto.idusuarioregistrofactura;
         venta.nroFactura = ventaDto.nrofactura;
         venta.total = ventaDto.total;

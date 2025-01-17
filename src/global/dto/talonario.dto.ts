@@ -1,4 +1,4 @@
-export class TimbradoDTO {
+export class TalonarioDTO {
     id: number | null = null;
     codestablecimiento: number | null = null;
     codpuntoemision: number | null = null;

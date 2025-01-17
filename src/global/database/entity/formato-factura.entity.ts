@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { Timbrado } from "./timbrado.entity";
+import { Talonario } from "./facturacion/talonario.entity";
 
 @Entity()
 export class FormatoFactura{
@@ -22,7 +22,7 @@ export class FormatoFactura{
     @Column({default: false, nullable: false})
     eliminado: boolean;
 
-    @OneToMany(() => Timbrado, (timbrado) => timbrado.formato)
-    timbrados: Timbrado[];
+    @OneToMany(() => Talonario, (talonario) => talonario.formato)
+    talonarios: Talonario[];
 
 }

@@ -19,7 +19,7 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { AnulacionRequestDTO } from './dto/anulacion-request.dto';
-import { Timbrado } from '@database/entity/timbrado.entity';
+import { Talonario } from '@database/entity/facturacion/talonario.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
@@ -50,8 +50,8 @@ export class CobranzaExternaService {
         private cobroRepo: Repository<Cobro>,
         @InjectRepository(Venta)
         private ventaRepo: Repository<Venta>,
-        @InjectRepository(Timbrado)
-        private timbradoRepo: Repository<Timbrado>,
+        @InjectRepository(Talonario)
+        private talonarioRepo: Repository<Talonario>,
         @InjectRepository(FacturaElectronica)
         private facturaElectronicaRepo: Repository<FacturaElectronica>,
         private datasource: DataSource,
@@ -163,14 +163,14 @@ export class CobranzaExternaService {
             cobro.codTransaccionCobranzaExterna = request.codTransaccion;
             await manager.save(cobro);
 
-            if(venta.idtimbrado != null){
-                const timbrado = await this.timbradoRepo.findOneByOrFail({id: venta.idtimbrado}); 
+            if(venta.idtalonario != null){
+                const talonario = await this.talonarioRepo.findOneByOrFail({id: venta.idtalonario}); 
                 
-                if(timbrado.electronico){
-                    const oldTimbrado = { ...timbrado };
-                    timbrado.ultimoNroUsado = venta.nroFactura;
-                    await manager.save(timbrado);
-                    await manager.save(EventoAuditoriaUtil.getEventoAuditoriaTimbrado(Usuario.ID_USUARIO_SISTEMA, 'M', oldTimbrado, timbrado));
+                if(talonario.electronico){
+                    const oldTalonario = { ...talonario };
+                    talonario.ultimoNroUsado = venta.nroFactura;
+                    await manager.save(talonario);
+                    await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonario, talonario));
 
                     const facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, [detalle]);
                     await manager.save(facturaElectronica);
@@ -288,14 +288,14 @@ export class CobranzaExternaService {
         venta.fechaFactura = new Date();
         venta.fechaHoraFactura = new Date();
 
-        const timbrados = await this.timbradoRepo.findBy({ eliminado: false, electronico: true, activo: true });
-        if(timbrados.length > 0){
-            let timbrado = timbrados[0];
+        const talonarios = await this.talonarioRepo.findBy({ eliminado: false, electronico: true, activo: true });
+        if(talonarios.length > 0){
+            let talonario = talonarios[0];
             const puntoEmision = Number(process.env.PUNTO_EMISION_COBRANZA_EXT);
             if(Number.isInteger(puntoEmision))
-                timbrado = timbrados.find(t => t.codPuntoEmision == puntoEmision) ?? timbrado;
-            venta.idtimbrado = timbrado.id;
-            venta.nroFactura = Number(timbrado.ultimoNroUsado ?? 0) + 1
+                talonario = talonarios.find(t => t.codPuntoEmision == puntoEmision) ?? talonario;
+            venta.idtalonario = talonario.id;
+            venta.nroFactura = Number(talonario.ultimoNroUsado ?? 0) + 1
         }
         return venta;
     }

@@ -52,7 +52,7 @@ export class VentaView{
     nrofactura: number;
 
     @ViewColumn()
-    idtimbrado: number;
+    idtalonario: number;
 
     @ViewColumn()
     timbrado: number;

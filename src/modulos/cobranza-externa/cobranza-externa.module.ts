@@ -13,13 +13,13 @@ import { DetalleConsultaCobranzaExterna } from '@database/entity/detalle-consult
 import { ConsultaCobranzaExterna } from '@database/entity/consulta-cobranza-externa.entity';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Venta } from '@database/entity/venta.entity';
-import { Timbrado } from '@database/entity/timbrado.entity';
+import { Talonario } from '@database/entity/facturacion/talonario.entity';
 import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
 import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
-import { TimbradoView } from '@database/view/timbrado.view';
+import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
@@ -48,10 +48,10 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       ConsultaCobranzaExterna,
       Cobro,
       Venta,
-      Timbrado,
+      Talonario,
       DatoContribuyente,
       ActividadEconomica,
-      TimbradoView,
+      TalonarioView,
       Establecimiento,
       CodigoSeguridadContribuyente,
       FacturaElectronica,
