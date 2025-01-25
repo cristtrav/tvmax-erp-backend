@@ -31,4 +31,5 @@ export class VentaDTO {
     usuariorioregistrocobro: string | null = null;
     detalles: DetalleVentaDTO [] = [];
     eliminado: boolean | null = false;
+    iddte: number | null = null;
 }

@@ -91,6 +91,9 @@ export class VentaView{
     usuarioregistrocobro: string;
 
     @ViewColumn()
+    iddte: number;
+
+    @ViewColumn()
     idestadofacturaelectronica: number;
 
     @ViewColumn()

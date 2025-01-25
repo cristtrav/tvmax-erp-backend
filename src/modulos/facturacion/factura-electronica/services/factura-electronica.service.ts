@@ -1,4 +1,4 @@
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,8 +8,8 @@ import { Repository } from 'typeorm';
 export class FacturaElectronicaService {
 
     constructor(
-        @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        @InjectRepository(DTE)
+        private facturaElectronicaRepo: Repository<DTE>,
         @InjectRepository(FacturaElectronicaView)
         private facturaElectronicaViewRepo: Repository<FacturaElectronicaView>
     ){}
@@ -18,8 +18,8 @@ export class FacturaElectronicaService {
         return this.facturaElectronicaViewRepo.findOneByOrFail({ idventa })
     }
 
-    findById(idventa: number): Promise<FacturaElectronica>{
-        return this.facturaElectronicaRepo.findOneByOrFail({ idventa });
+    findById(id: number): Promise<DTE>{
+        return this.facturaElectronicaRepo.findOneByOrFail({ id });
     }
 
 }

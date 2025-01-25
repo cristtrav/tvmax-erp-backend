@@ -9,7 +9,7 @@ import { CuotasService } from '@modulos/cuotas/cuotas.service';
 import { CuotaView } from '@database/view/cuota.view';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { EmailSenderTaskService } from './email-sender-task/email-sender-task.service';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
@@ -31,7 +31,7 @@ import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consult
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
-import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
 import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
 import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
@@ -44,7 +44,7 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       Talonario,
       CuotaView,
       CobroCuotasView,
-      FacturaElectronica,
+      DTE,
       VentaView,
       Venta,
       DatoContribuyente,

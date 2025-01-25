@@ -14,7 +14,7 @@ import qrgen from 'facturacionelectronicapy-qrgen';
 import xmlsign from 'facturacionelectronicapy-xmlsign';
 import { copyFile, readdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { existsSync, mkdirSync, rmdirSync } from 'node:fs';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { Repository } from 'typeorm';
@@ -47,8 +47,8 @@ export class FacturaElectronicaUtilsService {
         @InjectRepository(CodigoSeguridadContribuyente)
         private cscRepo: Repository<CodigoSeguridadContribuyente>,
         private consultaRucSrv: ConsultaRucService,
-        @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        @InjectRepository(DTE)
+        private facturaElectronicaRepo: Repository<DTE>,
         private kudeUtils: KudeUtilsService
     ) { }
 
@@ -166,10 +166,7 @@ export class FacturaElectronicaUtilsService {
         for(let detalle of detalles){
             items.push({
                 codigo: `${detalle.idservicio}`,
-                descripcion:
-                    this.sifenUtilsSrv.getAmbiente() == 'prod' ?
-                    detalle.descripcion :
-                    'DOCUMENTO ELECTRÓNICO SIN VALOR COMERCIAL NI FISCAL - GENERADO EN AMBIENTE DE PRUEBA',
+                descripcion: detalle.descripcion,
                 unidadMedida: 77,
                 cantidad: detalle.cantidad,
                 precioUnitario: detalle.monto,
@@ -220,7 +217,7 @@ export class FacturaElectronicaUtilsService {
         }
     }
       
-    public async generateKude(factElectronica: FacturaElectronica, conDuplicado: boolean = false): Promise<StreamableFile>{
+    public async generateKude(factElectronica: DTE, conDuplicado: boolean = false): Promise<StreamableFile>{
         const timestamp = `${new Date().getTime()}`;
         if(!existsSync('tmp')) mkdirSync('tmp');
         if(!existsSync(`tmp/${timestamp}`)) mkdirSync(`tmp/${timestamp}`);
@@ -237,7 +234,7 @@ export class FacturaElectronicaUtilsService {
         const urlLogo = `${process.cwd()}/src/assets/facturacion-electronica/img/logo-tvmax.png`;
 
         //Escribir XML a archivo temporal (La libreria lee el archivo del disco)
-        await writeFile(dteFilePath, factElectronica.documentoElectronico);
+        await writeFile(dteFilePath, factElectronica.xml);
 
         //Generar KUDE en PDF (La libreria genera en un archivo PDF en disco)
         await this.kudeUtils.generate(
@@ -289,9 +286,9 @@ export class FacturaElectronicaUtilsService {
         }
     }
 
-    public async generarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
-        const facturaElectronica = new FacturaElectronica();
-        facturaElectronica.idventa = venta.id;
+    public async generarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<DTE> {
+        const facturaElectronica = new DTE();
+        //facturaElectronica.idventa = venta.id;
         facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
         facturaElectronica.version = 1;
         facturaElectronica.fechaCambioEstado = new Date();
@@ -304,7 +301,7 @@ export class FacturaElectronicaUtilsService {
         //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
         //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
 
-        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        facturaElectronica.xml = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
         facturaElectronica.firmado = signedXmlDE != null;
         facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
         facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
@@ -313,9 +310,9 @@ export class FacturaElectronicaUtilsService {
         return facturaElectronica;
     }
 
-    public async regenerarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<FacturaElectronica> {
+    public async regenerarFacturaElectronica(venta: Venta, detalles: DetalleVenta[]): Promise<DTE> {
         
-        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ idventa: venta.id });
+        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ id: venta.iddte });
         facturaElectronica.version = facturaElectronica.version + 1;
         
         facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.NO_ENVIADO;
@@ -329,7 +326,7 @@ export class FacturaElectronicaUtilsService {
         //console.log('Factura XML firmado generado', signedWithQRXmlDE != null);
         //console.log('Factura XML firmado con QR generado', signedWithQRXmlDE != null);
 
-        facturaElectronica.documentoElectronico = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        facturaElectronica.xml = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
         facturaElectronica.firmado = signedXmlDE != null;
         facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
         facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();

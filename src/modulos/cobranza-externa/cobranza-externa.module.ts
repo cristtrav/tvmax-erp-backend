@@ -22,7 +22,7 @@ import { ActividadEconomica } from '@database/entity/facturacion/actividad-econo
 import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-util.service';
 import { VentaView } from '@database/view/venta.view';
@@ -31,7 +31,7 @@ import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sife
 import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
 import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
-import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
 import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
 @Module({
@@ -54,7 +54,7 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       TalonarioView,
       Establecimiento,
       CodigoSeguridadContribuyente,
-      FacturaElectronica,
+      DTE,
       EstadoDocumentoSifen,
       VentaView,
       Lote,

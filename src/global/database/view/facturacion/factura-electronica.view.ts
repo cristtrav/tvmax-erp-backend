@@ -6,6 +6,9 @@ import { ViewColumn, ViewEntity } from "typeorm";
     expression: 'SELECT * FROM facturacion.vw_facturas_electronicas'
 })
 export class FacturaElectronicaView{
+
+    @ViewColumn()
+    id: number;
     
     @ViewColumn()
     idventa: number;

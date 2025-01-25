@@ -1,16 +1,16 @@
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import setApi from 'facturacionelectronicapy-setapi';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
+import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SifenUtilService } from './sifen-util.service';
 import { Lote } from '@database/entity/facturacion/lote.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
 import { ResultadoProcesamientoLoteType } from '@modulos/sifen/lote-sifen/types/resultado-procesamiento-lote.type';
-import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
 import { ConsultaDTEResponse } from '@modulos/sifen/consulta-dte/interfaces/consulta-dte-response.interface';
 import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
@@ -21,8 +21,8 @@ export class SifenApiUtilService {
         private sifenUtilSrv: SifenUtilService,
         private sifenLoteMessageSrv: SifenLoteMessageService,
         private sifenConsultaDTEMsgSrv: ConsultaDTEMessageService,
-        @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        @InjectRepository(DTE)
+        private facturaElectronicaRepo: Repository<DTE>,
         @InjectRepository(EstadoDocumentoSifen)
         private estadoDocumentoSifenRepo: Repository<EstadoDocumentoSifen>,
         @InjectRepository(Lote)
@@ -32,28 +32,28 @@ export class SifenApiUtilService {
         private datasource: DataSource
     ){}
 
-    public async enviar(factElectronica: FacturaElectronica, manager: EntityManager){
+    public async enviar(factElectronica: DTE, manager: EntityManager){
         if(!factElectronica){
-            console.log(factElectronica.idventa, `No se encuentra la factura electrónica`);
+            console.log(factElectronica.id, `No se encuentra la factura electrónica`);
             return;
         }
         if(!factElectronica.firmado){
-            console.log(factElectronica.idventa, 'No se envia a SIFEN, documento sin firma');
-            factElectronica.observacion = `${factElectronica.idventa} - No se envia a SIFEN, documento sin firma`;
+            console.log(factElectronica.id, 'No se envia a SIFEN, documento sin firma');
+            factElectronica.observacion = `${factElectronica.id} - No se envia a SIFEN, documento sin firma`;
             if(manager) await manager.save(factElectronica);
             return;
         }
 
         if(!this.sifenUtilSrv.certDataExists()){
-            console.log(factElectronica.idventa, 'No se envia a SIFEN, no se encuentra el certificado digital');
-            factElectronica.observacion = `${factElectronica.idventa} - No se envia a SIFEN, no se encuentra el certificado digital`;
+            console.log(factElectronica.id, 'No se envia a SIFEN, no se encuentra el certificado digital');
+            factElectronica.observacion = `${factElectronica.id} - No se envia a SIFEN, no se encuentra el certificado digital`;
             if(manager) await manager.save(factElectronica);
         }
         
         const response = await setApi.recibe(
-            Number(`${factElectronica.idventa}${factElectronica.version}`),
-            factElectronica.documentoElectronico,
-            this.sifenUtilSrv.getAmbiente(),
+            Number(`${factElectronica.id}${factElectronica.version}`), //Antes tenia idventa
+            factElectronica.xml,
+            this.sifenUtilSrv.getAmbiente(), 
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
         );
@@ -69,8 +69,8 @@ export class SifenApiUtilService {
         await manager.save(factElectronica);
     }
 
-    public async enviarCancelacion(cancelacion: CancelacionFactura, entityManager: EntityManager){
-        const factElect = await this.facturaElectronicaRepo.findOneBy({ idventa: cancelacion.idventa });
+    public async enviarCancelacion(cancelacion: DTECancelacion, entityManager: EntityManager){
+        const factElect = await this.facturaElectronicaRepo.findOneBy({ id: cancelacion.iddte });
 
         if(factElect.idestadoDocumentoSifen != EstadoDocumentoSifen.APROBADO && factElect.idestadoDocumentoSifen != EstadoDocumentoSifen.APROBADO_CON_OBS){
             const estadoDoc = await this.estadoDocumentoSifenRepo.findOneBy({ id: factElect.idestadoDocumentoSifen });
@@ -88,7 +88,7 @@ export class SifenApiUtilService {
         cancelacion.fechaHoraEnvio = new Date();
         const response = await setApi.evento(
             Number(cancelacion.id),
-            cancelacion.documento, 
+            cancelacion.xml, 
             this.sifenUtilSrv.getAmbiente(),
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
@@ -110,7 +110,7 @@ export class SifenApiUtilService {
         const lote = await this.loteRepo.findOneByOrFail({ id });
         const detalles = await this.detalleLoteRepo.find({
             where: { idlote: id },
-            relations: { facturaElectronica: true }
+            relations: { dte: true }
         });
 
         if(detalles.length == 0)
@@ -118,14 +118,14 @@ export class SifenApiUtilService {
                 message: 'Lotes sin detalles, no se puede enviar' 
             }, HttpStatus.INTERNAL_SERVER_ERROR)
 
-        if(detalles.some(dl => dl.facturaElectronica == null))
+        if(detalles.some(dl => dl.dte == null))
             throw new HttpException({
                 message: `No se pudo obtener factura electrónica de algun detalle del lote`
             }, HttpStatus.INTERNAL_SERVER_ERROR);
 
         const response = await setApi.recibeLote(
             lote.id,
-            detalles.map(dl => dl.facturaElectronica.documentoElectronico),
+            detalles.map(dl => dl.dte.xml),
             this.sifenUtilSrv.getAmbiente(),
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
@@ -141,12 +141,12 @@ export class SifenApiUtilService {
             
             if(this.sifenLoteMessageSrv.isLoteAceptadoEnvio(response))
                 for(let detalleLote of detalles){
-                    const factura = detalleLote.facturaElectronica;
+                    const factura = detalleLote.dte;
                     const oldFactura = { ...factura };
                     factura.idestadoDocumentoSifen = EstadoDocumentoSifen.ENVIADO;
                     factura.fechaCambioEstado = new Date();
                     factura.observacion = `Enviado a SIFEN. Lote id: «${lote.id}», Nro. lote: «${lote.nroLoteSifen}»`;
-                    await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactura, factura))
+                    await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactura, factura))
                     await manager.save(factura);
                 }
             await manager.save(lote);
@@ -192,7 +192,7 @@ export class SifenApiUtilService {
         );
     }
 
-    public async consultarDTE(factura: FacturaElectronica): Promise<ConsultaDTEResponse> {
+    public async consultarDTE(factura: DTE): Promise<ConsultaDTEResponse> {
         console.log('cdc a consultar', this.sifenUtilSrv.getCDC(factura));
         const response = await setApi.consulta(
             new Date().getTime(),

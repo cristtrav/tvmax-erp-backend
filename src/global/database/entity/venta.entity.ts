@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { DetalleVenta } from "./detalle-venta.entity";
 import { Cliente } from "./cliente.entity";
+import { Talonario } from "./facturacion/talonario.entity";
 
 @Entity()
 export class Venta {
@@ -94,10 +95,17 @@ export class Venta {
     @Column({ default: false, nullable: false })
     eliminado: boolean;
 
+    @Column()
+    iddte: number;
+
     @OneToMany(() => DetalleVenta, (detalle) => detalle.venta)
     detalles: DetalleVenta[];
 
     @ManyToOne(() => Cliente, (cliente) => cliente.ventas)
     @JoinColumn({ name: 'idcliente' })
     cliente: Cliente;
+
+    @ManyToOne(() => Talonario)
+    @JoinColumn({name: 'idtalonario'})
+    talonario: Talonario;
 }

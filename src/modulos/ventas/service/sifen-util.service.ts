@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CertDataType } from '../types/cert-data.type';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { xml2json } from 'xml-js';
 
 @Injectable()
@@ -38,8 +38,8 @@ export class SifenUtilService {
         return process.env.SIFEN_ENVIO_AUTO_LOTE_DISABLED == 'TRUE';
     }
 
-    public getCDC(factura: FacturaElectronica): string {
-        const deJson = JSON.parse(xml2json(factura.documentoElectronico));
+    public getCDC(factura: DTE): string {
+        const deJson = JSON.parse(xml2json(factura.xml));
         return deJson.elements[0].elements[1].attributes.Id;
     }
 

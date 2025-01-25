@@ -1,8 +1,7 @@
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { FacturaElectronica } from "./factura-electronica.entity";
 import { TablaAuditoria } from "../tabla-auditoria.entity";
 import { EventoAuditoria } from "../evento-auditoria.entity";
-import { DetalleLote } from "./detalle-lote.entity";
+import { DetalleLote } from "./lote-detalle.entity";
 @Entity({schema: 'facturacion'})
 export class Lote {
 
@@ -14,12 +13,12 @@ export class Lote {
     @Column({
         name: 'fecha_hora_creacion',
         nullable: false,
-        type: 'time with time zone',
+        type: 'timestamp with time zone',
         default: new Date()
     })
     fechaHoraCreacion: Date;
 
-    @Column({name: 'fecha_hora_consulta', type: 'time with time zone'})
+    @Column({name: 'fecha_hora_consulta', type: 'timestamp with time zone'})
     fechaHoraConsulta: Date;
 
     @Column({name: 'fecha_hora_envio', type: 'timestamp with time zone'})

@@ -1,4 +1,4 @@
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { VentaView } from '@database/view/venta.view';
 import { Injectable } from '@nestjs/common';
@@ -21,13 +21,13 @@ export class SifenEventosUtilService {
         private talonarioViewRepo: Repository<TalonarioView>,
     ){}
 
-    public async getCancelacion(idevento: number, factura: FacturaElectronica): Promise<string>{
+    public async getCancelacion(idevento: number, factura: DTE): Promise<string>{
         const data = {
             cdc: this.sifenUtilSrv.getCDC(factura),
             motivo: 'Cancelación de CDC'
         }
         console.log("Anulacion DATA", data);
-        const venta = await this.ventaViewRepo.findOneByOrFail({ id: factura.idventa });
+        const venta = await this.ventaViewRepo.findOneByOrFail({ iddte: factura.id, eliminado: false });
         const talonario = await this.talonarioViewRepo.findOneByOrFail({ id: venta.idtalonario });
         const documentoXML = await xmlgen.generateXMLEventoCancelacion(idevento, await this.sifenFacturaUtilSrv.getParams(talonario), data);
         return documentoXML;

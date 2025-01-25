@@ -1,13 +1,13 @@
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({schema: 'facturacion'})
-export class CancelacionFactura {
+@Entity({schema: 'facturacion', name: 'dte_cancelacion'})
+export class DTECancelacion {
 
     @PrimaryColumn({type: 'bigint'})
     id: string;
 
     @Column({nullable: false})
-    idventa: number;
+    iddte: number;
 
     @Column({name: 'fecha_hora', type: 'timestamp with time zone', default: new Date() , nullable: false})
     fechaHora: Date;
@@ -19,7 +19,7 @@ export class CancelacionFactura {
     envioCorrecto: boolean;
 
     @Column({type: 'xml', nullable: false})
-    documento: string;
+    xml: string;
 
     @Column({type: 'text'})
     observacion: string;

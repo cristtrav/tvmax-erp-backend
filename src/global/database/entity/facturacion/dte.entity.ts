@@ -1,18 +1,18 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { DetalleLote } from "./detalle-lote.entity";
+import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { DetalleLote } from "./lote-detalle.entity";
 import { EventoAuditoria } from "../evento-auditoria.entity";
 import { TablaAuditoria } from "../tabla-auditoria.entity";
 
-@Entity({schema: "facturacion"})
-export class FacturaElectronica {
+@Entity({schema: "facturacion", name: 'dte'})
+export class DTE {
 
-    static readonly TABLA_AUDITORIA = new TablaAuditoria().initialize(38, 'Factura Electrónica');
+    static readonly TABLA_AUDITORIA = new TablaAuditoria().initialize(38, 'Documento Tributario Electrónico (DTE)');
 
-    @PrimaryColumn()
-    idventa: number;
+    @PrimaryGeneratedColumn('identity', {generatedIdentity: 'BY DEFAULT'})
+    id: number;
 
-    @Column({name: 'documento_electronico', nullable: false, type: "xml"})
-    documentoElectronico: string;
+    @Column({name: 'xml', nullable: false, type: "xml"})
+    xml: string;
 
     @Column({name: 'firmado', nullable: false, default: false})
     firmado: boolean;
@@ -41,20 +41,20 @@ export class FacturaElectronica {
     @Column({name: 'observacion_envio_email', type: 'text'})
     observacionEnvioEmail: string;
 
-    @OneToMany(() => DetalleLote, (DetalleLote) => DetalleLote.facturaElectronica)
+    @OneToMany(() => DetalleLote, (DetalleLote) => DetalleLote.dte)
     detallesLote: DetalleLote[];
 
     static getEventoAuditoria(
         idusuario: number,
         operacion: 'R' | 'M' | 'E',
-        oldValue: FacturaElectronica | null,
-        newValue: FacturaElectronica | null
+        oldValue: DTE | null,
+        newValue: DTE | null
     ): EventoAuditoria {
         const evento = new EventoAuditoria();
         evento.idusuario = idusuario;
         evento.operacion = operacion;
         evento.fechahora = new Date();
-        evento.idtabla = FacturaElectronica.TABLA_AUDITORIA.id;
+        evento.idtabla = DTE.TABLA_AUDITORIA.id;
         evento.estadoanterior = oldValue;
         evento.estadonuevo = newValue;
         return evento;

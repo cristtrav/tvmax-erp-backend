@@ -1,6 +1,6 @@
 import { Cliente } from '@database/entity/cliente.entity';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { VentaView } from '@database/view/venta.view';
 import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
@@ -30,15 +30,15 @@ export class EmailSenderTaskService {
         200;
 
     constructor(
-        @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        @InjectRepository(DTE)
+        private facturaElectronicaRepo: Repository<DTE>,
         @InjectRepository(VentaView)
         private ventaViewRepo: Repository<VentaView>,
         @InjectRepository(Venta)
         private ventaRepo: Repository<Venta>,
-        private facturaElectronicaUtil: FacturaElectronicaUtilsService,
         @InjectRepository(DatoContribuyente)
         private datoContribuyenteRepo: Repository<DatoContribuyente>,
+        private facturaElectronicaUtil: FacturaElectronicaUtilsService,
         private datasource: DataSource
     ){}
 
@@ -58,7 +58,7 @@ export class EmailSenderTaskService {
         })
     }
 
-    private async getFacturas(): Promise<FacturaElectronica[]>{
+    private async getFacturas(): Promise<DTE[]>{
         const alias = 'fact';
         const ambienteSifen = process.env.SIFEN_AMBIENTE ?? 'test';
         let query = this.facturaElectronicaRepo
@@ -69,7 +69,7 @@ export class EmailSenderTaskService {
             }))
             .andWhere(`${alias}.intentoEnvioEmail <= :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
             .take(this.TAMANIO_LOTE)
-            .orderBy(`${alias}.idventa`, 'DESC');
+            .orderBy(`${alias}.id`, 'DESC');
             if(ambienteSifen == 'prod') query = query.andWhere(new Brackets((qb) => {
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobado`, { idestadoAprobado: EstadoDocumentoSifen.APROBADO });
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobadoObs`, { idestadoAprobadoObs: EstadoDocumentoSifen.APROBADO_CON_OBS });
@@ -96,8 +96,8 @@ export class EmailSenderTaskService {
         }
     }
 
-    private async getMailOptions(factE: FacturaElectronica, cliente: Cliente){
-        const venta = await this.ventaViewRepo.findOneBy({ id: factE.idventa });
+    private async getMailOptions(factE: DTE, cliente: Cliente){
+        const venta = await this.ventaViewRepo.findOneBy({ iddte: factE.id });
         const razonSocial = (await this.datoContribuyenteRepo.findOneBy({ clave: DatoContribuyente.RAZON_SOCIAL })).valor;
         const nombreArchivo = `${venta.timbrado}-${venta.prefijofactura}-${venta.nrofactura.toString().padStart(7, '0')}`;
         return {
@@ -114,7 +114,7 @@ export class EmailSenderTaskService {
             attachments: [
                 {
                     filename: `${nombreArchivo}.xml`,
-                    content: factE.documentoElectronico,
+                    content: factE.xml,
                     contentType: 'text/xml'
                 },
                 {
@@ -126,24 +126,24 @@ export class EmailSenderTaskService {
         }
     }
 
-    private async sendMail(facturaElectronica: FacturaElectronica){
+    private async sendMail(facturaElectronica: DTE){
         const oldFacturaElectronica = { ...facturaElectronica };
         const cliente = (
             await this.ventaRepo.findOne({
-                where: { id: facturaElectronica.idventa },
+                where: { iddte: facturaElectronica.id, anulado: false, eliminado: false },
                 relations: { cliente: true }
             })
         ).cliente;
         if(cliente.email == null){
-            console.log(facturaElectronica.idventa, "Cliente sin email");
+            console.log(facturaElectronica.id, "Cliente sin email");
             facturaElectronica.observacionEnvioEmail = "Correo no enviado. Cliente sin email";
             await this.datasource.transaction(async manager => {
-                await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
+                await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
                 await manager.save(facturaElectronica);
             });
             return;
         };
-        console.log(facturaElectronica.idventa, `Intentando enviar email a ${cliente.email}`);        
+        console.log(facturaElectronica.id, `Intentando enviar email a ${cliente.email}`);        
         const transporter = nodemailer.createTransport(this.getTransportConfig());
         facturaElectronica.intentoEnvioEmail = facturaElectronica.intentoEnvioEmail + 1;
         await this.datasource.transaction(async manager => {
@@ -153,14 +153,14 @@ export class EmailSenderTaskService {
                 facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
                 facturaElectronica.observacionEnvioEmail = info.response;
             }catch(e){
-                console.error(facturaElectronica.idventa, 'Error al enviar email');
+                console.error(facturaElectronica.id, 'Error al enviar email');
                 console.error(e);
                 facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO ;
                 facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
                 facturaElectronica.observacionEnvioEmail = e;                
             }
 
-            await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
+            await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
             await manager.save(facturaElectronica);
         });
         

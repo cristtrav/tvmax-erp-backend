@@ -26,13 +26,13 @@ export class VentasController {
         private facturaElectronicaSrv: FacturaElectronicaService,
         private facturaElectronicaUtilsSrv: FacturaElectronicaUtilsService,
         private jwtUtil: JwtUtilsService
-    ){}
+    ) { }
 
     @Get('count')
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
     countVentas(
-        @Query() queries: {[name: string]: any}
-    ): Promise<number>{
+        @Query() queries: { [name: string]: any }
+    ): Promise<number> {
         return this.ventasSrv.count(queries);
     }
 
@@ -41,7 +41,7 @@ export class VentasController {
     async create(
         @Body() fv: VentaDTO,
         @Headers('authorization') auth: string
-    ): Promise<number>{
+    ): Promise<number> {
         return this.ventasSrv.create(
             DTOEntityUtis.ventaDtoToEntity(fv),
             fv.detalles.map(dv => DTOEntityUtis.detalleVentaDtoToEntity(dv)),
@@ -54,7 +54,7 @@ export class VentasController {
     async edit(
         @Body() fv: VentaDTO,
         @Headers('authorization') auth: string
-    ){
+    ) {
         await this.ventasSrv.edit(
             DTOEntityUtis.ventaDtoToEntity(fv),
             fv.detalles.map(dv => DTOEntityUtis.detalleVentaDtoToEntity(dv)),
@@ -65,16 +65,16 @@ export class VentasController {
     @Get('total')
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
     count(
-        @Query() queries: {[name: string]: any}
-    ): Promise<number>{
+        @Query() queries: { [name: string]: any }
+    ): Promise<number> {
         return this.ventasSrv.count(queries);
     }
 
     @Get()
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
     findAll(
-        @Query() queries: {[name: string]: any}
-    ): Promise<VentaView[]>{
+        @Query() queries: { [name: string]: any }
+    ): Promise<VentaView[]> {
         return this.ventasSrv.findAll(queries);
     }
 
@@ -83,8 +83,8 @@ export class VentasController {
     async anular(
         @Param('id') id: number,
         @Headers('authorization') auth: string
-    ){
-        await this.ventasSrv.anular(id, true, this.jwtUtil.extractJwtSub(auth));        
+    ) {
+        await this.ventasSrv.anular(id, true, this.jwtUtil.extractJwtSub(auth));
     }
 
     @Get(':id/revertiranulacion')
@@ -92,7 +92,7 @@ export class VentasController {
     async revertiranul(
         @Param('id') id: number,
         @Headers('authorization') auth: string
-    ){
+    ) {
         await this.ventasSrv.anular(id, false, this.jwtUtil.extractJwtSub(auth));
     }
 
@@ -100,15 +100,15 @@ export class VentasController {
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
     async getDetallesByIdventa(
         @Param('id') id: number
-    ): Promise<DetalleVentaView[]>{
+    ): Promise<DetalleVentaView[]> {
         return this.detallesVentaSrv.findByIdVenta(id);
     }
 
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
-    @Get(':id/detalles/total')    
+    @Get(':id/detalles/total')
     countByIdventa(
         @Param('id') idventa: number
-    ): Promise<number>{
+    ): Promise<number> {
         return this.detallesVentaSrv.countByIdVenta(idventa);
     }
 
@@ -117,7 +117,7 @@ export class VentasController {
     async delete(
         @Param('id') id: number,
         @Headers('authorization') auth: string
-    ){
+    ) {
         await this.ventasSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
     }
 
@@ -125,8 +125,8 @@ export class VentasController {
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
     async findById(
         @Param('id') id: number
-    ){
-        return this.ventasSrv.findById(id);        
+    ) {
+        return this.ventasSrv.findById(id);
     }
 
     @Get(':id/dte')
@@ -134,9 +134,10 @@ export class VentasController {
     @Header('content-type', 'text/xml')
     async getDTEById(
         @Param('id') id: number
-    ): Promise<StreamableFile>{
-        const factElectronica = await this.facturaElectronicaSrv.findById(id);
-        return new StreamableFile(Buffer.from(factElectronica.documentoElectronico, 'utf-8'));
+    ): Promise<StreamableFile> {
+        const venta = await this.ventasSrv.findById(id);
+        const factElectronica = await this.facturaElectronicaSrv.findById(venta.iddte);
+        return new StreamableFile(Buffer.from(factElectronica.xml, 'utf-8'));
     }
 
     @Get(':id/kude')
@@ -145,9 +146,10 @@ export class VentasController {
     async getKUDEById(
         @Param('id') id: number,
         @Query('duplicado') duplicado: string
-    ): Promise<StreamableFile>{
+    ): Promise<StreamableFile> {
+        const venta = await this.ventasSrv.findById(id);
         return await this.facturaElectronicaUtilsSrv.generateKude(
-            await this.facturaElectronicaSrv.findById(id),
+            await this.facturaElectronicaSrv.findById(venta.iddte),
             duplicado == 'true'
         );
     }
@@ -156,7 +158,7 @@ export class VentasController {
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
     findDetailsById(
         @Param('idventa') idventa: number
-    ): Promise<FacturaElectronicaView> {
+    ): Promise<FacturaElectronicaView> {        
         return this.facturaElectronicaSrv.findDetailsById(idventa);
     }
 
@@ -164,7 +166,7 @@ export class VentasController {
     @AllowedIn(Permissions.VENTAS.SINCRONIZARSIFEN)
     async consultarFacturasifen(
         @Param('idventa') idventa: number
-    ){
+    ) {
         await this.ventasSrv.consultarFacturaSifen(idventa);
         return { resultado: 'ok' };
     }

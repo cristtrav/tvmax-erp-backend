@@ -10,15 +10,16 @@ import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Cliente } from '@database/entity/cliente.entity';
 import { FacturaElectronicaUtilsService } from './factura-electronica-utils.service';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenApiUtilService } from './sifen-api-util.service';
-import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
 import { SifenUtilService } from './sifen-util.service';
 import { SifenEventosUtilService } from './sifen-eventos-util.service';
 import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
 import { Usuario } from '@database/entity/usuario.entity';
 import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
+import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.entity';
+import { TalonarioView } from '@database/view/facturacion/talonario.view';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -40,19 +41,21 @@ export class VentasService {
         private detalleVentaRepo: Repository<DetalleVenta>,
         @InjectRepository(Talonario)
         private talonarioRepo: Repository<Talonario>,
+        @InjectRepository(TalonarioView)
+        private talonarioViewRepo: Repository<TalonarioView>,
         @InjectRepository(Cuota)
         private cuotaRepo: Repository<Cuota>,
         @InjectRepository(Cliente)
         private clienteRepo: Repository<Cliente>,
         @InjectRepository(Cobro)
         private cobroRepo: Repository<Cobro>,
+        @InjectRepository(DTE)
+        private facturaElectronicaRepo: Repository<DTE>,
         private datasource: DataSource,
         private facturaElectronicaUtilSrv: FacturaElectronicaUtilsService,
         private sifenApiUtilSrv: SifenApiUtilService,
         private sifenEventosUtilSrv: SifenEventosUtilService,
         private sifenUtilsSrv: SifenUtilService,
-        @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>,
         private dvRucSrv: DigitoVerificadorRucService
     ) { }
 
@@ -118,11 +121,11 @@ export class VentasService {
     }
 
     async create(venta: Venta, detalles: DetalleVenta[], idusuario: number): Promise<number> {
-        
-        const talonario = await this.talonarioRepo.findOneByOrFail({ id: venta.idtalonario })
+
+        const talonario = await this.talonarioRepo.findOneOrFail({ where: { id: venta.idtalonario }, relations: { timbrado: true }});
         const oldTalonario = { ...talonario };
 
-        if(talonario.electronico){
+        if(talonario.timbrado.electronico){
             venta.nroFactura = Number(talonario.ultimoNroUsado ?? '0');
             do venta.nroFactura = venta.nroFactura + 1;
             while(await this.facturaYaRegistrada(talonario.id, venta.nroFactura));
@@ -172,10 +175,12 @@ export class VentasService {
                 }
             }
             
-            if(talonario.electronico){
-                const facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles);
-                await manager.save(FacturaElectronica.getEventoAuditoria(idusuario, 'R', null, facturaElectronica));
-                await manager.save(await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles));
+            if(talonario.timbrado.electronico){
+                let facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles);
+                await manager.save(DTE.getEventoAuditoria(idusuario, 'R', null, facturaElectronica));
+                facturaElectronica = await manager.save(facturaElectronica);
+                venta.iddte = facturaElectronica.id;
+                await manager.save(venta);
                 if(
                     !this.sifenUtilsSrv.isDisabled() &&
                     this.sifenUtilsSrv.getModo() == 'sync'
@@ -186,7 +191,15 @@ export class VentasService {
     }
 
     async edit(venta: Venta, detalleVenta: DetalleVenta[], idusuario: number) {
-        const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
+        const talonarioValidacion = await this.talonarioViewRepo.findOneByOrFail({id: venta.idtalonario});
+        const factElectronica = await this.facturaElectronicaRepo.findOneBy({ id: venta.iddte });
+        if(
+            (talonarioValidacion.electronico && venta.iddte == null) ||
+            (talonarioValidacion.electronico && factElectronica == null)
+        ) throw new HttpException({
+            message: 'No se encontró el documento electrónico (DTE) = null'
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+
         if(factElectronica &&
             (
                 factElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO ||
@@ -299,7 +312,8 @@ export class VentasService {
             ventaNroFacturaQuery.setParameter('idtalonario', venta.idtalonario);
             const ultimoNroTalonarioActual = (await ventaNroFacturaQuery.getRawOne()).ultimonro;
 
-            const talonarioActual = await this.talonarioRepo.findOneByOrFail({ id: venta.idtalonario });
+            const talonarioActual = await this.talonarioRepo.findOneOrFail({ where: {id: venta.idtalonario}, relations: {timbrado: true} });
+            
             const oldTalonarioActual = { ...talonarioActual };
             talonarioActual.ultimoNroUsado = ultimoNroTalonarioActual;
             await manager.save(talonarioActual);
@@ -314,10 +328,10 @@ export class VentasService {
                 await manager.save(talonarioAnterior);
                 await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonarioAnterior, talonarioAnterior));
             }
-            if(talonarioActual.electronico){
+            if(talonarioActual.timbrado.electronico){
                 const factElectRegen = await this.facturaElectronicaUtilSrv.regenerarFacturaElectronica(venta, detalleVenta);
                 await manager.save(factElectRegen);
-                await manager.save(FacturaElectronica.getEventoAuditoria(idusuario, 'M', factElectronica, factElectRegen));
+                await manager.save(DTE.getEventoAuditoria(idusuario, 'M', factElectronica, factElectRegen));
                 if(!this.sifenUtilsSrv.isDisabled() &&
                     this.sifenUtilsSrv.getModo() == 'sync'
                 )await this.sifenApiUtilSrv.enviar(factElectRegen, manager);
@@ -336,11 +350,11 @@ export class VentasService {
 
     async anular(idventa: number, anulado: boolean, idusuario: number) {
         const venta = await this.ventaRepo.findOneOrFail({ where: { id: idventa }, relations: { detalles: true } });
-        const talonario = await this.talonarioRepo.findOneByOrFail({id: venta.idtalonario});
-        const factElectronica = await this.facturaElectronicaRepo.findOneBy({idventa: idventa});
+        const talonario = await this.talonarioRepo.findOneOrFail({ where: {id: venta.idtalonario}, relations: {timbrado: true} });
+        const factElectronica = await this.facturaElectronicaRepo.findOneBy({id: venta.iddte});
         const oldVenta = { ...venta };
         
-        if(talonario.electronico && !anulado) throw new HttpException({
+        if(talonario.timbrado.electronico && !anulado) throw new HttpException({
             message: 'No se puede revertir anulación de F. Electrónica'
         }, HttpStatus.BAD_REQUEST);
 
@@ -374,11 +388,11 @@ export class VentasService {
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
                 const eventoXml = await this.sifenEventosUtilSrv.getCancelacion(idevento, factElectronica)
                 const eventoXmlSigned = await this.sifenEventosUtilSrv.getEventoFirmado(eventoXml);
-                const cancelacion = new CancelacionFactura();
+                const cancelacion = new DTECancelacion();
                 cancelacion.id = idevento;
-                cancelacion.documento = eventoXmlSigned ?? eventoXml;
+                cancelacion.xml = eventoXmlSigned ?? eventoXml;
                 cancelacion.fechaHora = new Date();
-                cancelacion.idventa = venta.id;
+                cancelacion.iddte = venta.iddte;
                 cancelacion.envioCorrecto = false;
                 await manager.save(cancelacion);
 
@@ -387,14 +401,18 @@ export class VentasService {
                 else console.log('OBS Anulación: SIFEN DESACTIVADO');
 
                 factElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.CANCELADO;
-                await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactElectronica, factElectronica));
+                await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactElectronica, factElectronica));
                 await manager.save(factElectronica);
             }
         });
     }
 
     async delete(id: number, idusuario: number) {
-        const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: id });
+        const venta = await this.ventaRepo.findOneOrFail({ where: { id }, relations: { detalles: true } })
+        const oldVenta = { ...venta };
+        venta.eliminado = true;
+
+        const factElectronica = await this.facturaElectronicaRepo.findOneBy({ id: venta.iddte });
         if(factElectronica &&
             (factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.RECHAZADO &&
              factElectronica.idestadoDocumentoSifen != EstadoDocumentoSifen.NO_ENVIADO)
@@ -402,9 +420,7 @@ export class VentasService {
             message: 'No se puede eliminar: Factura electrónica enviada a tributación'
         }, HttpStatus.BAD_REQUEST);
 
-        const venta = await this.ventaRepo.findOneOrFail({ where: { id }, relations: { detalles: true } })
-        const oldVenta = { ...venta };
-        venta.eliminado = true;
+        
 
         await this.datasource.transaction(async manager => {
             await manager.save(venta);
@@ -458,9 +474,9 @@ export class VentasService {
         ) != null
     }
 
-    public async consultarFacturaSifen(idventa: number){
-        console.log('idventa a consultar', idventa)
-        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ idventa });
+    public async consultarFacturaSifen(id: number){
+        console.log('idventa a consultar', id)
+        const facturaElectronica = await this.facturaElectronicaRepo.findOneByOrFail({ id });
         const oldFacturaElectronica = {... facturaElectronica };
 
         if(facturaElectronica.idestadoDocumentoSifen == EstadoDocumentoSifen.CANCELADO)
@@ -482,9 +498,9 @@ export class VentasService {
             else if(respuesta.codigo == ConsultaDTEMessageService.COD_NO_ENCONTRADO){
                 facturaElectronica.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
             }else{
-                console.log(`idventa: ${idventa}, ${respuesta.codigo} - ${respuesta.mensaje}`);
+                console.log(`idventa: ${id}, ${respuesta.codigo} - ${respuesta.mensaje}`);
             }
-            await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
+            await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
             await manager.save(facturaElectronica);
         })
     }

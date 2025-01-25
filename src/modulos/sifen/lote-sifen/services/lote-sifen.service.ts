@@ -1,5 +1,5 @@
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { Lote } from '@database/entity/facturacion/lote.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { Venta } from '@database/entity/venta.entity';
@@ -10,7 +10,7 @@ import { ResultadoProcesamientoLoteType } from '../types/resultado-procesamiento
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { SifenLoteMessageService } from './sifen-lote-message.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
-import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
 import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
 
 @Injectable()
@@ -23,8 +23,8 @@ export class LoteSifenService {
         private lotesRepo: Repository<Lote>,
         @InjectRepository(LoteView)
         private loteViewRepo: Repository<LoteView>,
-        @InjectRepository(FacturaElectronica)
-        private facturaElectronicaSrv: Repository<FacturaElectronica>,
+        @InjectRepository(DTE)
+        private facturaElectronicaSrv: Repository<DTE>,
         @InjectRepository(DetalleLote)
         private detalleLoteRepo: Repository<DetalleLote>,
         @InjectRepository(DetalleLoteView)
@@ -67,7 +67,7 @@ export class LoteSifenService {
             .where('detalle.idlote = :idlote', { idlote });
     
         if(includeFactura)
-            query = query.leftJoinAndSelect('detalle.facturaElectronica', 'facturaElectronica');
+            query = query.leftJoinAndSelect('detalle.dte', 'facturaElectronica');
         
         return query.getMany();
     }
@@ -108,33 +108,33 @@ export class LoteSifenService {
         const lotes: Lote[] = [];
 
         const queryFacturas = this.facturaElectronicaSrv.createQueryBuilder('factura')
-        .leftJoin(Venta, 'venta', 'venta.id = factura.idventa')
+        .leftJoin(Venta, 'venta', 'venta.iddte = factura.id')
         .leftJoinAndSelect('factura.detallesLote', 'detallesLote')
         .leftJoinAndSelect('detallesLote.lote', 'lote')
         .where(`factura.idestadoDocumentoSifen = :idestado`, {idestado: EstadoDocumentoSifen.NO_ENVIADO})
         .andWhere(`factura.firmado = TRUE`)
         .andWhere(`venta.eliminado = FALSE`)
         .andWhere(`venta.anulado = FALSE`)
-        .orderBy(`factura.idventa`, 'ASC');
+        .orderBy(`factura.id`, 'ASC');
 
-        let facturas = (await queryFacturas.getMany())
+        let facturasElec = (await queryFacturas.getMany())
             .filter(f => !f.detallesLote.some(d => !d.lote.enviado));
 
         await this.datasource.transaction(async manager => {
-            while(facturas.length > 0){
+            while(facturasElec.length > 0){
                 const lote = await manager.save(new Lote());                
                 lote.detallesLote = [];
-                facturas.slice(0, this.TAMANIO_LOTE).forEach(async factura => {
+                facturasElec.slice(0, this.TAMANIO_LOTE).forEach(async factElec => {
                     const detalleLote = new DetalleLote();
                     detalleLote.idlote = lote.id;
-                    detalleLote.idventa = factura.idventa;
+                    detalleLote.iddte = factElec.id;
                     lote.detallesLote = lote.detallesLote.concat([detalleLote]);
                     await manager.save(detalleLote);
                 })
                 await manager.save(Lote.getEventoAuditoria(
                     Usuario.ID_USUARIO_SISTEMA, 'R', null, lote
                 ));
-                facturas = facturas.slice(this.TAMANIO_LOTE);
+                facturasElec = facturasElec.slice(this.TAMANIO_LOTE);
                 lotes.push(lote);
             }
         });
@@ -148,7 +148,7 @@ export class LoteSifenService {
         const oldLote = { ...lote }; 
         const detalles = await this.detalleLoteRepo.find({
             where: { idlote: lote.id },
-            relations: { facturaElectronica: true }
+            relations: { dte: true }
         });
         
         await this.datasource.transaction(async manager => {
@@ -172,39 +172,39 @@ export class LoteSifenService {
                 respuestaLote.codigo != SifenLoteMessageService.COD_LOTE_EN_PROCESO
             ){
                 for(let detalleLote of detalles){
-                    const factura = detalleLote.facturaElectronica;
-                    const oldFactura = { ... factura };
-                    console.log(`Procesar factura electronica ${factura.idventa}`);
+                    const factElec = detalleLote.dte;
+                    const oldFactura = { ... factElec };
+                    console.log(`Procesar DTE ${factElec.id}`);
 
-                    const resultadoProc = respuestaLote.resultados.find(r => r.cdc == this.sifenUtilSrv.getCDC(factura))
+                    const resultadoProc = respuestaLote.resultados.find(r => r.cdc == this.sifenUtilSrv.getCDC(factElec))
                     console.log('Resultado procesamiento para factura', resultadoProc);
                     if(resultadoProc == null){
-                        console.log(`No se encontró el resultado de PROC  idventa:${factura.idventa}, lote: ${lote.id}`);
+                        console.log(`No se encontró el resultado de PROC id DTE:${factElec.id}, lote: ${lote.id}`);
                         continue;
                     }
 
                     if(
-                        factura.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO ||
-                        factura.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO_CON_OBS ||
-                        factura.idestadoDocumentoSifen == EstadoDocumentoSifen.CANCELADO
+                        factElec.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO ||
+                        factElec.idestadoDocumentoSifen == EstadoDocumentoSifen.APROBADO_CON_OBS ||
+                        factElec.idestadoDocumentoSifen == EstadoDocumentoSifen.CANCELADO
                     ) {
-                        console.log(`Factura electronica id ${factura.idventa} ya aprobada`)
+                        console.log(`DTE id ${factElec.id} ya aprobado`);
                     }else {
                         if(resultadoProc.estado == 'Aprobado'){
-                            factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
-                            factura.fechaCambioEstado = respuestaLote.fecha;
+                            factElec.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO;
+                            factElec.fechaCambioEstado = respuestaLote.fecha;
                         }
                         if(resultadoProc.estado == 'Aprobado con observación'){
-                            factura.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO_CON_OBS
-                            factura.fechaCambioEstado = respuestaLote.fecha;
+                            factElec.idestadoDocumentoSifen = EstadoDocumentoSifen.APROBADO_CON_OBS
+                            factElec.fechaCambioEstado = respuestaLote.fecha;
                         }
                         if(resultadoProc.estado == 'Rechazado'){
-                            factura.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
-                            factura.fechaCambioEstado = respuestaLote.fecha;
+                            factElec.idestadoDocumentoSifen = EstadoDocumentoSifen.RECHAZADO;
+                            factElec.fechaCambioEstado = respuestaLote.fecha;
                         }
-                        factura.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
-                        await manager.save(FacturaElectronica.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactura, factura));
-                        await manager.save(factura);
+                        factElec.observacion = `${resultadoProc.detalle.codigo} - ${resultadoProc.detalle.mensaje}`
+                        await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFactura, factElec));
+                        await manager.save(factElec);
                     }
                     detalleLote.codigoEstado = resultadoProc.detalle.codigo;
                     detalleLote.descripcion = resultadoProc.detalle.mensaje;

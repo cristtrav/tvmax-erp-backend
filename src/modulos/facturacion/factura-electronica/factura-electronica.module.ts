@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { FacturaElectronicaService } from './services/factura-electronica.service';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
 import { JwtModule } from '@nestjs/jwt';
@@ -9,7 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
   imports:[
     JwtModule.register({}),
     TypeOrmModule.forFeature([
-      FacturaElectronica,
+      DTE,
       FacturaElectronicaView,
     ])
   ],

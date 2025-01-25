@@ -23,10 +23,10 @@ import { ActividadEconomica } from '@database/entity/facturacion/actividad-econo
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/services/factura-electronica.service';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { SifenApiUtilService } from './service/sifen-api-util.service';
-import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
+import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { SifenUtilService } from './service/sifen-util.service';
 import { SifenEventosUtilService } from './service/sifen-eventos-util.service';
@@ -38,7 +38,7 @@ import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
 import { KudeUtilsService } from '@globalutil/kude-utils.service';
-import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
 import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 
 @Module({
@@ -58,9 +58,9 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       DatoContribuyente,
       ActividadEconomica,
       Establecimiento,
-      FacturaElectronica,
+      DTE,
       CodigoSeguridadContribuyente,
-      CancelacionFactura,
+      DTECancelacion,
       EstadoDocumentoSifen,
       Lote,
       FacturaElectronicaView,

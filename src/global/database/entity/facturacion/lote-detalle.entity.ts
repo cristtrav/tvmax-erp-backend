@@ -1,15 +1,15 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Lote } from "./lote.entity";
-import { FacturaElectronica } from "./factura-electronica.entity";
+import { DTE } from "./dte.entity";
 
-@Entity({name: 'detalle_lote', schema: 'facturacion'})
+@Entity({name: 'lote_detalle', schema: 'facturacion'})
 export class DetalleLote{
 
     @PrimaryColumn()
     idlote: number
 
     @PrimaryColumn()
-    idventa: number;
+    iddte: number;
 
     @Column({name: 'codigo_estado', length: 10})
     codigoEstado: string;
@@ -21,7 +21,7 @@ export class DetalleLote{
     @JoinColumn({name: 'idlote'})
     lote: Lote;
 
-    @ManyToOne(() => FacturaElectronica)
-    @JoinColumn({name: 'idventa'})
-    facturaElectronica: FacturaElectronica;
+    @ManyToOne(() => DTE)
+    @JoinColumn({name: 'iddte'})
+    dte: DTE;
 }

@@ -3,7 +3,7 @@ import { LoteSifenService } from './lote-sifen/services/lote-sifen.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Lote } from '@database/entity/facturacion/lote.entity';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { LoteSifenController } from './lote-sifen/controllers/lote-sifen.controller';
 import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
@@ -15,7 +15,7 @@ import { ConsultaRucMessageService } from './consulta-ruc/services/consulta-ruc-
 import { Permiso } from '@database/entity/permiso.entity';
 import { JwtUtilsService } from '@globalutil/jwt-utils.service';
 import { LoteView } from '@database/view/facturacion/lote.view';
-import { DetalleLote } from '@database/entity/facturacion/detalle-lote.entity';
+import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
 import { DetalleLoteView } from '@database/view/facturacion/detalle-lote.view';
 import { ConsultaDTEMessageService } from './consulta-dte/services/consulta-dte-message.service';
 
@@ -23,7 +23,7 @@ import { ConsultaDTEMessageService } from './consulta-dte/services/consulta-dte-
   imports: [
     JwtModule.register({}),
     TypeOrmModule.forFeature([
-      FacturaElectronica,
+      DTE,
       Lote,
       LoteView,
       EstadoDocumentoSifen,

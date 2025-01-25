@@ -1,6 +1,5 @@
 import { FormatoFactura } from "@database/entity/formato-factura.entity";
 import { BarrioDTO } from "src/global/dto/barrio.dto";
-import { ClienteDTO } from "src/global/dto/cliente.dto";
 import { CuotaDTO } from "src/global/dto/cuota.dto";
 import { DepartamentoDTO } from "src/global/dto/departamento.dto";
 import { DetalleVentaDTO } from "src/global/dto/detalle-venta-dto";
@@ -8,24 +7,19 @@ import { DistritoDTO } from "src/global/dto/distrito.dto";
 import { DomicilioDTO } from "src/global/dto/domicilio.dto";
 import { FormatoFacturaDTO } from "src/global/dto/formato-factura.dto";
 import { GrupoDTO } from "src/global/dto/grupo.dto";
-import { RolDTO } from "src/global/dto/rol.dto";
 import { ServicioDTO } from "src/global/dto/servicio.dto";
 import { SuscripcionDTO } from "src/global/dto/suscripcion.dto";
-import { TalonarioDTO } from "@dto/talonario.dto";
 import { UsuarioDTO } from "src/global/dto/usuario.dto";
 import { VentaDTO } from "src/global/dto/venta.dto";
 import { Barrio } from "../database/entity/barrio.entity";
-import { Cliente } from "../database/entity/cliente.entity";
 import { Cuota } from "../database/entity/cuota.entity";
 import { Departamento } from "../database/entity/departamento.entity";
 import { DetalleVenta } from "../database/entity/detalle-venta.entity";
 import { Distrito } from "../database/entity/distrito.entity";
 import { Domicilio } from "../database/entity/domicilio.entity";
 import { Grupo } from "../database/entity/grupo.entity";
-import { Rol } from "../database/entity/rol.entity";
 import { Servicio } from "../database/entity/servicio.entity";
 import { Suscripcion } from "../database/entity/suscripcion.entity";
-import { Talonario } from "../database/entity/facturacion/talonario.entity";
 import { Usuario } from "../database/entity/usuario.entity";
 import { Venta } from "../database/entity/venta.entity";
 import { Sorteo } from "@database/entity/sorteos/sorteo.entity";
@@ -167,6 +161,7 @@ export class DTOEntityUtis {
         venta.totalGravadoIva5 = ventaDto.totalgravadoiva5;
         venta.totalIva10 = ventaDto.totaliva10;
         venta.totalIva5 = ventaDto.totaliva5;
+        venta.iddte = ventaDto.iddte;
         return venta;
     }
 

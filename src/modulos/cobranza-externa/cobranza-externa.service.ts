@@ -22,12 +22,12 @@ import { AnulacionRequestDTO } from './dto/anulacion-request.dto';
 import { Talonario } from '@database/entity/facturacion/talonario.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
-import { FacturaElectronica } from '@database/entity/facturacion/factura-electronica.entity';
+import { DTE } from '@database/entity/facturacion/dte.entity';
 import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
 import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
 import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-util.service';
-import { CancelacionFactura } from '@database/entity/facturacion/cancelacion-factura.entity';
+import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 
 @Injectable()
@@ -52,8 +52,8 @@ export class CobranzaExternaService {
         private ventaRepo: Repository<Venta>,
         @InjectRepository(Talonario)
         private talonarioRepo: Repository<Talonario>,
-        @InjectRepository(FacturaElectronica)
-        private facturaElectronicaRepo: Repository<FacturaElectronica>,
+        @InjectRepository(DTE)
+        private facturaElectronicaRepo: Repository<DTE>,
         private datasource: DataSource,
         private facturaElectronicaUtilSrv: FacturaElectronicaUtilsService,
         private sifenApiUtilSrv: SifenApiUtilService,
@@ -164,9 +164,11 @@ export class CobranzaExternaService {
             await manager.save(cobro);
 
             if(venta.idtalonario != null){
-                const talonario = await this.talonarioRepo.findOneByOrFail({id: venta.idtalonario}); 
                 
-                if(talonario.electronico){
+                //const talonario = await this.talonarioRepo.findOneByOrFail({id: venta.idtalonario}); 
+                const talonario = await this.talonarioRepo.findOneOrFail({ where: {id: venta.idtalonario}, relations: {timbrado: true} });
+                
+                if(talonario.timbrado.electronico){
                     const oldTalonario = { ...talonario };
                     talonario.ultimoNroUsado = venta.nroFactura;
                     await manager.save(talonario);
@@ -240,16 +242,16 @@ export class CobranzaExternaService {
                 await manager.save(detalle);
             }
 
-            const factElectronica = await this.facturaElectronicaRepo.findOneBy({ idventa: venta.id });
+            const factElectronica = await this.facturaElectronicaRepo.findOneBy({ id: venta.iddte });
             if(factElectronica != null){
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
                 const eventoXml = await this.sifenEventosUtil.getCancelacion(idevento, factElectronica)
                 const eventoXmlSigned = await this.sifenEventosUtil.getEventoFirmado(eventoXml);
-                const cancelacion = new CancelacionFactura();
+                const cancelacion = new DTECancelacion();
                 cancelacion.id = idevento;
-                cancelacion.documento = eventoXmlSigned ?? eventoXml;
+                cancelacion.xml = eventoXmlSigned ?? eventoXml;
                 cancelacion.fechaHora = new Date();
-                cancelacion.idventa = venta.id;
+                cancelacion.iddte = venta.id;
                 cancelacion.envioCorrecto = false;
                 if(
                     factElectronica.idestadoDocumentoSifen == 1  ||
@@ -288,7 +290,15 @@ export class CobranzaExternaService {
         venta.fechaFactura = new Date();
         venta.fechaHoraFactura = new Date();
 
-        const talonarios = await this.talonarioRepo.findBy({ eliminado: false, electronico: true, activo: true });
+        //const talonarios = await this.talonarioRepo.findBy({ eliminado: false, electronico: true, activo: true });
+        const talonarios = await this.talonarioRepo
+            .createQueryBuilder('talon')
+            .leftJoinAndSelect(`talon.timbrado`, 'timbrado')
+            .where(`talon.eliminado = false`)
+            .andWhere(`talon.activo = true`)
+            .andWhere(`timbrado.electronico = true`)
+            .getMany();
+
         if(talonarios.length > 0){
             let talonario = talonarios[0];
             const puntoEmision = Number(process.env.PUNTO_EMISION_COBRANZA_EXT);
