@@ -6,7 +6,7 @@ import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';
 import { ReiteracionDTO } from '@dto/reclamos/reiteracion.dto';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Reiteracion } from '@database/entity/reclamos/reiteracion.entity';
 
 @Controller('reiteracionesreclamos')

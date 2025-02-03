@@ -9,14 +9,29 @@ import { ClienteView } from '@database/view/cliente.view';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { SuscripcionView } from '@database/view/suscripcion.view';
 import { Permiso } from '@database/entity/permiso.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Cliente, ClienteView, Suscripcion, SuscripcionView, Permiso])
+    TypeOrmModule.forFeature([
+      Cliente,
+      ClienteView,
+      Suscripcion,
+      SuscripcionView,
+      Permiso
+    ])
   ],
-  providers: [ClientesService, SuscripcionesService, JwtUtilsService],
-  controllers: [ClientesController]
+  providers: [
+    ClientesService,
+    SuscripcionesService,
+    JwtUtilsService
+  ],
+  controllers: [
+    ClientesController
+  ],
+  exports: [
+    ClientesService
+  ]
 })
 export class ClientesModule {}

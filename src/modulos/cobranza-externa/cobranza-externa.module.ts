@@ -14,9 +14,6 @@ import { ConsultaCobranzaExterna } from '@database/entity/consulta-cobranza-exte
 import { Cobro } from '@database/entity/cobro.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { Talonario } from '@database/entity/facturacion/talonario.entity';
-import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
-import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
-import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
 import { TalonarioView } from '@database/view/facturacion/talonario.view';
@@ -24,15 +21,10 @@ import { Establecimiento } from '@database/entity/facturacion/establecimiento.en
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { DTE } from '@database/entity/facturacion/dte.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
-import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-util.service';
 import { VentaView } from '@database/view/venta.view';
 import { Lote } from '@database/entity/facturacion/lote.entity';
-import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
-import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
-import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
-import { KudeUtilsService } from '@globalutil/kude-utils.service';
 import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
-import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
+import { SifenUtilsModule } from '@modulos/sifen/sifen-utils/sifen-utils.module';
 
 @Module({
   imports: [
@@ -59,11 +51,12 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       VentaView,
       Lote,
       DetalleLote
-    ])
+    ]),
+    SifenUtilsModule
   ],
   providers: [
     CobranzaExternaService,
-    FacturaElectronicaUtilsService,
+    /*FacturaElectronicaUtilsService,
     SifenApiUtilService,
     SifenUtilService,
     SifenEventosUtilService,
@@ -71,7 +64,7 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
     ConsultaRucService,
     ConsultaRucMessageService,
     KudeUtilsService,
-    ConsultaDTEMessageService
+    DteUtilsService*/
   ],
   controllers: [CobranzaExternaController]
 })

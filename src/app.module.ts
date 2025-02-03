@@ -46,9 +46,11 @@ import { EstablecimientosModule } from './modulos/facturacion/establecimientos/e
 import { FacturaElectronicaModule } from './modulos/facturacion/factura-electronica/factura-electronica.module';
 import { CodigoSeguridadContribuyenteModule } from './modulos/facturacion/codigo-seguridad-contribuyente/codigo-seguridad-contribuyente.module';
 import { UbicacionesSifenModule } from './modulos/ubicaciones-sifen/ubicaciones-sifen.module';
-import { SifenModule } from './modulos/sifen/sifen.module';
 import { EstadoFacturaElectronicaModule } from './modulos/facturacion/estado-documento-factura-electronica/estado-factura-electronica.module';
-import { DigitoVerificadorRucService } from './global/util/digito-verificador-ruc.service';
+import { NotasCreditoModule } from './modulos/facturacion/notas-credito/notas-credito.module';
+import { SifenUtilsModule } from './modulos/sifen/sifen-utils/sifen-utils.module';
+import { UtilModule } from './global/util/util.module';
+import { TimbradosModule } from './modulos/facturacion/timbrados/timbrados.module';
 
 @Module({
   imports: [
@@ -104,8 +106,11 @@ import { DigitoVerificadorRucService } from './global/util/digito-verificador-ru
     FacturaElectronicaModule,
     CodigoSeguridadContribuyenteModule,
     UbicacionesSifenModule,
-    SifenModule,
-    EstadoFacturaElectronicaModule
+    EstadoFacturaElectronicaModule,
+    NotasCreditoModule,
+    SifenUtilsModule,
+    UtilModule,
+    TimbradosModule
   ],
   controllers: [AppController],
   providers: [

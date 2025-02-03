@@ -5,7 +5,7 @@ import { Departamento } from '@database/entity/departamento.entity';
 import { DepartamentoDTO } from 'src/global/dto/departamento.dto';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from 'src/global/filters/http-exception.filter';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';

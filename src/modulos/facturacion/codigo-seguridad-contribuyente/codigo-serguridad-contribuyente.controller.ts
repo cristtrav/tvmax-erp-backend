@@ -3,7 +3,7 @@ import { CodigoSeguridadContribuyenteService } from './codigo-seguridad-contribu
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { CodigoSeguridadContribuyenteDTO } from '@dto/facturacion/codigo-seguridad-contribuyente.dto';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';

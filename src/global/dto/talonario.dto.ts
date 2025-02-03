@@ -11,4 +11,5 @@ export class TalonarioDTO {
     activo: boolean | null = true;
     idformatofactura: number | null = null;
     electronico: boolean = false;
+    tipodocumento: string | null = null;
 }

@@ -17,13 +17,15 @@ export class TalonariosService {
     ) { }
 
     private getSelectQuery(queries: { [name: string]: any }): SelectQueryBuilder<TalonarioView> {
-        const { eliminado, activo, electronico, sort, offset, limit } = queries;
+        const { eliminado, activo, electronico, sort, offset, limit, nrotimbrado, tipodocumento } = queries;
         const alias: string = 'talonario';
         let query: SelectQueryBuilder<TalonarioView> = this.talonarioViewRepo.createQueryBuilder(alias);
 
         if (eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado`, { eliminado });
         if (activo != null) query = query.andWhere(`${alias}.activo = :activo`, { activo });
         if (electronico != null) query = query.andWhere(`${alias}.electronico`, {electronico});
+        if (nrotimbrado != null) query = query.andWhere(`${alias}.nrotimbrado = :nrotimbrado`, { nrotimbrado });
+        if (tipodocumento != null) query = query.andWhere(`${alias}.tipodocumento = :tipodocumento`, { tipodocumento });
         if (offset) query = query.skip(offset);
         if (limit) query = query.take(limit);
         if (sort) {

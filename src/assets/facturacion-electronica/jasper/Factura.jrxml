@@ -1,6 +1,6 @@
 <!-- Created with Jaspersoft Studio version 7.0.1.final using JasperReports Library version 7.0.1-573496633c2b4074e32f433154b543003f7d2498  -->
 <jasperReport name="Factura" language="java" columnCount="1" pageWidth="595" pageHeight="442" whenNoDataType="BlankPage" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="9d35ef5c-5869-4d1d-b843-9880d8432e96">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DTE-Test2-Datasource"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FacturaDTE"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -486,12 +486,12 @@
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 			</element>
-			<element kind="textField" uuid="5c408e2f-851c-4c62-bdda-6e9890c80aca" x="380" y="46" width="161" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" vTextAlign="Middle">
+			<element kind="textField" uuid="5c408e2f-851c-4c62-bdda-6e9890c80aca" x="380" y="58" width="161" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" vTextAlign="Middle">
 				<expression><![CDATA[$F{dEst}+ "-" +   $F{dPunExp} + "-" +$F{dNumDoc}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="staticText" uuid="6ebc92a2-0cc8-4d8b-9052-196971db0969" x="366" y="46" width="14" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+			<element kind="staticText" uuid="6ebc92a2-0cc8-4d8b-9052-196971db0969" x="366" y="58" width="14" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
 				<text><![CDATA[Nº:]]></text>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
@@ -529,10 +529,10 @@
 				<expression><![CDATA[$F{dDesDepEmi}]]></expression>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="textField" uuid="7e33cad9-f088-4695-9548-b692ac9eed14" x="366" y="36" width="175" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" bold="true" vTextAlign="Middle">
-				<expression><![CDATA[$F{dDesTiDE}]]></expression>
-				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<element kind="textField" uuid="7e33cad9-f088-4695-9548-b692ac9eed14" x="366" y="46" width="175" height="12" fontName="DejaVu Sans" fontSize="8.0" blankWhenNull="true" bold="true" vTextAlign="Middle">
+				<expression><![CDATA[$F{dDesTiDE}.toUpperCase()]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
 			<element kind="staticText" uuid="21411e00-d25a-4f6f-a99d-bf2de4ba2f93" x="366" y="26" width="77" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
@@ -848,6 +848,47 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
 			</element>
+			<element kind="staticText" uuid="574c174d-b99d-47ac-a899-116a15da3dd7" x="3" y="13" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+				<text><![CDATA[TOTAL DE LA OPERACION]]></text>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="4304c0a2-4c58-4c38-8081-d1f5cd6592e7" x="3" y="23" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+				<text><![CDATA[TOTAL EN GUARANIES]]></text>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="526605a2-5140-40fe-af56-43c48bfc8765" x="3" y="3" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+				<text><![CDATA[SUBTOTAL]]></text>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="f4fac15b-5ea3-43b1-a76a-24c2ecdf566f" x="3" y="33" width="106" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+				<text><![CDATA[LIQUIDACIÓN IVA]]></text>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="98bef27f-d248-4c99-92c4-98a50f55ff7a" x="386" y="33" width="44" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+				<text><![CDATA[Total IVA :]]></text>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="staticText" uuid="271ea843-106c-4c99-a086-c03b0de4e8d5" x="278" y="33" width="25" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+				<text><![CDATA[(10%)]]></text>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="staticText" uuid="690bf62f-df4a-40be-bc9b-3da75c1cf4ac" x="169" y="33" width="20" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
+				<text><![CDATA[(5%)]]></text>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="textField" uuid="6dd6ffd9-113e-48d3-a7b1-54564d1d8848" x="455" y="11" width="100" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{dTotGralOpe}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
+			</element>
 			<box>
 				<pen lineWidth="1.5"/>
 				<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -917,47 +958,6 @@
 			<box>
 				<pen lineWidth="1.0"/>
 			</box>
-		</element>
-		<element kind="staticText" uuid="f4fac15b-5ea3-43b1-a76a-24c2ecdf566f" x="3" y="33" width="106" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
-			<text><![CDATA[LIQUIDACIÓN IVA]]></text>
-			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
-			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-		</element>
-		<element kind="staticText" uuid="690bf62f-df4a-40be-bc9b-3da75c1cf4ac" x="169" y="33" width="20" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
-			<text><![CDATA[(5%)]]></text>
-			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
-			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-		</element>
-		<element kind="staticText" uuid="271ea843-106c-4c99-a086-c03b0de4e8d5" x="278" y="33" width="25" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
-			<text><![CDATA[(10%)]]></text>
-			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-		</element>
-		<element kind="staticText" uuid="98bef27f-d248-4c99-92c4-98a50f55ff7a" x="386" y="33" width="44" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
-			<text><![CDATA[Total IVA :]]></text>
-			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-		</element>
-		<element kind="staticText" uuid="526605a2-5140-40fe-af56-43c48bfc8765" x="3" y="3" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
-			<text><![CDATA[SUBTOTAL]]></text>
-			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
-			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-		</element>
-		<element kind="staticText" uuid="574c174d-b99d-47ac-a899-116a15da3dd7" x="3" y="13" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
-			<text><![CDATA[TOTAL DE LA OPERACION]]></text>
-			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
-			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-		</element>
-		<element kind="textField" uuid="6dd6ffd9-113e-48d3-a7b1-54564d1d8848" x="455" y="11" width="100" height="11" fontName="DejaVu Sans" fontSize="7.0" pattern="#,###.###;(#,###.###-)" hTextAlign="Right" vTextAlign="Middle">
-			<expression><![CDATA[$F{dTotGralOpe}]]></expression>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-			<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3"/>
-		</element>
-		<element kind="staticText" uuid="4304c0a2-4c58-4c38-8081-d1f5cd6592e7" x="3" y="23" width="148" height="10" fontName="DejaVu Sans" fontSize="7.0" bold="true" vTextAlign="Middle">
-			<text><![CDATA[TOTAL EN GUARANIES]]></text>
-			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="29f58474-1738-49aa-a73d-37a6cbf3d577"/>
-			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 		</element>
 		<element kind="textField" uuid="fded8888-2fd5-43ab-ba29-1da5e463104f" x="0" y="122" width="555" height="12" fontName="DejaVu Sans" fontSize="7.0" hTextAlign="Center" vTextAlign="Middle">
 			<expression><![CDATA[$V{PAGE_NUMBER}]]></expression>

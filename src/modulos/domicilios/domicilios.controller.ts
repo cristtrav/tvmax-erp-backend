@@ -1,7 +1,7 @@
 import { Permissions } from '@auth/permission.list';
 import { DomicilioDTO } from 'src/global/dto/domicilio.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { DomiciliosService } from './domicilios.service';
 import { DomicilioView } from '@database/view/domicilio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';

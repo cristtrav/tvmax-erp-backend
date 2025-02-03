@@ -7,7 +7,7 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { Modulo } from '@database/entity/modulo.entity';
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 import { Usuario } from '@database/entity/usuario.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [

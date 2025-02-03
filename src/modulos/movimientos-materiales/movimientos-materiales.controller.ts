@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Header, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MovimientosMaterialesService } from './movimientos-materiales.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { DetallesMovimientosMaterialesService } from './detalles-movimientos-materiales/detalles-movimientos-materiales.service';
 import { DetalleMovimientoMaterialView } from '@database/view/depositos/detalle-movimiento-material.view';

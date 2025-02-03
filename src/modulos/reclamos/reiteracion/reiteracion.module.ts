@@ -6,7 +6,7 @@ import { Reiteracion } from '@database/entity/reclamos/reiteracion.entity';
 import { ReiteracionView } from '@database/view/reclamos/reiteracion.view';
 import { ReiteracionController } from './reiteracion.controller';
 import { Permiso } from '@database/entity/permiso.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Reclamo } from '@database/entity/reclamos/reclamo.entity';
 import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 

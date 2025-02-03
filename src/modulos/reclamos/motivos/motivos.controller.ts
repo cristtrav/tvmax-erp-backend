@@ -2,7 +2,7 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MotivosService } from './motivos.service';
 import { Motivo } from '@database/entity/reclamos/motivo.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { MotivoReclamoDTO } from '@dto/reclamos/motivo.dto';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';

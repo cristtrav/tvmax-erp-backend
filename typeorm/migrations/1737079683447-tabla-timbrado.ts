@@ -11,6 +11,8 @@ export class TablaTimbrado1737079683447 implements MigrationInterface {
                 fecha_inicio_vigencia date NOT NULL,
                 fecha_vencimiento date,
                 electronico boolean NOT NULL DEFAULT false,
+                activo boolean NOT NULL DEFAULT true,
+                eliminado boolean NOT NULL DEFAULT false,
                 PRIMARY KEY (nro_timbrado)
             );`
         );
@@ -20,7 +22,9 @@ export class TablaTimbrado1737079683447 implements MigrationInterface {
                 talon_timbrado.nro_timbrado::integer,
                 talon_data.fecha_inicio_vigencia,
                 talon_data.fecha_vencimiento,
-                talon_data.electronico
+                talon_data.electronico,
+                talon_data.activo,
+                false
             FROM (SELECT DISTINCT nro_timbrado FROM facturacion.talonario) talon_timbrado
             JOIN LATERAL
                 (SELECT * FROM facturacion.talonario talon_aux WHERE talon_aux.nro_timbrado = talon_timbrado.nro_timbrado LIMIT 1) talon_data

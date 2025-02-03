@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Barrio } from '@database/entity/barrio.entity';
 import { BarrioView } from '@database/view/barrio.view';
 import { Permiso } from '@database/entity/permiso.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [

@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { CodigoSerguridadContribuyenteController } from './codigo-serguridad-contribuyente.controller';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({

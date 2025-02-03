@@ -350,4 +350,22 @@ export class Permissions {
         CONSULTAR: 1260
     }
 
+    static readonly NOTASCREDITO = {
+        ACCESSOMODULO: 1300,
+        CONSULTAR: 1301,
+        REGISTRAR: 1302,
+        EDITAR: 1303,
+        ELIMINAR: 1304,
+        ANULAR: 1305
+    }
+
+    static readonly TIMBRADOS = {
+        ACCESSOMODULO: 1360,
+        CONSULTAR: 1361,
+        REGISTRAR: 1362,
+        EDITAR: 1363,
+        ELIMINAR: 1364
+    }
+
+
 }

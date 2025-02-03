@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { VentasService } from './service/ventas.service';
 import { VentasController } from './controller/ventas.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { ClientesService } from '../clientes/service/clientes.service';
 import { DetallesVentasService } from './service/detalles-ventas.service';
 import { DetallesVentasController } from './controller/detalles-ventas.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,29 +16,28 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { Cobro } from '@database/entity/cobro.entity';
-import { FacturaElectronicaUtilsService } from './service/factura-electronica-utils.service';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { ActividadEconomica } from '@database/entity/facturacion/actividad-economica.entity';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { TalonarioView } from '@database/view/facturacion/talonario.view';
-import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/services/factura-electronica.service';
 import { DTE } from '@database/entity/facturacion/dte.entity';
 import { CodigoSeguridadContribuyente } from '@database/entity/facturacion/codigo-seguridad-contribuyente.entity';
-import { SifenApiUtilService } from './service/sifen-api-util.service';
 import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
-import { SifenUtilService } from './service/sifen-util.service';
-import { SifenEventosUtilService } from './service/sifen-eventos-util.service';
 import { Lote } from '@database/entity/facturacion/lote.entity';
-import { SifenLoteMessageService } from '@modulos/sifen/lote-sifen/services/sifen-lote-message.service';
-import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
-import { ConsultaRucService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc.service';
-import { ConsultaRucMessageService } from '@modulos/sifen/consulta-ruc/services/consulta-ruc-message.service';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
-import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
-import { KudeUtilsService } from '@globalutil/kude-utils.service';
+import { DteView } from '@database/view/facturacion/dte.view';
 import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
-import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
+import { CancelarVentaService } from './service/cancelar-venta.service';
+import { AnularVentaService } from './service/anular-venta.service';
+import { AnularVentaController } from './controller/anular-venta.controller';
+import { CancelarVentaController } from './controller/cancelar-venta.controller';
+import { AnularVentaNotacreditoController } from './controller/anular-venta-notacredito.controller';
+import { AnularVentaNotacreditoService } from './service/anular-venta-notacredito.service';
+import { SifenUtilsModule } from '@modulos/sifen/sifen-utils/sifen-utils.module';
+import { UtilModule } from '@globalutil/util.module';
+import { FacturaElectronicaModule } from '@modulos/facturacion/factura-electronica/factura-electronica.module';
+import { NotaCredito } from '@database/entity/facturacion/nota-credito.entity';
+import { NotaCreditoView } from '@database/view/facturacion/nota-credito.view';
 
 @Module({
   imports: [
@@ -63,27 +61,27 @@ import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/
       DTECancelacion,
       EstadoDocumentoSifen,
       Lote,
-      FacturaElectronicaView,
-      DetalleLote
-    ])
+      DteView,
+      DetalleLote,
+      NotaCreditoView
+    ]),
+    SifenUtilsModule,
+    UtilModule,
+    FacturaElectronicaModule
   ],
   providers: [
     VentasService,
-    ClientesService,
     DetallesVentasService,
-    FacturaElectronicaUtilsService,
-    FacturaElectronicaService,
-    SifenApiUtilService,
-    SifenUtilService,
-    SifenEventosUtilService,
-    SifenLoteMessageService,
-    ConsultaRucService,
-    ConsultaRucMessageService,
-    JwtUtilsService,
-    DigitoVerificadorRucService,
-    KudeUtilsService,
-    ConsultaDTEMessageService
+    CancelarVentaService,
+    AnularVentaService,
+    AnularVentaNotacreditoService
   ],
-  controllers: [VentasController, DetallesVentasController]
+  controllers: [
+    VentasController,
+    DetallesVentasController,
+    AnularVentaController,
+    CancelarVentaController,
+    AnularVentaNotacreditoController
+  ]
 })
 export class VentasModule {}

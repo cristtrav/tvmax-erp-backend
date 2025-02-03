@@ -119,8 +119,8 @@ export class RefactorTimbrados1737051816262 implements MigrationInterface {
         await queryRunner.query(`UPDATE public.modulo SET descripcion = 'Timbrados' WHERE id = 13;`);
         await queryRunner.query(`ALTER TABLE IF EXISTS public.venta RENAME idtalonario TO idtimbrado;`)
         await queryRunner.query(
-            `ALTER TABLE IF EXISTS facturacion.talonario RENAME CONSTRAINT fk_talonario_establecimiento TO fk_timbrado_establecimiento;
-            ALTER TABLE IF EXISTS facturacion.talonario RENAME CONSTRAINT fk_talonario_formato_factura TO fk_timbrado_formato_factura;`
+            `ALTER TABLE IF EXISTS facturacion.timbrado RENAME CONSTRAINT fk_talonario_establecimiento TO fk_timbrado_establecimiento;
+            ALTER TABLE IF EXISTS facturacion.timbrado RENAME CONSTRAINT fk_talonario_formato_factura TO fk_timbrado_formato_factura;`
         );
     }
 

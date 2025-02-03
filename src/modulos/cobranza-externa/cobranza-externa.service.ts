@@ -21,14 +21,12 @@ import { Usuario } from '@database/entity/usuario.entity';
 import { AnulacionRequestDTO } from './dto/anulacion-request.dto';
 import { Talonario } from '@database/entity/facturacion/talonario.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
-import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 import { DTE } from '@database/entity/facturacion/dte.entity';
-import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
-import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
-import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
-import { SifenEventosUtilService } from '@modulos/ventas/service/sifen-eventos-util.service';
+import { FacturaElectronicaUtilsService } from '@modulos/sifen/sifen-utils/services/dte/factura-electronica-utils.service';
+import { SifenApiUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-api-util.service';
+import { SifenUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-util.service';
+import { SifenEventosUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-eventos-util.service';
 import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.entity';
-import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 
 @Injectable()
 export class CobranzaExternaService {
@@ -174,7 +172,7 @@ export class CobranzaExternaService {
                     await manager.save(talonario);
                     await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonario, talonario));
 
-                    const facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, [detalle]);
+                    const facturaElectronica = await this.facturaElectronicaUtilSrv.generarDTE(venta, [detalle]);
                     await manager.save(facturaElectronica);
                     
                     if(
@@ -245,7 +243,7 @@ export class CobranzaExternaService {
             const factElectronica = await this.facturaElectronicaRepo.findOneBy({ id: venta.iddte });
             if(factElectronica != null){
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
-                const eventoXml = await this.sifenEventosUtil.getCancelacion(idevento, factElectronica)
+                const eventoXml = await this.sifenEventosUtil.getCancelacionNotaCredito(idevento, factElectronica)
                 const eventoXmlSigned = await this.sifenEventosUtil.getEventoFirmado(eventoXml);
                 const cancelacion = new DTECancelacion();
                 cancelacion.id = idevento;

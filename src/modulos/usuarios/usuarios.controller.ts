@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { Permissions } from '@auth/permission.list';
 import { UsuariosService } from './usuarios.service';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { UsuarioDTO } from 'src/global/dto/usuario.dto';
 import { UsuarioView } from '@database/view/usuario.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';

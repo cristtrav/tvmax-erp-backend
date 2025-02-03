@@ -1,7 +1,7 @@
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, UseFilters, UseGuards } from '@nestjs/common';
 import { PremiosService } from './premios.service';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { PremioView } from '@database/view/sorteos/premio.view';
 import { Permissions } from '@auth/permission.list';

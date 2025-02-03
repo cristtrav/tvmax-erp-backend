@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFil
 import { TiposMaterialesService } from './tipos-materiales.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { TipoMaterial } from '@database/entity/depositos/tipo-material.entity';
 import { TipoMaterialView } from '@database/view/depositos/tipos-materiales.view';
 import { Permissions } from '@auth/permission.list';

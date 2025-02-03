@@ -3,7 +3,7 @@ import { FormatoFactura } from '@database/entity/formato-factura.entity';
 import { FormatoFacturaDTO } from 'src/global/dto/formato-factura.dto';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { FormatoFacturasService } from './formato-facturas.service';
 import { LoginGuard } from '@auth/guards/login.guard';

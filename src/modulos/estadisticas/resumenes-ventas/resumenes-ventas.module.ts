@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ResumenesVentasController } from './resumenes-ventas.controller';
 import { ResumenesVentasService } from './resumenes-ventas.service';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [

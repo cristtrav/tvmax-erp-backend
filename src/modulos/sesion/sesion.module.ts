@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from '@database/entity/usuario.entity';
 import { UsuarioView } from '@database/view/usuario.view';
 import { Sesion } from '@database/entity/sesion.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { PermisosModule } from '@modulos/permisos/permisos.module';
 import { UsuariosService } from '@modulos/usuarios/usuarios.service';
 import { Rol } from '@database/entity/rol.entity';

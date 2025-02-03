@@ -1,0 +1,1 @@
+export type QueriesType = {[name: string]: any}

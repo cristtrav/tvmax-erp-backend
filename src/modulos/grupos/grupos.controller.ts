@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, Head
 import { GruposService } from './grupos.service';
 import { Grupo } from '@database/entity/grupo.entity';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';

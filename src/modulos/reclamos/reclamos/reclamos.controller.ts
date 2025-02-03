@@ -2,7 +2,7 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { ReclamosService } from './reclamos.service';
 import { ReclamoDTO } from '@dto/reclamos/reclamo.dto';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { EstadoReclamoType, Reclamo } from '@database/entity/reclamos/reclamo.entity';
 import { ReclamoView } from '@database/view/reclamos/reclamo.view';
 import { DetallesReclamosService } from './detalles-reclamos/detalles-reclamos.service';

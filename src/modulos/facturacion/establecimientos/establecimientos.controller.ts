@@ -4,7 +4,7 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFil
 import { EstablecimientosService } from './establecimientos.service';
 import { EstablecimientoDTO } from '@dto/facturacion/establecimiento.dto';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';

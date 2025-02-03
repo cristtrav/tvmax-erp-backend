@@ -2,7 +2,7 @@ import { ClienteDTO } from 'src/global/dto/cliente.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { ClientesService } from '../service/clientes.service';
 import { SuscripcionesService } from '../../suscripciones/suscripciones.service';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { ClienteView } from '@database/view/cliente.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';

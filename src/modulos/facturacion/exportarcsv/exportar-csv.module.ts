@@ -7,7 +7,7 @@ import { VentaView } from '@database/view/venta.view';
 import { Venta } from '@database/entity/venta.entity';
 import { VentaTributacionExpView } from '@database/view/venta-tributacion-exp.view';
 import { Permiso } from '@database/entity/permiso.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [

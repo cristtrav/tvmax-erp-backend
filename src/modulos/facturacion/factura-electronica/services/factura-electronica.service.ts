@@ -1,5 +1,6 @@
 import { DTE } from '@database/entity/facturacion/dte.entity';
-import { FacturaElectronicaView } from '@database/view/facturacion/factura-electronica.view';
+import { Venta } from '@database/entity/venta.entity';
+import { DteView } from '@database/view/facturacion/dte.view';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,18 +9,21 @@ import { Repository } from 'typeorm';
 export class FacturaElectronicaService {
 
     constructor(
+        @InjectRepository(Venta)
+        private ventaRepo: Repository<Venta>,
         @InjectRepository(DTE)
-        private facturaElectronicaRepo: Repository<DTE>,
-        @InjectRepository(FacturaElectronicaView)
-        private facturaElectronicaViewRepo: Repository<FacturaElectronicaView>
+        private dteRepo: Repository<DTE>,
+        @InjectRepository(DteView)
+        private dteViewRepo: Repository<DteView>
     ){}
 
-    findDetailsById(idventa: number): Promise<FacturaElectronicaView>{
-        return this.facturaElectronicaViewRepo.findOneByOrFail({ idventa })
+    async findDetailsById(idventa: number): Promise<DteView>{
+        const ventaRepo = await this.ventaRepo.findOneByOrFail({ id: idventa });
+        return this.dteViewRepo.findOneByOrFail({ id: ventaRepo.iddte });
     }
 
     findById(id: number): Promise<DTE>{
-        return this.facturaElectronicaRepo.findOneByOrFail({ id });
+        return this.dteRepo.findOneByOrFail({ id });
     }
 
 }

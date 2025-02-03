@@ -13,7 +13,7 @@ import { ParticipanteView } from '@database/view/sorteos/participante.view';
 import { Participante } from '@database/entity/sorteos/participante.entity';
 import { SorteoView } from '@database/view/sorteos/sorteo.view';
 import { Permiso } from '@database/entity/permiso.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [

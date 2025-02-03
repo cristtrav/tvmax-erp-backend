@@ -6,6 +6,7 @@ import { EventoAuditoria } from "../evento-auditoria.entity";
 import { TalonarioDTO } from "@dto/talonario.dto";
 import { Timbrado } from "./timbrado.entity";
 import { Venta } from "../venta.entity";
+import { TIPO_DOCUMENTO, TipoDocumentoType } from "@database/types/facturacion/tipo-documento.type";
 
 @Entity({schema: Schemas.FACTURACION})
 export class Talonario{
@@ -74,6 +75,9 @@ export class Talonario{
     @Column({nullable: false, default: true})
     activo: boolean;
 
+    @Column({name: 'tipo_documento', nullable: false, type: 'enum', enum: TIPO_DOCUMENTO})
+    tipoDocumento: TipoDocumentoType;
+
     @Column({nullable: false, default: false})
     eliminado: boolean;
 
@@ -100,10 +104,11 @@ export class Talonario{
         this.nroTimbrado = talonarioDTO.nrotimbrado;
         this.ultimoNroUsado = talonarioDTO.ultimonrousado;
         this.activo = talonarioDTO.activo;
-        this.idformatoFactura = talonarioDTO.idformatofactura;     
+        this.idformatoFactura = talonarioDTO.idformatofactura;
+        this.tipoDocumento = <TipoDocumentoType> talonarioDTO.tipodocumento;
     }
 
-    static readonly TABLA_AUDITORIA = new TablaAuditoria().initialize(9, 'talonario');
+    static readonly TABLA_AUDITORIA = new TablaAuditoria().initialize(9, 'Talonario');
     static getEventoAuditoria(
         idusuario: number,
         operacion: 'R' | 'M' | 'E',

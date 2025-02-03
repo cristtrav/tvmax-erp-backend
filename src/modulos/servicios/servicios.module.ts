@@ -2,7 +2,7 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { Servicio } from '@database/entity/servicio.entity';
 import { CuotaView } from '@database/view/cuota.view';
 import { ServicioView } from '@database/view/servicio.view';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';

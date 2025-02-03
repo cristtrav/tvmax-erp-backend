@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MaterialesService } from './materiales.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { MaterialView } from '@database/view/depositos/material.view';
 import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';

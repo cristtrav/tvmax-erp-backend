@@ -9,7 +9,7 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { RolUsuario } from '@database/entity/rol-usuario.entity';
 import { RolView } from '@database/view/rol.view';
 import { Rol } from '@database/entity/rol.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [

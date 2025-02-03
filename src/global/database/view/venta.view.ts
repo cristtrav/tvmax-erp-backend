@@ -94,9 +94,11 @@ export class VentaView{
     iddte: number;
 
     @ViewColumn()
-    idestadofacturaelectronica: number;
+    idestadodte: number;
+    
+    @ViewColumn()
+    fechacambioestadodte: string;
 
     @ViewColumn()
     eliminado: boolean;
-
 }

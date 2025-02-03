@@ -4,7 +4,7 @@ import { ActividadEconomica } from '@database/entity/facturacion/actividad-econo
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActividadEconomicaController } from './actividad-economica.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({

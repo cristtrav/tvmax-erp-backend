@@ -9,17 +9,17 @@ import { Cuota } from '@database/entity/cuota.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { Cobro } from '@database/entity/cobro.entity';
 import { Cliente } from '@database/entity/cliente.entity';
-import { FacturaElectronicaUtilsService } from './factura-electronica-utils.service';
+import { FacturaElectronicaUtilsService } from '../../sifen/sifen-utils/services/dte/factura-electronica-utils.service';
 import { DTE } from '@database/entity/facturacion/dte.entity';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
-import { SifenApiUtilService } from './sifen-api-util.service';
-import { SifenUtilService } from './sifen-util.service';
-import { SifenEventosUtilService } from './sifen-eventos-util.service';
-import { DigitoVerificadorRucService } from '@globalutil/digito-verificador-ruc.service';
+import { SifenApiUtilService } from '../../sifen/sifen-utils/services/sifen/sifen-api-util.service';
+import { SifenUtilService } from '../../sifen/sifen-utils/services/sifen/sifen-util.service';
+import { SifenEventosUtilService } from '../../sifen/sifen-utils/services/sifen/sifen-eventos-util.service';
+import { DigitoVerificadorRucService } from '@globalutil/services/digito-verificador-ruc.service';
 import { Usuario } from '@database/entity/usuario.entity';
-import { ConsultaDTEMessageService } from '@modulos/sifen/consulta-dte/services/consulta-dte-message.service';
 import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.entity';
 import { TalonarioView } from '@database/view/facturacion/talonario.view';
+import { ConsultaDTEMessageService } from '@modulos/sifen/sifen-utils/services/consultas/consulta-dte-message.service';
 
 const appendIdOnSort: string[] = [
     "fechafactura",
@@ -76,7 +76,7 @@ export class VentasService {
             limit,
             idtalonario,
             nrofactura,
-            idestadofacturaelectronica
+            idestadodte
         } = queries;
 
         const alias: string = 'venta';
@@ -91,7 +91,7 @@ export class VentasService {
         if (fechafincobro) query = query.andWhere(`${alias}.fechacobro <= :fechafincobro`, { fechafincobro });
         if (nrofactura) query = query.andWhere(`${alias}.nrofactura = :nrofactura`, { nrofactura });
         if (idtalonario) query = query.andWhere(`${alias}.idtalonario = :idtalonario`, { idtalonario });
-        if (idestadofacturaelectronica) query = query.andWhere(`${alias}.idestadofacturaelectronica = :idestadofacturaelectronica`, {idestadofacturaelectronica});
+        if (idestadodte) query = query.andWhere(`${alias}.idestadodte = :idestadodte`, { idestadodte });
         if (idcobradorcomision)
             if (Array.isArray(idcobradorcomision)) query = query.andWhere(`${alias}.idcobradorcomision IN (:...idcobradorcomision)`, { idcobradorcomision });
             else query = query.andWhere(`${alias}.idcobradorcomision = :idcobradorcomision`, { idcobradorcomision });
@@ -176,7 +176,7 @@ export class VentasService {
             }
             
             if(talonario.timbrado.electronico){
-                let facturaElectronica = await this.facturaElectronicaUtilSrv.generarFacturaElectronica(venta, detalles);
+                let facturaElectronica = await this.facturaElectronicaUtilSrv.generarDTE(venta, detalles);
                 await manager.save(DTE.getEventoAuditoria(idusuario, 'R', null, facturaElectronica));
                 facturaElectronica = await manager.save(facturaElectronica);
                 venta.iddte = facturaElectronica.id;
@@ -329,7 +329,7 @@ export class VentasService {
                 await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonarioAnterior, talonarioAnterior));
             }
             if(talonarioActual.timbrado.electronico){
-                const factElectRegen = await this.facturaElectronicaUtilSrv.regenerarFacturaElectronica(venta, detalleVenta);
+                const factElectRegen = await this.facturaElectronicaUtilSrv.regenerarDTE(venta, detalleVenta);
                 await manager.save(factElectRegen);
                 await manager.save(DTE.getEventoAuditoria(idusuario, 'M', factElectronica, factElectRegen));
                 if(!this.sifenUtilsSrv.isDisabled() &&
@@ -386,7 +386,7 @@ export class VentasService {
             if(factElectronica != null){
                 const oldFactElectronica = { ...factElectronica };
                 const [{ idevento }] = await this.datasource.query(`SELECT NEXTVAL('facturacion.seq_id_evento_sifen') AS idevento`);
-                const eventoXml = await this.sifenEventosUtilSrv.getCancelacion(idevento, factElectronica)
+                const eventoXml = await this.sifenEventosUtilSrv.getCancelacionNotaCredito(idevento, factElectronica)
                 const eventoXmlSigned = await this.sifenEventosUtilSrv.getEventoFirmado(eventoXml);
                 const cancelacion = new DTECancelacion();
                 cancelacion.id = idevento;

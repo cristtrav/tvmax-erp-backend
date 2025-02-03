@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { Permissions } from 'src/global/auth/permission.list';
 import { BarriosService } from './barrios.service';
 import { BarrioDTO } from '../../global/dto/barrio.dto';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { BarrioView } from '@database/view/barrio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';

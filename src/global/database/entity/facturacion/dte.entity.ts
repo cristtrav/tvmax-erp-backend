@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from
 import { DetalleLote } from "./lote-detalle.entity";
 import { EventoAuditoria } from "../evento-auditoria.entity";
 import { TablaAuditoria } from "../tabla-auditoria.entity";
+import { TIPO_DOCUMENTO, TipoDocumentoType } from "@database/types/facturacion/tipo-documento.type";
 
 @Entity({schema: "facturacion", name: 'dte'})
 export class DTE {
@@ -40,6 +41,9 @@ export class DTE {
 
     @Column({name: 'observacion_envio_email', type: 'text'})
     observacionEnvioEmail: string;
+
+    @Column({name: 'tipo_documento', nullable: false, type: 'enum', enum: TIPO_DOCUMENTO})
+    tipoDocumento: TipoDocumentoType;
 
     @OneToMany(() => DetalleLote, (DetalleLote) => DetalleLote.dte)
     detallesLote: DetalleLote[];

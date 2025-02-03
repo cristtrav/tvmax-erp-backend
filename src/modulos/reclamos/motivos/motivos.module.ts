@@ -4,7 +4,7 @@ import { MotivosController } from './motivos.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Motivo } from '@database/entity/reclamos/motivo.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({

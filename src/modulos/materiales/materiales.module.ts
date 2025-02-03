@@ -9,7 +9,7 @@ import { MaterialView } from '@database/view/depositos/material.view';
 import { MaterialIdentificable } from '@database/entity/depositos/material-identificable.entity';
 import { Permiso } from '@database/entity/permiso.entity';
 import { DetalleMovimientoMaterial } from '@database/entity/depositos/detalle-movimiento-material.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports: [

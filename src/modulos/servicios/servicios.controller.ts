@@ -4,7 +4,7 @@ import { Permissions } from '../../global/auth/permission.list';
 import { ServicioView } from '@database/view/servicio.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { ServicioDTO } from 'src/global/dto/servicio.dto';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';

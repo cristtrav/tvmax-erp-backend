@@ -1,7 +1,7 @@
 import { Permissions } from '@auth/permission.list';
 import { TalonarioDTO } from '@dto/talonario.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { TalonariosService } from './talonarios.service';
 import { TalonarioView } from '@database/view/facturacion/talonario.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';

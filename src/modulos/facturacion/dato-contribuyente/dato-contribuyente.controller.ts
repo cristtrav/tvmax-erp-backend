@@ -3,7 +3,7 @@ import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { Body, Controller, Get, Headers, Post, UseFilters, UseGuards } from '@nestjs/common';
 import { DatoContribuyenteService } from './dato-contribuyente.service';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { Permissions } from '@auth/permission.list';

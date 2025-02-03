@@ -3,7 +3,7 @@ import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyen
 import { DTE } from '@database/entity/facturacion/dte.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { VentaView } from '@database/view/venta.view';
-import { FacturaElectronicaUtilsService } from '@modulos/ventas/service/factura-electronica-utils.service';
+import { FacturaElectronicaUtilsService } from '@modulos/sifen/sifen-utils/services/dte/factura-electronica-utils.service';
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import * as nodemailer from 'nodemailer';
 import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-email.entity.dto';
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { Usuario } from '@database/entity/usuario.entity';
+import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-util.service';
 
 @Injectable()
 export class EmailSenderTaskService {
@@ -39,7 +40,8 @@ export class EmailSenderTaskService {
         @InjectRepository(DatoContribuyente)
         private datoContribuyenteRepo: Repository<DatoContribuyente>,
         private facturaElectronicaUtil: FacturaElectronicaUtilsService,
-        private datasource: DataSource
+        private datasource: DataSource,
+        private kudeFacturaUtilSrv: KudeUtilService
     ){}
 
     @Cron('*/30 7-21 * * *')
@@ -96,72 +98,74 @@ export class EmailSenderTaskService {
         }
     }
 
-    private async getMailOptions(factE: DTE, cliente: Cliente){
-        const venta = await this.ventaViewRepo.findOneBy({ iddte: factE.id });
+    private async getMailOptions(dte: DTE, cliente: Cliente){
+        const venta = await this.ventaViewRepo.findOneBy({ iddte: dte.id });
         const razonSocial = (await this.datoContribuyenteRepo.findOneBy({ clave: DatoContribuyente.RAZON_SOCIAL })).valor;
         const nombreArchivo = `${venta.timbrado}-${venta.prefijofactura}-${venta.nrofactura.toString().padStart(7, '0')}`;
+        const tipoDocumentoSubject = dte.tipoDocumento == 'NCR' ? 'Nota de Crédito Electrónica' : 'Factura Electrónica';
+        const tipoDocumentoContent = dte.tipoDocumento == 'NCR' ? 'nota de crédito' : 'factura';
         return {
             from: {
                 name: process.env.SMTP_NAME ?? 'Facturación TVMAX',
                 address: `${process.env.SMTP_USER}`
             },
             to: `${cliente.email}`,
-            subject: `Factura Electrónica Nro ${venta.nrofactura} | ${razonSocial}`,
-            text: `Estimado/a ${cliente.razonSocial}, \nAdjunto encontrará su factura en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE). \n¡Gracias por su preferencia!`,
+            subject: `${tipoDocumentoSubject} Nro ${venta.nrofactura} | ${razonSocial}`,
+            text: `Estimado/a ${cliente.razonSocial}, \nAdjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE). \n¡Gracias por su preferencia!`,
             html: `<h3>Estimado/a ${cliente.razonSocial},</h3>
-            <p>Adjunto encontrará su factura en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE).</p>
+            <p>Adjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE).</p>
             <p><strong>¡Gracias por su preferencia!</strong></p>`,
             attachments: [
                 {
                     filename: `${nombreArchivo}.xml`,
-                    content: factE.xml,
+                    content: dte.xml,
                     contentType: 'text/xml'
                 },
                 {
                     filename: `${nombreArchivo}.pdf`,
-                    content: (await this.facturaElectronicaUtil.generateKude(factE)).getStream(),
+                    content: (await this.kudeFacturaUtilSrv.generateKude(dte)).getStream(),
                     contentType: 'application/pdf'
                 }
             ]
         }
     }
 
-    private async sendMail(facturaElectronica: DTE){
-        const oldFacturaElectronica = { ...facturaElectronica };
+    private async sendMail(dte: DTE){
+        const oldDte = { ...dte };
         const cliente = (
             await this.ventaRepo.findOne({
-                where: { iddte: facturaElectronica.id, anulado: false, eliminado: false },
+                where: { iddte: dte.id, anulado: false, eliminado: false },
                 relations: { cliente: true }
             })
         ).cliente;
         if(cliente.email == null){
-            console.log(facturaElectronica.id, "Cliente sin email");
-            facturaElectronica.observacionEnvioEmail = "Correo no enviado. Cliente sin email";
+            console.log(dte.id, "Cliente sin email");
+            dte.observacionEnvioEmail = "Correo no enviado. Cliente sin email";
             await this.datasource.transaction(async manager => {
-                await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
-                await manager.save(facturaElectronica);
+                await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
+                await manager.save(dte);
             });
             return;
         };
-        console.log(facturaElectronica.id, `Intentando enviar email a ${cliente.email}`);        
+        console.log(dte.id, `Intentando enviar email a ${cliente.email}`);        
         const transporter = nodemailer.createTransport(this.getTransportConfig());
-        facturaElectronica.intentoEnvioEmail = facturaElectronica.intentoEnvioEmail + 1;
+        dte.intentoEnvioEmail = dte.intentoEnvioEmail + 1;
         await this.datasource.transaction(async manager => {
             try{
-                const info = await transporter.sendMail(await this.getMailOptions(facturaElectronica, cliente));
-                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.ENVIADO;
-                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-                facturaElectronica.observacionEnvioEmail = info.response;
+                const info = await transporter.sendMail(await this.getMailOptions(dte, cliente));
+                dte.idestadoEnvioEmail = EstadoEnvioEmail.ENVIADO;
+                dte.fechaCambioEstadoEnvioEmaill = new Date();
+                dte.observacionEnvioEmail = info.response;
             }catch(e){
-                console.error(facturaElectronica.id, 'Error al enviar email');
+                console.error(dte.id, 'Error al enviar email');
                 console.error(e);
-                facturaElectronica.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO ;
-                facturaElectronica.fechaCambioEstadoEnvioEmaill = new Date();
-                facturaElectronica.observacionEnvioEmail = e;                
+                dte.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO ;
+                dte.fechaCambioEstadoEnvioEmaill = new Date();
+                dte.observacionEnvioEmail = e;                
             }
 
-            await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldFacturaElectronica, facturaElectronica));
-            await manager.save(facturaElectronica);
+            await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
+            await manager.save(dte);
         });
         
         

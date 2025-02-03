@@ -7,7 +7,7 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 import { EventoAuditoriaView } from '@database/view/evento-auditoria.view';
 import { TablaAuditoria } from '@database/entity/tabla-auditoria.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 
 @Module({
   imports:[

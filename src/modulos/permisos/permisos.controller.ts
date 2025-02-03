@@ -2,7 +2,7 @@ import { Permissions } from '@auth/permission.list';
 import { Funcionalidad } from '@database/entity/funcionalidad.entity';
 import { Modulo } from '@database/entity/modulo.entity';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Body, Controller, Get, Headers, Param, Put, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { PermisosService } from './permisos.service';
 import { LoginGuard } from '@auth/guards/login.guard';

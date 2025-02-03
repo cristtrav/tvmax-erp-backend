@@ -50,6 +50,9 @@ export class TalonarioView{
     electronico: boolean;
 
     @ViewColumn()
+    tipodocumento: string;
+
+    @ViewColumn()
     eliminado: boolean;
 
 }

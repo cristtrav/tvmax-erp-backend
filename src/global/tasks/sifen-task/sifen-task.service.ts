@@ -1,6 +1,6 @@
-import { LoteSifenService } from '@modulos/sifen/lote-sifen/services/lote-sifen.service';
-import { SifenApiUtilService } from '@modulos/ventas/service/sifen-api-util.service';
-import { SifenUtilService } from '@modulos/ventas/service/sifen-util.service';
+import { LoteDteService } from '@modulos/sifen/sifen-utils/services/lotes/lote-dte.service';
+import { SifenApiUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-api-util.service';
+import { SifenUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-util.service';
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 
@@ -8,7 +8,7 @@ import { Cron } from '@nestjs/schedule';
 export class SifenTaskService {
 
     constructor(
-        private loteSifenSrv: LoteSifenService,
+        private loteSifenSrv: LoteDteService,
         private sifenApiUtilsSrv: SifenApiUtilService,
         private sifenUtilSrv: SifenUtilService
     ){}

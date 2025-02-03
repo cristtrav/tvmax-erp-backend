@@ -4,7 +4,7 @@ import { DepartamentosService } from './departamentos.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Departamento } from '@database/entity/departamento.entity';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Permiso } from '@database/entity/permiso.entity';
 
 @Module({

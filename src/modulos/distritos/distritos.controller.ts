@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Head
 import { DistritoDTO } from '../../global/dto/distrito.dto';
 import { Permissions } from '../../global/auth/permission.list';
 import { DistritosService } from './distritos.service';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { DistritoView } from '@database/view/distritos.view';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';

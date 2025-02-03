@@ -3,7 +3,7 @@ import { EstablecimientosService } from './establecimientos.service';
 import { Establecimiento } from '@database/entity/facturacion/establecimiento.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EstablecimientosController } from './establecimientos.controller';
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { Permiso } from '@database/entity/permiso.entity';
 import { JwtModule } from '@nestjs/jwt';
 

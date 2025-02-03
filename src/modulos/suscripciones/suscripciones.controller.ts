@@ -4,7 +4,7 @@ import { SuscripcionesService } from './suscripciones.service';
 import { SuscripcionDTO } from '../../global/dto/suscripcion.dto';
 import { CuotasService } from '../cuotas/cuotas.service';
 import { ServiciosService } from '../servicios/servicios.service'
-import { JwtUtilsService } from '@globalutil/jwt-utils.service';
+import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { CuotaView } from '@database/view/cuota.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
 import { SuscripcionView } from '@database/view/suscripcion.view';
