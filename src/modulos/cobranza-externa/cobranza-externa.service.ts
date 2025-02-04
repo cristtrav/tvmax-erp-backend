@@ -172,8 +172,9 @@ export class CobranzaExternaService {
                     await manager.save(talonario);
                     await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonario, talonario));
 
-                    const facturaElectronica = await this.facturaElectronicaUtilSrv.generarDTE(venta, [detalle]);
-                    await manager.save(facturaElectronica);
+                    let facturaElectronica = await this.facturaElectronicaUtilSrv.generarDTE(venta, [detalle]);
+                    facturaElectronica = await manager.save(facturaElectronica); 
+                    venta.iddte = facturaElectronica.id;
                     
                     if(
                         !this.sifenUtilsSrv.isDisabled() &&
