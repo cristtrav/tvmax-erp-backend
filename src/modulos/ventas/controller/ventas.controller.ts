@@ -1,5 +1,5 @@
 import { Permissions } from '@auth/permission.list';
-import { Body, Controller, Delete, Get, Header, Headers, Param, Post, Put, Query, StreamableFile, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Header, Headers, HttpException, HttpStatus, Param, Post, Put, Query, StreamableFile, UseFilters, UseGuards } from '@nestjs/common';
 import { VentasService } from '../service/ventas.service';
 import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { DetallesVentasService } from '../service/detalles-ventas.service';
@@ -137,6 +137,9 @@ export class VentasController {
         @Param('id') id: number
     ): Promise<StreamableFile> {
         const venta = await this.ventasSrv.findById(id);
+        if(venta.iddte == null) throw new HttpException({
+            message: 'La venta no tiene una factura electrónica asociada'
+        }, HttpStatus.NOT_FOUND);
         const factElectronica = await this.facturaElectronicaSrv.findById(venta.iddte);
         return new StreamableFile(Buffer.from(factElectronica.xml, 'utf-8'));
     }
@@ -149,6 +152,9 @@ export class VentasController {
         @Query('duplicado') duplicado: string
     ): Promise<StreamableFile> {
         const venta = await this.ventasSrv.findById(id);
+        if(venta.iddte == null) throw new HttpException({
+            message: 'La venta no tiene una factura electrónica asociada'
+        }, HttpStatus.NOT_FOUND);
         return await this.kudeFacturaUtilSrv.generateKude(
             await this.facturaElectronicaSrv.findById(venta.iddte),
             duplicado == 'true'

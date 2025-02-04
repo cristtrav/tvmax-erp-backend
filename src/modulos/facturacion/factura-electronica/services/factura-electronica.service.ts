@@ -1,7 +1,7 @@
 import { DTE } from '@database/entity/facturacion/dte.entity';
 import { Venta } from '@database/entity/venta.entity';
 import { DteView } from '@database/view/facturacion/dte.view';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -18,8 +18,11 @@ export class FacturaElectronicaService {
     ){}
 
     async findDetailsById(idventa: number): Promise<DteView>{
-        const ventaRepo = await this.ventaRepo.findOneByOrFail({ id: idventa });
-        return this.dteViewRepo.findOneByOrFail({ id: ventaRepo.iddte });
+        const venta = await this.ventaRepo.findOneByOrFail({ id: idventa });
+        if(venta.iddte == null) throw new HttpException({
+            message: 'La venta no tiene una factura electrónica asociada'
+        }, HttpStatus.NOT_FOUND);
+        return this.dteViewRepo.findOneByOrFail({ id: venta.iddte });
     }
 
     findById(id: number): Promise<DTE>{
