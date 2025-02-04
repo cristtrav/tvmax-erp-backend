@@ -175,6 +175,7 @@ export class CobranzaExternaService {
                     let facturaElectronica = await this.facturaElectronicaUtilSrv.generarDTE(venta, [detalle]);
                     facturaElectronica = await manager.save(facturaElectronica); 
                     venta.iddte = facturaElectronica.id;
+                    await manager.save(venta);
                     
                     if(
                         !this.sifenUtilsSrv.isDisabled() &&
