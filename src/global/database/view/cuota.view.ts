@@ -19,6 +19,12 @@ export class CuotaView{
     nrocuota: number;
 
     @ViewColumn()
+    totalcuotas: number;
+
+    @ViewColumn()
+    codigogrupo: string;
+
+    @ViewColumn()
     idsuscripcion: number;
 
     @ViewColumn()

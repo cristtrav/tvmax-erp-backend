@@ -2,7 +2,7 @@ import { Permissions } from '@auth/permission.list';
 import { CuotaDTO } from 'src/global/dto/cuota.dto';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Headers, UseFilters } from '@nestjs/common';
 import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
-import { CuotasService } from './cuotas.service';
+import { CuotasService } from '../service/cuotas.service';
 import { CuotaView } from '@database/view/cuota.view';
 import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';
@@ -10,6 +10,7 @@ import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
+import { ResultadoGeneracionCuotaDTO } from '../dto/resultado-generacion-cuota.dto';
 
 @Controller('cuotas')
 @UseGuards(LoginGuard, AllowedInGuard)
@@ -104,6 +105,19 @@ export class CuotasController {
         @Body() body: { anio: number, mes: number }
     ){
         this.cuotaSrv.generarCuotas(body.mes, body.anio);
+    }
+
+    @Post('generarsuscripcion')
+    @AllowedIn(Permissions.CUOTAS.REGISTRAR)
+    async generarSuscripcion(
+        @Headers('authorization') auth: string,
+        @Body() cuotaDto: CuotaDTO,
+    ): Promise<ResultadoGeneracionCuotaDTO>{
+        return await this.cuotaSrv.generarCuotasSuscripcion(
+            cuotaDto.cantidad,
+            DTOEntityUtis.cuotaDtoToEntity(cuotaDto),
+            this.jwtUtil.extractJwtSub(auth)
+        );
     }
 
 }

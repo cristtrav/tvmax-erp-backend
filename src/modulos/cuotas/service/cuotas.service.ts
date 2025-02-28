@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TablasAuditoriaList } from '@database/tablas-auditoria.list';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cuota } from '@database/entity/cuota.entity';
-import { Brackets, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
 import { CuotaView } from '@database/view/cuota.view';
 import { EventoAuditoria } from '@database/entity/evento-auditoria.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
@@ -11,6 +11,9 @@ import { es } from 'date-fns/locale';
 import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
+import { CuotaGrupo } from '@database/entity/cuota-grupo.entity';
+import { Usuario } from '@database/entity/usuario.entity';
+import { ResultadoGeneracionCuotaDTO } from '../dto/resultado-generacion-cuota.dto';
 
 @Injectable()
 export class CuotasService {
@@ -88,30 +91,68 @@ export class CuotasService {
             message: `La cuota para el servicio «${cuotaExistente.servicio}» del mes «${format(c.fechaVencimiento, "MMMM yyyy", { locale: es })}» ya existe.`
         }, HttpStatus.BAD_REQUEST);
 
-        await this.datasource.transaction(async manager => {
-            await manager.save(c);
-            await manager.save(this.getEventoAuditoria(idusuario, 'R', null, c));
-        })
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.startTransaction();
+        try {
+            await queryRunner.manager.save(c);
+            await queryRunner.manager.save(this.getEventoAuditoria(idusuario, 'R', null, c));
+            if(c.codigoGrupo != null)
+                await this.actualizarNumeracionCuotas(c.codigoGrupo, c.idsuscripcion, c.idservicio, queryRunner.manager);
+            await queryRunner.commitTransaction();
+        } catch(e) {
+            console.error('Error al registrar cuota', e);
+            await queryRunner.rollbackTransaction();
+            throw e;
+        } finally {
+            await queryRunner.release();
+        }
     }
 
     async edit(oldid: number, c: Cuota, idusuario: number) {
-        await this.datasource.transaction(async manager => {
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.startTransaction();
+        try{
+            if(c.codigoGrupo == null) c.nroCuota = null;
+
             const oldCuota: Cuota = await this.cuotaRepo.findOneByOrFail({ id: oldid });
-            await manager.save(c);
-            const newCuota: Cuota = await this.cuotaRepo.findOneByOrFail({ id: c.id });
-            await manager.save(this.getEventoAuditoria(idusuario, "M", oldCuota, newCuota));
-            if (oldid != c.id) await manager.remove(oldCuota);
-        })
+            const newCuota = await queryRunner.manager.save(c);
+            await queryRunner.manager.save(this.getEventoAuditoria(idusuario, "M", oldCuota, newCuota));
+            if (oldid != c.id) await queryRunner.manager.remove(oldCuota);
+            
+            if(oldCuota.codigoGrupo != null)
+                await this.actualizarNumeracionCuotas(oldCuota.codigoGrupo, oldCuota.idsuscripcion, oldCuota.idservicio, queryRunner.manager);
+            if(newCuota.codigoGrupo != null)
+                await this.actualizarNumeracionCuotas(newCuota.codigoGrupo, newCuota.idsuscripcion, newCuota.idservicio, queryRunner.manager);
+
+            await queryRunner.commitTransaction();
+        }catch(e){
+            console.error('Error al editar cuota', e);
+            await queryRunner.rollbackTransaction();
+            throw e;
+        }finally{
+            await queryRunner.release();
+        }
     }
 
     async delete(id: number, idusuario: number) {
         const cuota: Cuota = await this.cuotaRepo.findOneByOrFail({ id });
         const oldCuota: Cuota = { ...cuota };
         cuota.eliminado = true;
-        await this.datasource.transaction(async manager => {
-            await manager.save(cuota);
-            await manager.save(this.getEventoAuditoria(idusuario, 'E', oldCuota, cuota));
-        })
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.startTransaction();
+        try{
+            await queryRunner.manager.save(cuota);
+            await queryRunner.manager.save(this.getEventoAuditoria(idusuario, 'E', oldCuota, cuota));
+            if(cuota.codigoGrupo != null)
+                await this.actualizarNumeracionCuotas(cuota.codigoGrupo, cuota.idsuscripcion, cuota.idservicio, queryRunner.manager);
+            await queryRunner.commitTransaction();
+        }catch(e){
+            console.error('Error al eliminar cuota', e);
+            await queryRunner.rollbackTransaction();
+            throw e;
+        }finally{
+            await queryRunner.release();
+        }
     }
 
     async findCobro(idcuota: number): Promise<CobroCuotasView> {
@@ -166,5 +207,76 @@ export class CuotasService {
         generacionCuotas.cantidadCuotasOmitidas =cantSuscripcionesOmitidas;
         generacionCuotas.fechaHoraFin = new Date();
         await this.generacionCuotasRepo.save(generacionCuotas);
+    }
+
+    async generarCuotasSuscripcion(cantidad: number, cuota: Cuota, idusuario: number): Promise<ResultadoGeneracionCuotaDTO>{
+        const resultGeneracion: ResultadoGeneracionCuotaDTO = {
+            total: cantidad,
+            generado: 0,
+            errors: []
+        }
+
+        await this.datasource.transaction(async manager => {
+            for(let i = 0; i < cantidad; i++){
+                const nuevaCuota = Object.assign(new Cuota(), cuota);
+                nuevaCuota.fechaVencimiento = new Date(cuota.fechaVencimiento.getTime());
+                nuevaCuota.fechaVencimiento.setMonth(nuevaCuota.fechaVencimiento.getMonth() + i);
+                
+                const busquedaCuota = await this.cuotaRepo.createQueryBuilder('cuota')
+                .where(`cuota.eliminado = false`)
+                .andWhere(`cuota.idsuscripcion = :idsuscripcion`, { idsuscripcion: nuevaCuota.idsuscripcion })
+                .andWhere(`cuota.idservicio = :idservicio`, { idservicio: nuevaCuota.idservicio })
+                .andWhere('EXTRACT(month FROM cuota.fechaVencimiento) = :mes', { mes: (nuevaCuota.fechaVencimiento.getMonth() + 1)})
+                .andWhere('EXTRACT(year FROM cuota.fechaVencimiento) = :anio', { anio: nuevaCuota.fechaVencimiento.getFullYear() })
+                .getOne();
+                if(busquedaCuota != null){
+                    const errorMsg = `Cuota con vencimiento ${format(nuevaCuota.fechaVencimiento, 'dd/MMMM/yyyy', {locale: es})} ya existe.`
+                    resultGeneracion.errors = resultGeneracion.errors.concat([errorMsg])
+                    continue;
+                }
+
+                await manager.save(nuevaCuota);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(idusuario, 'R', null, nuevaCuota));
+                resultGeneracion.generado = resultGeneracion.generado + 1;
+            }
+            if(cuota.codigoGrupo != null) await this.actualizarNumeracionCuotas(
+                cuota.codigoGrupo,
+                cuota.idsuscripcion,
+                cuota.idservicio,
+                manager
+            );
+        })
+        return resultGeneracion;
+    }
+
+    private async actualizarNumeracionCuotas(codigo: string, idsuscripcion: number, idservicio: number, manager: EntityManager){
+        const cuotasEnGrupo = await manager.getRepository(Cuota)
+                .createQueryBuilder('cuota')
+                .where(`cuota.codigoGrupo = :codigo`, { codigo })
+                .andWhere(`cuota.idservicio = :idservicio`, { idservicio })
+                .andWhere(`cuota.idsuscripcion = :idsuscripcion`, { idsuscripcion })
+                .andWhere(`cuota.eliminado = false`)
+                .orderBy(`cuota.fechaVencimiento`, 'ASC')
+                .getMany();
+
+        for(let i = 0; i < cuotasEnGrupo.length; i++){
+            const cuo = cuotasEnGrupo[i];
+            const oldCuo = { ...cuo };
+            cuo.nroCuota = i + 1;
+            await manager.save(cuo);
+            await manager.save(this.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldCuo, cuo));
+        }
+        if(cuotasEnGrupo.length > 0){
+            const grupo = await manager.getRepository(CuotaGrupo)
+                .findOneByOrFail({
+                    codigo,
+                    idservicio,
+                    idsuscripcion
+                })
+            const oldGrupo = { ...grupo };
+            grupo.totalCuotas = cuotasEnGrupo.length;
+            await manager.save(grupo);
+            await manager.save(CuotaGrupo.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldGrupo, grupo));
+        }
     }
 }

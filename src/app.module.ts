@@ -51,6 +51,7 @@ import { NotasCreditoModule } from './modulos/facturacion/notas-credito/notas-cr
 import { SifenUtilsModule } from './modulos/sifen/sifen-utils/sifen-utils.module';
 import { UtilModule } from './global/util/util.module';
 import { TimbradosModule } from './modulos/facturacion/timbrados/timbrados.module';
+import { CuotasGruposModule } from './modulos/cuotas-grupos/cuotas-grupos.module';
 
 @Module({
   imports: [
@@ -110,7 +111,8 @@ import { TimbradosModule } from './modulos/facturacion/timbrados/timbrados.modul
     NotasCreditoModule,
     SifenUtilsModule,
     UtilModule,
-    TimbradosModule
+    TimbradosModule,
+    CuotasGruposModule,
   ],
   controllers: [AppController],
   providers: [

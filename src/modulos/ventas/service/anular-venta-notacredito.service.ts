@@ -129,11 +129,4 @@ export class AnularVentaNotacreditoService {
         });
     }
 
-    private getNroFactura(talon: TalonarioView, nroDoc: number){
-        const estab = talon.codestablecimiento.toString().padStart(3, '0');
-        const punto = talon.codpuntoemision.toString().padStart(3, '0');
-        const nro = nroDoc.toString().padStart(7, '0');
-        return `${estab}-${punto}-${nro}`;
-    }
-
 }

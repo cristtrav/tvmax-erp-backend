@@ -1,4 +1,4 @@
-import { CuotasService } from '@modulos/cuotas/cuotas.service';
+import { CuotasService } from '@modulos/cuotas/service/cuotas.service';
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 

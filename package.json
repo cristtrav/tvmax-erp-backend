@@ -1,6 +1,6 @@
 {
   "name": "tvmax-erp-backend",
-  "version": "1.11.3",
+  "version": "1.11.4",
   "description": "Backend del sistema TV Max ERP",
   "author": "Cristhian Traversi",
   "private": true,
@@ -51,6 +51,7 @@
     "rimraf": "^5.0.5",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.19",
+    "unique-sequence": "^1.0.4",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {

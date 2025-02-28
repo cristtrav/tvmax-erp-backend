@@ -36,8 +36,11 @@ import { AnularVentaNotacreditoService } from './service/anular-venta-notacredit
 import { SifenUtilsModule } from '@modulos/sifen/sifen-utils/sifen-utils.module';
 import { UtilModule } from '@globalutil/util.module';
 import { FacturaElectronicaModule } from '@modulos/facturacion/factura-electronica/factura-electronica.module';
-import { NotaCredito } from '@database/entity/facturacion/nota-credito.entity';
 import { NotaCreditoView } from '@database/view/facturacion/nota-credito.view';
+import { UtilVentaService } from './service/util-venta.service';
+import { CrearVentaService } from './service/crear-venta.service';
+import { EditarVentaService } from './service/editar-venta.service';
+import { EliminarVentaService } from './service/eliminar-venta.service';
 
 @Module({
   imports: [
@@ -74,7 +77,11 @@ import { NotaCreditoView } from '@database/view/facturacion/nota-credito.view';
     DetallesVentasService,
     CancelarVentaService,
     AnularVentaService,
-    AnularVentaNotacreditoService
+    AnularVentaNotacreditoService,
+    UtilVentaService,
+    CrearVentaService,
+    EditarVentaService,
+    EliminarVentaService
   ],
   controllers: [
     VentasController,

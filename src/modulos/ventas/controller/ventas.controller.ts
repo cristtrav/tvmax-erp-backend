@@ -15,6 +15,9 @@ import { VentaDTO } from '@dto/venta.dto';
 import { DteView } from '@database/view/facturacion/dte.view';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-util.service';
+import { CrearVentaService } from '../service/crear-venta.service';
+import { EditarVentaService } from '../service/editar-venta.service';
+import { EliminarVentaService } from '../service/eliminar-venta.service';
 
 @Controller('ventas')
 @UseGuards(LoginGuard, AllowedInGuard)
@@ -26,7 +29,10 @@ export class VentasController {
         private detallesVentaSrv: DetallesVentasService,
         private facturaElectronicaSrv: FacturaElectronicaService,
         private jwtUtil: JwtUtilsService,
-        private kudeFacturaUtilSrv: KudeUtilService
+        private kudeFacturaUtilSrv: KudeUtilService,
+        private crearVentaSrv: CrearVentaService,
+        private editarVentaSrv: EditarVentaService,
+        private eliminarVentaSrv: EliminarVentaService
     ) { }
 
     @Get('count')
@@ -43,7 +49,7 @@ export class VentasController {
         @Body() fv: VentaDTO,
         @Headers('authorization') auth: string
     ): Promise<number> {
-        return this.ventasSrv.create(
+        return this.crearVentaSrv.create(
             DTOEntityUtis.ventaDtoToEntity(fv),
             fv.detalles.map(dv => DTOEntityUtis.detalleVentaDtoToEntity(dv)),
             this.jwtUtil.extractJwtSub(auth)
@@ -56,7 +62,7 @@ export class VentasController {
         @Body() fv: VentaDTO,
         @Headers('authorization') auth: string
     ) {
-        await this.ventasSrv.edit(
+        await this.editarVentaSrv.edit(
             DTOEntityUtis.ventaDtoToEntity(fv),
             fv.detalles.map(dv => DTOEntityUtis.detalleVentaDtoToEntity(dv)),
             this.jwtUtil.extractJwtSub(auth)
@@ -78,24 +84,6 @@ export class VentasController {
     ): Promise<VentaView[]> {
         return this.ventasSrv.findAll(queries);
     }
-
-    /*@Get(':id/anular')
-    @AllowedIn(Permissions.VENTAS.ANULAR)
-    async anular(
-        @Param('id') id: number,
-        @Headers('authorization') auth: string
-    ) {
-        await this.ventasSrv.anular(id, true, this.jwtUtil.extractJwtSub(auth));
-    }
-
-    @Get(':id/revertiranulacion')
-    @AllowedIn(Permissions.VENTAS.REVERTIRANUL)
-    async revertiranul(
-        @Param('id') id: number,
-        @Headers('authorization') auth: string
-    ) {
-        await this.ventasSrv.anular(id, false, this.jwtUtil.extractJwtSub(auth));
-    }*/
 
     @Get(':id/detalles')
     @AllowedIn(Permissions.VENTAS.CONSULTAR)
@@ -119,7 +107,7 @@ export class VentasController {
         @Param('id') id: number,
         @Headers('authorization') auth: string
     ) {
-        await this.ventasSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
+        await this.eliminarVentaSrv.delete(id, this.jwtUtil.extractJwtSub(auth));
     }
 
     @Get(':id')

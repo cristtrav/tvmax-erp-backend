@@ -90,6 +90,7 @@ export class DTOEntityUtis {
         cuota.pagado = cuotaDTO.pagado;
         if (cuotaDTO.fechavencimiento != null)
             cuota.fechaVencimiento = new Date(`${cuotaDTO.fechavencimiento}T00:00:00`);
+        cuota.codigoGrupo = cuotaDTO.codigogrupo;
         return cuota;
     }
 

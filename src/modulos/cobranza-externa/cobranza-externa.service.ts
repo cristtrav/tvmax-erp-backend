@@ -314,7 +314,10 @@ export class CobranzaExternaService {
         const detalleVenta = new DetalleVenta();
         detalleVenta.venta = venta;        
         detalleVenta.cantidad = 1;
-        detalleVenta.descripcion = `CUOTA ${format(cuota.fechavencimiento, 'MMM yyyy', {locale: es})} | ${cuota.servicio} [${cuota.idsuscripcion}]`.toUpperCase();
+        detalleVenta.descripcion = `CUOTA ${format(cuota.fechavencimiento, 'MMM yyyy', {locale: es})}`;
+        if(cuota.totalcuotas != null && cuota.nrocuota != null)
+            detalleVenta.descripcion = `${detalleVenta.descripcion} (${cuota.nrocuota}/${cuota.totalcuotas})`
+        detalleVenta.descripcion = `${detalleVenta.descripcion} | ${cuota.servicio} [${cuota.idsuscripcion}]`.toUpperCase()
         detalleVenta.eliminado = false;
         detalleVenta.idcuota = detalleCobranza.idcuota;
         detalleVenta.idservicio = cuota.idservicio;

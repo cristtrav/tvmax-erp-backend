@@ -9,4 +9,6 @@ export class CuotaDTO{
     nrocuota: number | null = null;
     pagado: boolean = false;
     observacion: string | null = null;
+    codigogrupo: string | null = null;
+    cantidad: number | null = null;
 }

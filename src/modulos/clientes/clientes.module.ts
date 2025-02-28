@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientesService } from './service/clientes.service';
 import { ClientesController } from './controller/clientes.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { SuscripcionesService } from '../suscripciones/suscripciones.service';
+import { SuscripcionesService } from '../suscripciones/service/suscripciones.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cliente } from '@database/entity/cliente.entity';
 import { ClienteView } from '@database/view/cliente.view';

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { SuscripcionesService } from './suscripciones.service';
-import { SuscripcionesController } from './suscripciones.controller';
+import { SuscripcionesService } from './service/suscripciones.service';
+import { SuscripcionesController } from './controller/suscripciones.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { CuotasService } from '../cuotas/cuotas.service';
+import { CuotasService } from '../cuotas/service/cuotas.service';
 import { ServiciosService } from '../servicios/servicios.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Servicio } from '@database/entity/servicio.entity';
@@ -15,6 +15,10 @@ import { Permiso } from '@database/entity/permiso.entity';
 import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
+import { CuotasGruposController } from './controller/cuotas-grupos-by-suscripcion.controller';
+import { CuotasGruposBySuscripcionService } from './service/cuotas-grupos-by-suscripcion.service';
+import { CuotaGrupo } from '@database/entity/cuota-grupo.entity';
+import { CuotaGrupoView } from '@database/view/cuota-grupo.view';
 
 @Module({
   imports: [
@@ -28,16 +32,19 @@ import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
       Suscripcion,
       SuscripcionView,
       Permiso,
-      GeneracionCuotas
+      GeneracionCuotas,
+      CuotaGrupo,
+      CuotaGrupoView
     ])
   ],
   providers: [
     SuscripcionesService,    
     CuotasService,
     ServiciosService,
-    JwtUtilsService
+    JwtUtilsService,
+    CuotasGruposBySuscripcionService
   ],
-  controllers: [SuscripcionesController],
+  controllers: [SuscripcionesController, CuotasGruposController],
   exports: [ServiciosService]
 })
 export class SuscripcionesModule {}

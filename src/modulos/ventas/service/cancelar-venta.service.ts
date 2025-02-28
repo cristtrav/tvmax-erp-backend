@@ -12,6 +12,7 @@ import { DTECancelacion } from '@database/entity/facturacion/dte-cancelacion.ent
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
+import { UtilVentaService } from './util-venta.service';
 
 @Injectable()
 export class CancelarVentaService {
@@ -29,7 +30,8 @@ export class CancelarVentaService {
         private detalleVentaRepo: Repository<DetalleVenta>,
         private sifenEventosUtilSrv: SifenEventosUtilService,
         private sifenApiUtilSrv: SifenApiUtilService,
-        private datasource: DataSource
+        private datasource: DataSource,
+        private utilVentaSrv: UtilVentaService
     ){}
 
     async cancelar(idventa: number, idusuario: number) {
@@ -59,7 +61,7 @@ export class CancelarVentaService {
             for (let detalle of venta.detalles.filter(deta => deta.idcuota != null)) {
                 const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
                 const oldCuota = { ...cuota }
-                cuota.pagado = await this.pagoCuotaExists(detalle.idcuota, idventa);
+                cuota.pagado = await this.utilVentaSrv.pagoCuotaExists(detalle.idcuota, idventa);
                 await manager.save(cuota);
                 await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota))
             }
@@ -87,8 +89,8 @@ export class CancelarVentaService {
         });
     }
     
-        //Comprueba si la cuota fue pagada en otra transaccion
-    private async pagoCuotaExists(idcuota: number, idventaIgnorar: number): Promise<boolean> {
+    //Comprueba si la cuota fue pagada en otra transaccion
+    /*private async pagoCuotaExists(idcuota: number, idventaIgnorar: number): Promise<boolean> {
         const detalleQuery = this.detalleVentaRepo.createQueryBuilder('detalle')
             .innerJoin(`detalle.cuota`, 'cuota', 'detalle.eliminado = :dveliminado', { dveliminado: false })
             .innerJoin(
@@ -99,6 +101,6 @@ export class CancelarVentaService {
             )
             .where('detalle.idcuota = :idcuota', { idcuota });
         return (await detalleQuery.getCount()) != 0;
-    }
+    }*/
 
 }

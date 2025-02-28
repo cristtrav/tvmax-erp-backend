@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CuotasService } from './cuotas.service';
-import { CuotasController } from './cuotas.controller';
+import { CuotasService } from './service/cuotas.service';
+import { CuotasController } from './controller/cuotas.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cuota } from '@database/entity/cuota.entity';
@@ -10,11 +10,20 @@ import { CobroCuotasView } from '@database/view/cobro-cuotas.view';
 import { GeneracionCuotas } from '@database/entity/generacion-cuotas.entity';
 import { Suscripcion } from '@database/entity/suscripcion.entity';
 import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
+import { CuotaGrupo } from '@database/entity/cuota-grupo.entity';
 
 @Module({
   imports: [
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Cuota, CuotaView, CobroCuotasView, Permiso, GeneracionCuotas, Suscripcion])
+    TypeOrmModule.forFeature([
+      Cuota,
+      CuotaView,
+      CobroCuotasView,
+      Permiso, 
+      GeneracionCuotas,
+      Suscripcion,
+      CuotaGrupo
+    ])
   ],
   providers: [CuotasService, JwtUtilsService],
   controllers: [CuotasController],

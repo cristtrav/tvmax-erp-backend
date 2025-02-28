@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseFilters, Headers } from '@nestjs/common';
 import { Permissions } from 'src/global/auth/permission.list';
-import { SuscripcionesService } from './suscripciones.service';
-import { SuscripcionDTO } from '../../global/dto/suscripcion.dto';
-import { CuotasService } from '../cuotas/cuotas.service';
-import { ServiciosService } from '../servicios/servicios.service'
+import { SuscripcionesService } from '../service/suscripciones.service';
+import { SuscripcionDTO } from '../../../global/dto/suscripcion.dto';
+import { CuotasService } from '../../cuotas/service/cuotas.service';
+import { ServiciosService } from '../../servicios/servicios.service'
 import { JwtUtilsService } from '@globalutil/services/jwt-utils.service';
 import { CuotaView } from '@database/view/cuota.view';
 import { HttpExceptionFilter } from '@globalfilter/http-exception.filter';

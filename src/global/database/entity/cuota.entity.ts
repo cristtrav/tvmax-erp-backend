@@ -44,6 +44,9 @@ export class Cuota{
     @Column({name: 'factura_pago'})
     facturaPago: string;
 
+    @Column({name: 'codigo_grupo'})
+    codigoGrupo: string;
+
     @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.cuota)
     detallesVenta: DetalleVenta
 

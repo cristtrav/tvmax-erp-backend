@@ -6,6 +6,7 @@ import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { UtilVentaService } from './util-venta.service';
 
 @Injectable()
 export class AnularVentaService {
@@ -19,7 +20,8 @@ export class AnularVentaService {
         private cuotaRepo: Repository<Cuota>,
         @InjectRepository(DetalleVenta)
         private detalleVentaRepo: Repository<DetalleVenta>,
-        private datasource: DataSource
+        private datasource: DataSource,
+        private utilVentaSrv: UtilVentaService
     ){}
 
     async anular(idventa: number, anulado: boolean, idusuario: number) {
@@ -41,17 +43,23 @@ export class AnularVentaService {
             for (let detalle of venta.detalles.filter(deta => deta.idcuota != null)) {
                 const cuota = await this.cuotaRepo.findOneByOrFail({ id: detalle.idcuota });
                 const oldCuota = { ...cuota }
-                cuota.pagado = !venta.anulado && venta.pagado ? true : await this.pagoCuotaExists(detalle.idcuota, idventa);
+                cuota.pagado = !venta.anulado && venta.pagado ? true : await this.utilVentaSrv.pagoCuotaExists(detalle.idcuota, idventa);
                 if (cuota.pagado != oldCuota.pagado) {
                     await manager.save(cuota);
                     await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCuota(3, 'M', oldCuota, cuota))
+                    if(cuota.codigoGrupo != null) await this.utilVentaSrv.actualizarCuotaGrupo(
+                        cuota.codigoGrupo,
+                        cuota.idsuscripcion,
+                        cuota.idservicio,
+                        manager
+                    );
                 };
             }
         });
     }
 
     //Comprueba si la cuota fue pagada en otra transaccion
-    private async pagoCuotaExists(idcuota: number, idventaIgnorar: number): Promise<boolean> {
+    /*private async pagoCuotaExists(idcuota: number, idventaIgnorar: number): Promise<boolean> {
         const detalleQuery = this.detalleVentaRepo.createQueryBuilder('detalle')
             .innerJoin(`detalle.cuota`, 'cuota', 'detalle.eliminado = :dveliminado', { dveliminado: false })
             .innerJoin(
@@ -62,5 +70,5 @@ export class AnularVentaService {
             )
             .where('detalle.idcuota = :idcuota', { idcuota });
         return (await detalleQuery.getCount()) != 0;
-    }
+    }*/
 }
