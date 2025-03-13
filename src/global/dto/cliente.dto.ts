@@ -24,4 +24,5 @@ export class ClienteDTO {
     eliminado: boolean | null = false;
     latitud: number | null = null;
     longitud: number | null = null;
+    idtipocliente: number | null = null;
 }

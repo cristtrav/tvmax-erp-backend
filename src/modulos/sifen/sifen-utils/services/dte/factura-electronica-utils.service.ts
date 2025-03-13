@@ -11,6 +11,7 @@ import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-emai
 import { DteUtilsService } from '@modulos/sifen/sifen-utils/services/dte/dte-utils.service';
 import { DEDataInterface } from '../../interfaces/dte/de-data.interface';
 import { DEItemInterface } from '../../interfaces/dte/de-item.interface';
+import { XmlgenConfig } from 'facturacionelectronicapy-xmlgen/dist/services/type.interface.';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
@@ -28,7 +29,7 @@ export class FacturaElectronicaUtilsService {
         return await xmlgen.generateXMLDE(
             await this.dteUtilsSrv.getParams(talonario),
             await this.getData(venta, detalles, talonario),
-            { test: false, redondeoSedeco: false }
+            { test: false, redondeoSedeco: false, sum0_000001SuffixBeforeToFixed: false }
         );
     }
 

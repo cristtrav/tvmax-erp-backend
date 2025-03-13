@@ -21,8 +21,7 @@ export class ConsultaRucController {
     @AllowedIn(Permissions.CLIENTES.CONSULTAR)
     async consultaRuc(
         @Param('ci') ci: string
-    ): Promise<DetalleConsultaRucInterface>{
-        console.log('consultar ruc')
+    ): Promise<DetalleConsultaRucInterface>{        
         const response = await this.consultaRucSrv.consultar(ci);
         if(response.codigo == ConsultaRucMessageService.COD_NO_AUTORIZADO)
             throw new HttpException({

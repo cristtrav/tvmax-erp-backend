@@ -7,15 +7,9 @@ import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { UtilVentaService } from './util-venta.service';
-import { Cliente } from '@database/entity/cliente.entity';
-import { Cobro } from '@database/entity/cobro.entity';
 import { Cuota } from '@database/entity/cuota.entity';
-import { TalonarioView } from '@database/view/facturacion/talonario.view';
-import { VentaView } from '@database/view/venta.view';
-import { DigitoVerificadorRucService } from '@globalutil/services/digito-verificador-ruc.service';
 import { FacturaElectronicaUtilsService } from '@modulos/sifen/sifen-utils/services/dte/factura-electronica-utils.service';
 import { SifenApiUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-api-util.service';
-import { SifenEventosUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-eventos-util.service';
 import { SifenUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-util.service';
 import { InjectRepository } from '@nestjs/typeorm';
 

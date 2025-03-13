@@ -46,6 +46,9 @@ export class Cliente{
     @Column({name: 'excluido_sorteo', default: false, nullable: false})
     excluidoSorteo: boolean;
 
+    @Column({name: 'idtipo_cliente', nullable: false, default: 1, type: 'smallint'})
+    idtipoCliente: number;
+
     @OneToMany(() => Suscripcion, (suscripcion) => suscripcion.cliente)
     suscripciones: Suscripcion[];
 
@@ -81,6 +84,7 @@ export class Cliente{
         this.ci = clienteDto.ci;
         if(clienteDto.eliminado != null) this.eliminado = clienteDto.eliminado;
         if(clienteDto.excluidosorteo != null) this.excluidoSorteo = clienteDto.excluidosorteo;
+        this.idtipoCliente = clienteDto.idtipocliente;
         return this;
     }
 }

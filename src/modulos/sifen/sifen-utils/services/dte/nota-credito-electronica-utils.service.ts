@@ -34,7 +34,7 @@ export class NotaCreditoElectronicaUtilsService {
         return await xmlgen.generateXMLDE(
             await this.dteUtilsSrv.getParams(talonario),
             await this.getData(nota, detalles, talonario),
-            { test: false, redondeoSedeco: false }
+            { test: false, redondeoSedeco: false, sum0_000001SuffixBeforeToFixed: false }
         );
     }
 

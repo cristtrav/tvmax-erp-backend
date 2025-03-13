@@ -81,4 +81,10 @@ export class ClienteView{
     @ViewColumn()
     longitud: number;
 
+    @ViewColumn()
+    idtipocliente: number;
+
+    @ViewColumn()
+    tipocliente: string;
+
 }

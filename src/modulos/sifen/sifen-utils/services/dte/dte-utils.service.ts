@@ -16,6 +16,7 @@ import { DEActividadEconomicaInterface } from '../../interfaces/dte/de-actividad
 import { DEClienteInterface } from '../../interfaces/dte/de-cliente.interface';
 import { DEEstablecimientoInterface } from '../../interfaces/dte/de-establecimiento.interface';
 import { DEParamsInterface } from '../../interfaces/dte/de-params.interface';
+import { DETipoOperacionType } from '../../types/dte/de-tipo-operacion.type';
 
 @Injectable()
 export class DteUtilsService {
@@ -70,7 +71,7 @@ export class DteUtilsService {
             contribuyente: cliente.dvruc != null,
             codigo: `${cliente.id}`.padStart(3, '0'),
             razonSocial: cliente.dvruc != null ? (await this.consultarRazonSocialSifen(cliente.ci) ?? cliente.razonsocial) : cliente.razonsocial,
-            tipoOperacion: 2,
+            tipoOperacion: <DETipoOperacionType> (cliente.idtipocliente ?? 2),
             tipoContribuyente: 1,
             pais: "PRY",
             paisDescripcion: "Paraguay",
