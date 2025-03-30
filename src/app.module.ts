@@ -30,9 +30,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { SorteosModule } from './modulos/sorteos/sorteos.module';
 import { PremiosModule } from './modulos/premios/premios.module';
-import { TiposMaterialesModule } from './modulos/tipos-materiales/tipos-materiales.module';
-import { MaterialesModule } from './modulos/materiales/materiales.module';
-import { MovimientosMaterialesModule } from './modulos/movimientos-materiales/movimientos-materiales.module';
+import { TiposMaterialesModule } from './modulos/depositos/tipos-materiales/tipos-materiales.module';
+import { MaterialesModule } from './modulos/depositos/materiales/materiales.module';
+import { MovimientosMaterialesModule } from './modulos/depositos/movimientos-materiales/movimientos-materiales.module';
 import { AppInitService } from './app-init.service';
 import databaseConfig from '@config/database.config';
 import { MotivosModule } from './modulos/reclamos/motivos/motivos.module';
@@ -53,6 +53,7 @@ import { UtilModule } from './global/util/util.module';
 import { TimbradosModule } from './modulos/facturacion/timbrados/timbrados.module';
 import { CuotasGruposModule } from './modulos/cuotas-grupos/cuotas-grupos.module';
 import { ClientesTipoModule } from '@modulos/clientes-tipo/clientes-tipo.module';
+import { AjustesExistenciasModule } from './modulos/depositos/ajustes-existencias/ajustes-existencias.module';
 
 @Module({
   imports: [
@@ -114,7 +115,8 @@ import { ClientesTipoModule } from '@modulos/clientes-tipo/clientes-tipo.module'
     UtilModule,
     TimbradosModule,
     CuotasGruposModule,
-    ClientesTipoModule
+    ClientesTipoModule,
+    AjustesExistenciasModule
   ],
   controllers: [AppController],
   providers: [

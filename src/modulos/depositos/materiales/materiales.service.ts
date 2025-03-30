@@ -143,10 +143,11 @@ export class MaterialesService {
 
     private getIdentificableSelectQuery(queries: QueriesType): SelectQueryBuilder<MaterialIdentificable>{
         const alias = 'matident';
-        const { disponible, idmaterial, offset, limit, sort } = queries;
+        const { disponible, idmaterial, eliminado, offset, limit, sort } = queries;
         let query = this.materialIdentificableRepo.createQueryBuilder(alias);
         if(idmaterial != null) query = query.andWhere(`${alias}.idmaterial = :idmaterial`, {idmaterial});
         if(disponible != null) query = query.andWhere(`${alias}.disponible = :disponible`, {disponible});
+        if(eliminado != null) query = query.andWhere(`${alias}.eliminado = :eliminado` , { eliminado });
         if(offset) query = query.skip(offset);
         if(limit) query = query.take(limit);
         if(sort){

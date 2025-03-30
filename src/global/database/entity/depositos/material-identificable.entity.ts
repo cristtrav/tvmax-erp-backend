@@ -12,4 +12,7 @@ export class MaterialIdentificable {
     @Column({nullable: false, default: false})
     disponible: boolean;
 
+    @Column({nullable: false, default: false})
+    eliminado: boolean;
+
 }

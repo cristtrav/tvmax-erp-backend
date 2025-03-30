@@ -367,5 +367,13 @@ export class Permissions {
         ELIMINAR: 1364
     }
 
+    static readonly AJUSTESEXISTENCIASMATERIALES = {
+        ACCESOMODULO: 1400,
+        ACCESOFORMULARIO: 1401,
+        CONSULTAR: 1402,
+        REGISTRAR: 1403,
+        EDITAR: 1404,
+        ELIMINAR: 1405
+    }
 
 }
