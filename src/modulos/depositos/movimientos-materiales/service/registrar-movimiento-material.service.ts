@@ -40,6 +40,9 @@ export class RegistrarMovimientoMaterial {
         manager: EntityManager
     ): Promise<{savedMovimiento: MovimientoMaterial, savedDetalles: DetalleMovimientoMaterial[]}>{
         delete movimiento.id;
+        if(movimiento.tipoMovimiento == 'EN' && movimiento.idusuarioEntrega == -1)
+            movimiento.idusuarioEntrega = null;
+        
         const savedMovimiento = await manager.save(movimiento); 
         await manager.save(MovimientoMaterial.getEventoAuditoria(idusuario, 'R', null, movimiento));
         
