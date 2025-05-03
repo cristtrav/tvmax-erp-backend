@@ -36,6 +36,8 @@ import { DetalleVenta } from '@database/entity/detalle-venta.entity';
 import { NotaCreditoDetalle } from '@database/entity/facturacion/nota-credito-detalle.entity';
 import { Cuota } from '@database/entity/cuota.entity';
 import { ConsultaRucController } from './controllers/consultas/consulta-ruc.controller';
+import { ClientesService } from '@modulos/clientes/service/clientes.service';
+import { Cliente } from '@database/entity/cliente.entity';
 
 @Module({
     imports: [

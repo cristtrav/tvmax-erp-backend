@@ -10,10 +10,10 @@ const { exec } = require("child_process");
 export class KudeUtilService {
 
     constructor(
-        private sifenUtilsSrv: SifenUtilService,
+        private sifenUtilsSrv: SifenUtilService
     ){}
 
-    public async generateKude(factElectronica: DTE, conDuplicado: boolean = false): Promise<StreamableFile>{
+    public async generateKude(factElectronica: DTE, conDuplicado: boolean = false, direccionCliente?: string): Promise<StreamableFile>{
         const timestamp = `${new Date().getTime()}`;
         if(!existsSync('tmp')) mkdirSync('tmp');
         if(!existsSync(`tmp/${timestamp}`)) mkdirSync(`tmp/${timestamp}`);
@@ -37,7 +37,7 @@ export class KudeUtilService {
             dteFilePath,
             jasperPath,
             kudePath,
-            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}'}`
+            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}', DIRECCION_CLIENTE: '${direccionCliente}'}`
         );
 
         //Leer archivo PDF para retornar al cliente con GET

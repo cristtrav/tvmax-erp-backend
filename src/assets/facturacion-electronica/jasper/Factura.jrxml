@@ -14,6 +14,9 @@
 		<defaultValueExpression><![CDATA["0"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="LOGO_URL" forPrompting="false" class="java.lang.String"/>
+	<parameter name="DIRECCION_CLIENTE" forPrompting="false" class="java.lang.String">
+		<description><![CDATA[La direccion del cliente alterntativa si no está disponible el campo dDirRec]]></description>
+	</parameter>
 	<query language="xPath"><![CDATA[/rDE/DE/gDtipDE/gCamItem]]></query>
 	<field name="dCodInt" class="java.lang.String">
 		<description><![CDATA[dCodInt]]></description>
@@ -623,7 +626,7 @@
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
 			<element kind="textField" uuid="6120def0-fae4-4d3b-9cfc-4c227f59d00c" x="336" y="36" width="203" height="10" fontName="DejaVu Sans" fontSize="7.0" blankWhenNull="true" vTextAlign="Middle">
-				<expression><![CDATA[$F{dDirRec}]]></expression>
+				<expression><![CDATA[$F{dDirRec} != null && !$F{dDirRec}.equals( "" ) ? $F{dDirRec} :$P{DIRECCION_CLIENTE}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>

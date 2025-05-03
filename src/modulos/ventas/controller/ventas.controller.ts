@@ -18,6 +18,7 @@ import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-u
 import { CrearVentaService } from '../service/crear-venta.service';
 import { EditarVentaService } from '../service/editar-venta.service';
 import { EliminarVentaService } from '../service/eliminar-venta.service';
+import { ClientesService } from '@modulos/clientes/service/clientes.service';
 
 @Controller('ventas')
 @UseGuards(LoginGuard, AllowedInGuard)
@@ -32,7 +33,8 @@ export class VentasController {
         private kudeFacturaUtilSrv: KudeUtilService,
         private crearVentaSrv: CrearVentaService,
         private editarVentaSrv: EditarVentaService,
-        private eliminarVentaSrv: EliminarVentaService
+        private eliminarVentaSrv: EliminarVentaService,
+        private clientesSrv: ClientesService
     ) { }
 
     @Get('count')
@@ -143,9 +145,11 @@ export class VentasController {
         if(venta.iddte == null) throw new HttpException({
             message: 'La venta no tiene una factura electrónica asociada'
         }, HttpStatus.NOT_FOUND);
+        const cliente = await this.clientesSrv.findById(venta.idcliente);        
         return await this.kudeFacturaUtilSrv.generateKude(
             await this.facturaElectronicaSrv.findById(venta.iddte),
-            duplicado == 'true'
+            duplicado == 'true',
+            cliente.direccion
         );
     }
 

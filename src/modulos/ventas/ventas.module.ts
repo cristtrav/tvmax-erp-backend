@@ -41,6 +41,7 @@ import { UtilVentaService } from './service/util-venta.service';
 import { CrearVentaService } from './service/crear-venta.service';
 import { EditarVentaService } from './service/editar-venta.service';
 import { EliminarVentaService } from './service/eliminar-venta.service';
+import { ClientesModule } from '@modulos/clientes/clientes.module';
 
 @Module({
   imports: [
@@ -70,7 +71,8 @@ import { EliminarVentaService } from './service/eliminar-venta.service';
     ]),
     SifenUtilsModule,
     UtilModule,
-    FacturaElectronicaModule
+    FacturaElectronicaModule,
+    ClientesModule
   ],
   providers: [
     VentasService,
