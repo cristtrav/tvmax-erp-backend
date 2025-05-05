@@ -37,7 +37,7 @@ export class KudeUtilService {
             dteFilePath,
             jasperPath,
             kudePath,
-            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}', DIRECCION_CLIENTE: '${direccionCliente}'}`
+            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}', DIRECCION_CLIENTE: ${this.escapeString(direccionCliente)}}`
         );
 
         //Leer archivo PDF para retornar al cliente con GET
@@ -102,6 +102,14 @@ export class KudeUtilService {
               }
             );
         });
+    }
+
+    private escapeString(str: string): string{
+        let charArray = Array.from(JSON.stringify(str));
+        charArray[0] = `'`;
+        charArray[charArray.length - 1] = `'`
+        let escapedStr = charArray.join("")
+        return escapedStr;
     }
 
 }
