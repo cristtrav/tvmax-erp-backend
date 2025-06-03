@@ -90,7 +90,7 @@ export class EmailSenderTaskService {
         return {
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT,
-            secure: process.env.SMTP_SECURE != null ? process.env.SMTP_SECURE == 'true' : false,
+            secure: process.env.SMTP_SECURE == 'true',
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASSWORD
@@ -161,7 +161,7 @@ export class EmailSenderTaskService {
                 console.error(e);
                 dte.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO ;
                 dte.fechaCambioEstadoEnvioEmaill = new Date();
-                dte.observacionEnvioEmail = e;                
+                dte.observacionEnvioEmail = JSON.stringify(e);                
             }
 
             await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
