@@ -109,7 +109,6 @@ export class KudeUtilService {
     }
 
     private escapeString(str: string): string{
-        console.log("Direcciona a escapar: ", str)
         let charArray = Array.from(JSON.stringify(str));
         charArray[0] = `'`;
         charArray[charArray.length - 1] = `'`
