@@ -1,8 +1,9 @@
-import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { DetalleLote } from "./lote-detalle.entity";
 import { EventoAuditoria } from "../evento-auditoria.entity";
 import { TablaAuditoria } from "../tabla-auditoria.entity";
 import { TIPO_DOCUMENTO, TipoDocumentoType } from "@database/types/facturacion/tipo-documento.type";
+import { Venta } from "../venta.entity";
 
 @Entity({schema: "facturacion", name: 'dte'})
 export class DTE {
@@ -47,6 +48,9 @@ export class DTE {
 
     @OneToMany(() => DetalleLote, (DetalleLote) => DetalleLote.dte)
     detallesLote: DetalleLote[];
+
+    @OneToOne(() => Venta, (venta) => venta.dte)
+    venta: Venta;
 
     static getEventoAuditoria(
         idusuario: number,

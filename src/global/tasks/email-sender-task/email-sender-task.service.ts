@@ -1,9 +1,6 @@
-import { Cliente } from '@database/entity/cliente.entity';
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { DTE } from '@database/entity/facturacion/dte.entity';
-import { Venta } from '@database/entity/venta.entity';
 import { VentaView } from '@database/view/venta.view';
-import { FacturaElectronicaUtilsService } from '@modulos/sifen/sifen-utils/services/dte/factura-electronica-utils.service';
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +10,7 @@ import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-emai
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-util.service';
+import { ClienteView } from '@database/view/cliente.view';
 
 @Injectable()
 export class EmailSenderTaskService {
@@ -35,11 +33,10 @@ export class EmailSenderTaskService {
         private facturaElectronicaRepo: Repository<DTE>,
         @InjectRepository(VentaView)
         private ventaViewRepo: Repository<VentaView>,
-        @InjectRepository(Venta)
-        private ventaRepo: Repository<Venta>,
+        @InjectRepository(ClienteView)
+        private clienteViewRepo: Repository<ClienteView>,
         @InjectRepository(DatoContribuyente)
         private datoContribuyenteRepo: Repository<DatoContribuyente>,
-        private facturaElectronicaUtil: FacturaElectronicaUtilsService,
         private datasource: DataSource,
         private kudeFacturaUtilSrv: KudeUtilService
     ){}
@@ -65,13 +62,17 @@ export class EmailSenderTaskService {
         const ambienteSifen = process.env.SIFEN_AMBIENTE ?? 'test';
         let query = this.facturaElectronicaRepo
             .createQueryBuilder(alias)
+            .leftJoinAndSelect(`${alias}.venta`, `venta`)
+            .leftJoinAndSelect(`venta.cliente`, `cliente`)
+            .andWhere(`cliente.email IS NOT NULL`)
             .andWhere(new Brackets(qb => {
                 qb = qb.orWhere(`${alias}.idestadoEnvioEmail = 1`);
                 qb = qb.orWhere(`${alias}.idestadoEnvioEmail = 3`);
             }))
-            .andWhere(`${alias}.intentoEnvioEmail <= :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
+            .andWhere(`${alias}.intentoEnvioEmail < :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
             .take(this.TAMANIO_LOTE)
-            .orderBy(`${alias}.id`, 'DESC');
+            .orderBy(`${alias}.id`, 'DESC')
+            .addOrderBy(`${alias}.intentoEnvioEmail`, 'ASC');
             if(ambienteSifen == 'prod') query = query.andWhere(new Brackets((qb) => {
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobado`, { idestadoAprobado: EstadoDocumentoSifen.APROBADO });
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobadoObs`, { idestadoAprobadoObs: EstadoDocumentoSifen.APROBADO_CON_OBS });
@@ -98,7 +99,7 @@ export class EmailSenderTaskService {
         }
     }
 
-    private async getMailOptions(dte: DTE, cliente: Cliente){
+    private async getMailOptions(dte: DTE, cliente: ClienteView){
         const venta = await this.ventaViewRepo.findOneBy({ iddte: dte.id });
         const razonSocial = (await this.datoContribuyenteRepo.findOneBy({ clave: DatoContribuyente.RAZON_SOCIAL })).valor;
         const nombreArchivo = `${venta.timbrado}-${venta.prefijofactura}-${venta.nrofactura.toString().padStart(7, '0')}`;
@@ -111,8 +112,8 @@ export class EmailSenderTaskService {
             },
             to: `${cliente.email}`,
             subject: `${tipoDocumentoSubject} Nro ${venta.nrofactura} | ${razonSocial}`,
-            text: `Estimado/a ${cliente.razonSocial}, \nAdjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE). \n¡Gracias por su preferencia!`,
-            html: `<h3>Estimado/a ${cliente.razonSocial},</h3>
+            text: `Estimado/a ${cliente.razonsocial}, \nAdjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE). \n¡Gracias por su preferencia!`,
+            html: `<h3>Estimado/a ${cliente.razonsocial},</h3>
             <p>Adjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE).</p>
             <p><strong>¡Gracias por su preferencia!</strong></p>`,
             attachments: [
@@ -123,7 +124,7 @@ export class EmailSenderTaskService {
                 },
                 {
                     filename: `${nombreArchivo}.pdf`,
-                    content: (await this.kudeFacturaUtilSrv.generateKude(dte)).getStream(),
+                    content: (await this.kudeFacturaUtilSrv.generateKude(dte, false, cliente.direccion)).getStream(),
                     contentType: 'application/pdf'
                 }
             ]
@@ -132,13 +133,8 @@ export class EmailSenderTaskService {
 
     private async sendMail(dte: DTE){
         const oldDte = { ...dte };
-        const cliente = (
-            await this.ventaRepo.findOne({
-                where: { iddte: dte.id, anulado: false, eliminado: false },
-                relations: { cliente: true }
-            })
-        ).cliente;
-        if(cliente.email == null){
+        const clienteView = await this.clienteViewRepo.findOneByOrFail({ id: dte.venta.cliente.id});
+        if(clienteView.email == null){
             console.log(dte.id, "Cliente sin email");
             dte.observacionEnvioEmail = "Correo no enviado. Cliente sin email";
             await this.datasource.transaction(async manager => {
@@ -147,12 +143,12 @@ export class EmailSenderTaskService {
             });
             return;
         };
-        console.log(dte.id, `Intentando enviar email a ${cliente.email}`);        
+        console.log(dte.id, `Intentando enviar email a ${clienteView.email}`);        
         const transporter = nodemailer.createTransport(this.getTransportConfig());
         dte.intentoEnvioEmail = dte.intentoEnvioEmail + 1;
         await this.datasource.transaction(async manager => {
             try{
-                const info = await transporter.sendMail(await this.getMailOptions(dte, cliente));
+                const info = await transporter.sendMail(await this.getMailOptions(dte, clienteView));
                 dte.idestadoEnvioEmail = EstadoEnvioEmail.ENVIADO;
                 dte.fechaCambioEstadoEnvioEmaill = new Date();
                 dte.observacionEnvioEmail = info.response;

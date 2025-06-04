@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { DetalleVenta } from "./detalle-venta.entity";
 import { Cliente } from "./cliente.entity";
 import { Talonario } from "./facturacion/talonario.entity";
+import { DTE } from "./facturacion/dte.entity";
 
 @Entity()
 export class Venta {
@@ -108,4 +109,8 @@ export class Venta {
     @ManyToOne(() => Talonario)
     @JoinColumn({name: 'idtalonario'})
     talonario: Talonario;
+
+    @OneToOne(() => DTE, (dte) => dte.venta)
+    @JoinColumn({ name: 'iddte' })
+    dte: DTE;
 }

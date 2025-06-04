@@ -33,11 +33,15 @@ export class KudeUtilService {
         await writeFile(dteFilePath, factElectronica.xml);
 
         //Generar KUDE en PDF (La libreria genera en un archivo PDF en disco)
+        let generationParams = direccionCliente != null ?
+            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}', DIRECCION_CLIENTE: ${this.escapeString(direccionCliente)}}`:
+            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}' }`;
+
         await this.generate(
             dteFilePath,
             jasperPath,
             kudePath,
-            `{LOGO_URL: '${urlLogo}', ambiente: '${ambienteSifen}', DIRECCION_CLIENTE: ${this.escapeString(direccionCliente)}}`
+            generationParams
         );
 
         //Leer archivo PDF para retornar al cliente con GET
@@ -105,6 +109,7 @@ export class KudeUtilService {
     }
 
     private escapeString(str: string): string{
+        console.log("Direcciona a escapar: ", str)
         let charArray = Array.from(JSON.stringify(str));
         charArray[0] = `'`;
         charArray[charArray.length - 1] = `'`
