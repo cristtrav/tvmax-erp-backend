@@ -11,6 +11,7 @@ import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-docume
 import { Usuario } from '@database/entity/usuario.entity';
 import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-util.service';
 import { ClienteView } from '@database/view/cliente.view';
+import { EmailDesactivado } from '@database/entity/facturacion/email-desactivado.entity';
 
 @Injectable()
 export class EmailSenderTaskService {
@@ -37,11 +38,13 @@ export class EmailSenderTaskService {
         private clienteViewRepo: Repository<ClienteView>,
         @InjectRepository(DatoContribuyente)
         private datoContribuyenteRepo: Repository<DatoContribuyente>,
+        @InjectRepository(EmailDesactivado)
+        private emailDesactivadoRepo: Repository<EmailDesactivado>,
         private datasource: DataSource,
         private kudeFacturaUtilSrv: KudeUtilService
     ){}
 
-    @Cron('*/30 7-21 * * *')
+    @Cron('*/15 7-21 * * *')
     async enviar(){
         if(process.env.EMAIL_SENDER_DISABLED == 'TRUE') return;
 
@@ -135,14 +138,26 @@ export class EmailSenderTaskService {
         const oldDte = { ...dte };
         const clienteView = await this.clienteViewRepo.findOneByOrFail({ id: dte.venta.cliente.id});
         if(clienteView.email == null){
-            console.log(dte.id, "Cliente sin email");
-            dte.observacionEnvioEmail = "Correo no enviado. Cliente sin email";
+            let mensaje = "Correo no enviado. Cliente sin email";
+            console.log(dte.id, mensaje);
+            dte.observacionEnvioEmail = mensaje;
             await this.datasource.transaction(async manager => {
                 await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
                 await manager.save(dte);
             });
             return;
         };
+        const emailDesactivado = await this.emailDesactivadoRepo.findOneBy({ email: clienteView.email });
+        if(emailDesactivado){
+            let mensaje = `Correo no enviado. ${clienteView.email} desactivado. Motivo: ${emailDesactivado.motivo}`
+            console.log(mensaje);
+            dte.observacionEnvioEmail = mensaje;
+            await this.datasource.transaction(async manager => {
+                await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
+                await manager.save(dte);
+            });
+            return;
+        }
         console.log(dte.id, `Intentando enviar email a ${clienteView.email}`);        
         const transporter = nodemailer.createTransport(this.getTransportConfig());
         dte.intentoEnvioEmail = dte.intentoEnvioEmail + 1;

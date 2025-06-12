@@ -1,6 +1,6 @@
 {
   "name": "tvmax-erp-backend",
-  "version": "1.13.5",
+  "version": "1.14.0",
   "description": "Backend del sistema TV Max ERP",
   "author": "Cristhian Traversi",
   "private": true,
@@ -43,7 +43,10 @@
     "facturacionelectronicapy-setapi": "^1.0.30",
     "facturacionelectronicapy-xmlgen": "^1.0.265",
     "facturacionelectronicapy-xmlsign": "^1.0.18",
+    "imapflow": "^1.0.187",
+    "mailparser": "^3.7.3",
     "nodemailer": "^6.9.15",
+    "ollama": "^0.5.16",
     "passport-jwt": "^4.0.1",
     "pdf-lib": "^1.17.1",
     "pg": "^8.11.3",

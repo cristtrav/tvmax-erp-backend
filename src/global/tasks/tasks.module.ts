@@ -26,6 +26,8 @@ import { LoteDetalleView } from '@database/view/facturacion/lote-detalle.view';
 
 import { SifenUtilsModule } from '@modulos/sifen/sifen-utils/sifen-utils.module';
 import { CuotasModule } from '@modulos/cuotas/cuotas.module';
+import { EmailVerifierTaskService } from './email-verifier-task/email-verifier-task.service';
+import { EmailDesactivado } from '@database/entity/facturacion/email-desactivado.entity';
 
 @Module({
   imports: [
@@ -49,7 +51,8 @@ import { CuotasModule } from '@modulos/cuotas/cuotas.module';
       LoteView,
       EstadoDocumentoSifen,
       DetalleLote,
-      LoteDetalleView
+      LoteDetalleView,
+      EmailDesactivado
     ]),
     SifenUtilsModule,
     CuotasModule
@@ -57,7 +60,8 @@ import { CuotasModule } from '@modulos/cuotas/cuotas.module';
   providers: [
     SifenTaskService,
     EmailSenderTaskService,
-    CuotasScheduleService
+    CuotasScheduleService,
+    EmailVerifierTaskService
   ]
 })
 export class TasksModule {}
