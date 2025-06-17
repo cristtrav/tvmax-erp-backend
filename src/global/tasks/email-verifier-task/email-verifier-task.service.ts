@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Injectable, Logger, LoggerService, OnModuleInit } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser'
 import { join } from 'node:path';
@@ -9,25 +9,39 @@ import { ResultInterface } from './result.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmailDesactivado } from '@database/entity/facturacion/email-desactivado.entity';
 import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { CronJob } from 'cron';
 
 @Injectable()
-export class EmailVerifierTaskService {
-
+export class EmailVerifierTaskService implements OnModuleInit {
+    private readonly logger: LoggerService = new Logger(EmailVerifierTaskService.name);
     private workerRunning: boolean = false;
 
     constructor(
         @InjectRepository(EmailDesactivado)
-        private emailDesactivadoRepo: Repository<EmailDesactivado>
+        private emailDesactivadoRepo: Repository<EmailDesactivado>,
+        private scheduleRegistry: SchedulerRegistry,
+        private configService: ConfigService
     ){}
 
-    @Cron("*/10 * * * *")
+    onModuleInit() {
+        const cronExp = this.configService.get<string>('EMAIL_VERIFIER_CRON') || "*/10 * * * *";
+        const job = new CronJob(cronExp, () => this.verificar());
+        this.scheduleRegistry.addCronJob('emalVerifierTask', job);
+        job.start();
+        this.logger.log(`emailVerifierTask programado para ejecutarse con: ${cronExp}`)
+    }
+
     async verificar(){
+        this.logger.log('Verificando emails...')
         if(this.workerRunning){
-            console.log('Email analyzer worker still running');
+            this.logger.log('emailVerifierWorker todavía está ejecutándose');
             return;
         }
 
         const emailList: EmailInterface[] = await this.getEmailList();
+        this.logger.log(`${emailList.length} emails no leidos`);
+        if(emailList.length == 0) return;
         const resultList: ResultInterface[] = await this.analyze(emailList);
         if(resultList.length > 0) {
             await this.markAsSeen(resultList.map(result => result.uid));
@@ -44,7 +58,8 @@ export class EmailVerifierTaskService {
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASSWORD
-            }
+            },
+            logger: false
         });
     }
 
@@ -54,15 +69,13 @@ export class EmailVerifierTaskService {
         const client = this.getEmailClient();
         
         await client.connect();
-        console.log('luego de conectar')
         let lock = await client.getMailboxLock('INBOX');
-        console.log('luego de obtener el lock')
         try{
             const unseenUIDs = await client.search({ seen: false });
             
-            if (unseenUIDs.length === 0) {
+            /*if (unseenUIDs.length === 0) {
                 console.log('No hay mensajes no leídos.');
-            } else {
+            } else {*/
                 
                 for await (let msg of client.fetch(unseenUIDs, { uid: true, envelope: true, source: true })) {
                     const parsed = await simpleParser(msg.source);
@@ -73,9 +86,9 @@ export class EmailVerifierTaskService {
                         body: parsed.text
                     })
                 }    
-           }
+           /*}*/
         }catch(e){
-            console.error('Error al conectar al servidor de email', e);
+            this.logger.error('Error al conectar al servidor de email', e);
         }finally{
             lock.release();
         }
@@ -86,13 +99,11 @@ export class EmailVerifierTaskService {
     private async markAsSeen(uidList: number[]){
         const client = this.getEmailClient();
         await client.connect();
-        console.log('luego de conectar')
         let lock = await client.getMailboxLock('INBOX');
-        console.log('luego de obtener el lock')
         try{
             for(let uid of uidList) await client.messageFlagsAdd(uid, ['\\Seen'], { uid: true });
         }catch(e){
-            console.error('Error al conectar al servidor de email', e);
+            this.logger.log('Error al conectar al servidor de email', e);
         }finally{
             lock.release();
         }

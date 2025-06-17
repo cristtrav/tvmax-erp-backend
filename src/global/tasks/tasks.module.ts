@@ -61,7 +61,7 @@ import { EmailDesactivado } from '@database/entity/facturacion/email-desactivado
     SifenTaskService,
     EmailSenderTaskService,
     CuotasScheduleService,
-    EmailVerifierTaskService
+    EmailVerifierTaskService,
   ]
 })
 export class TasksModule {}

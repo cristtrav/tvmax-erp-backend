@@ -1,8 +1,8 @@
 import { DatoContribuyente } from '@database/entity/facturacion/dato-contribuyente.entity';
 import { DTE } from '@database/entity/facturacion/dte.entity';
 import { VentaView } from '@database/view/venta.view';
-import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Injectable, Logger, LoggerService, OnModuleInit } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, DataSource, Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
@@ -12,9 +12,13 @@ import { Usuario } from '@database/entity/usuario.entity';
 import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-util.service';
 import { ClienteView } from '@database/view/cliente.view';
 import { EmailDesactivado } from '@database/entity/facturacion/email-desactivado.entity';
+import { ConfigService } from '@nestjs/config';
+import { CronJob } from 'cron';
 
 @Injectable()
-export class EmailSenderTaskService {
+export class EmailSenderTaskService implements OnModuleInit {
+
+    private readonly logger: LoggerService = new Logger(EmailSenderTaskService.name);
 
     private readonly MAX_INTENTOS: number =
         Number.isInteger(Number(process.env.EMAIL_MAX_INTENTOS)) ?
@@ -41,15 +45,25 @@ export class EmailSenderTaskService {
         @InjectRepository(EmailDesactivado)
         private emailDesactivadoRepo: Repository<EmailDesactivado>,
         private datasource: DataSource,
-        private kudeFacturaUtilSrv: KudeUtilService
+        private kudeFacturaUtilSrv: KudeUtilService,
+        private schedule: SchedulerRegistry,
+        private configService: ConfigService
     ){}
 
-    @Cron('*/15 7-21 * * *')
+
+    onModuleInit() {
+        const cronExp = this.configService.get<string>('EMAIL_SENDER_CRON') || '*/15 7-21 * * *';
+        const job = new CronJob(cronExp, () => this.enviar())
+        this.schedule.addCronJob('emailSenderTask', job);
+        job.start();
+        this.logger.log(`emailSenderTask programado para ejecutarse con: ${cronExp}`)
+    }
+
     async enviar(){
         if(process.env.EMAIL_SENDER_DISABLED == 'TRUE') return;
 
         if(!this.smtpConfigExists()){
-            console.log('Parámetros SMTP no configurados en variables de entorno.');
+            this.logger.warn('Parámetros SMTP no configurados en variables de entorno.');
             return;
         }
         const facturas = await this.getFacturas();
@@ -139,7 +153,7 @@ export class EmailSenderTaskService {
         const clienteView = await this.clienteViewRepo.findOneByOrFail({ id: dte.venta.cliente.id});
         if(clienteView.email == null){
             let mensaje = "Correo no enviado. Cliente sin email";
-            console.log(dte.id, mensaje);
+            this.logger.warn(dte.id, mensaje);
             dte.observacionEnvioEmail = mensaje;
             await this.datasource.transaction(async manager => {
                 await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
@@ -150,7 +164,7 @@ export class EmailSenderTaskService {
         const emailDesactivado = await this.emailDesactivadoRepo.findOneBy({ email: clienteView.email });
         if(emailDesactivado){
             let mensaje = `Correo no enviado. ${clienteView.email} desactivado. Motivo: ${emailDesactivado.motivo}`
-            console.log(mensaje);
+            this.logger.warn(mensaje);
             dte.observacionEnvioEmail = mensaje;
             await this.datasource.transaction(async manager => {
                 await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
@@ -158,7 +172,7 @@ export class EmailSenderTaskService {
             });
             return;
         }
-        console.log(dte.id, `Intentando enviar email a ${clienteView.email}`);        
+        this.logger.log(dte.id, `Intentando enviar email a ${clienteView.email}`);        
         const transporter = nodemailer.createTransport(this.getTransportConfig());
         dte.intentoEnvioEmail = dte.intentoEnvioEmail + 1;
         await this.datasource.transaction(async manager => {
