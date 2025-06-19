@@ -68,7 +68,7 @@ export class EmailSenderTaskService implements OnModuleInit {
         }
         const facturas = await this.getFacturas();
         facturas.forEach((f, index) => {
-            setTimeout(async() => {                
+            setTimeout(async() => {
                await this.sendMail(f);    
             }, (this.TIEMPO_ESPERA_MILIS * index));
         })
@@ -89,7 +89,6 @@ export class EmailSenderTaskService implements OnModuleInit {
             .andWhere(`${alias}.intentoEnvioEmail < :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
             .take(this.TAMANIO_LOTE)
             .orderBy(`${alias}.id`, 'DESC')
-            .addOrderBy(`${alias}.intentoEnvioEmail`, 'ASC');
             if(ambienteSifen == 'prod') query = query.andWhere(new Brackets((qb) => {
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobado`, { idestadoAprobado: EstadoDocumentoSifen.APROBADO });
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobadoObs`, { idestadoAprobadoObs: EstadoDocumentoSifen.APROBADO_CON_OBS });
