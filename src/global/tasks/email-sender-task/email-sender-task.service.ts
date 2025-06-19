@@ -88,7 +88,8 @@ export class EmailSenderTaskService implements OnModuleInit {
             }))
             .andWhere(`${alias}.intentoEnvioEmail < :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
             .take(this.TAMANIO_LOTE)
-            .orderBy(`${alias}.id`, 'DESC')
+            .orderBy(`${alias}.intentoEnvioEmail`, 'ASC')
+            .addOrderBy(`${alias}.id`, 'DESC')
             if(ambienteSifen == 'prod') query = query.andWhere(new Brackets((qb) => {
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobado`, { idestadoAprobado: EstadoDocumentoSifen.APROBADO });
                 qb = qb.orWhere(`${alias}.idestadoDocumentoSifen = :idestadoAprobadoObs`, { idestadoAprobadoObs: EstadoDocumentoSifen.APROBADO_CON_OBS });
