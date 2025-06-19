@@ -87,7 +87,7 @@ export class EmailSenderTaskService implements OnModuleInit {
                 qb = qb.orWhere(`${alias}.idestadoEnvioEmail = 1`);
                 qb = qb.orWhere(`${alias}.idestadoEnvioEmail = 3`);
             }))
-            .andWhere(`${alias}.intentoEnvioEmail < :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
+            .andWhere(`${alias}.intentoEnvioEmail <= :maxIntentos`, { maxIntentos: this.MAX_INTENTOS})
             .take(this.TAMANIO_LOTE)
             .orderBy(`${alias}.intentoEnvioEmail`, 'ASC')
             .addOrderBy(`${alias}.id`, 'DESC')
@@ -151,9 +151,21 @@ export class EmailSenderTaskService implements OnModuleInit {
 
     private async sendMail(dte: DTE){
         const oldDte = { ...dte };
+
+        if(dte.intentoEnvioEmail >= this.MAX_INTENTOS){
+            this.logger.warn(dte.id, `Envio fallido, límite de intentos: ${dte.intentoEnvioEmail}`);
+            dte.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO;
+            dte.fechaCambioEstadoEnvioEmaill = new Date();
+            await this.datasource.transaction(async manager => {
+                await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
+                await manager.save(dte);
+            });
+            return;
+        } else dte.intentoEnvioEmail = dte.intentoEnvioEmail + 1;
+
         const clienteView = await this.clienteViewRepo.findOneByOrFail({ id: dte.venta.cliente.id});
         if(clienteView.email == null){
-            let mensaje = "Correo no enviado. Cliente sin email";
+            let mensaje = "Correo no enviado, cliente sin email";
             this.logger.warn(dte.id, mensaje);
             dte.observacionEnvioEmail = mensaje;
             await this.datasource.transaction(async manager => {
@@ -162,20 +174,23 @@ export class EmailSenderTaskService implements OnModuleInit {
             });
             return;
         };
+
         const emailDesactivado = await this.emailDesactivadoRepo.findOneBy({ email: clienteView.email });
         if(emailDesactivado){
             let mensaje = `Correo no enviado. ${clienteView.email} desactivado. Motivo: ${emailDesactivado.motivo}`
             this.logger.warn(mensaje);
             dte.observacionEnvioEmail = mensaje;
+
             await this.datasource.transaction(async manager => {
                 await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
                 await manager.save(dte);
             });
             return;
         }
+
         this.logger.log(dte.id, `Intentando enviar email a ${clienteView.email}`);        
         const transporter = nodemailer.createTransport(this.getTransportConfig());
-        dte.intentoEnvioEmail = dte.intentoEnvioEmail + 1;
+
         await this.datasource.transaction(async manager => {
             try{
                 const info = await transporter.sendMail(await this.getMailOptions(dte, clienteView));
@@ -185,15 +200,11 @@ export class EmailSenderTaskService implements OnModuleInit {
             }catch(e){
                 console.error(dte.id, 'Error al enviar email');
                 console.error(e);
-                dte.idestadoEnvioEmail = EstadoEnvioEmail.ENVIO_FALLIDO ;
-                dte.fechaCambioEstadoEnvioEmaill = new Date();
                 dte.observacionEnvioEmail = JSON.stringify(e);                
             }
 
             await manager.save(DTE.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldDte, dte));
             await manager.save(dte);
         });
-        
-        
     }
 }
