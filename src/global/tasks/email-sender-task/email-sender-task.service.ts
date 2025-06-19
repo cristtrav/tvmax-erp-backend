@@ -82,6 +82,7 @@ export class EmailSenderTaskService implements OnModuleInit {
             .leftJoinAndSelect(`${alias}.venta`, `venta`)
             .leftJoinAndSelect(`venta.cliente`, `cliente`)
             .andWhere(`cliente.email IS NOT NULL`)
+            .andWhere(`TRIM(cliente.email) != ''`)
             .andWhere(new Brackets(qb => {
                 qb = qb.orWhere(`${alias}.idestadoEnvioEmail = 1`);
                 qb = qb.orWhere(`${alias}.idestadoEnvioEmail = 3`);
