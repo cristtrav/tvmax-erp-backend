@@ -25,6 +25,8 @@ export class EmailVerifierTaskService implements OnModuleInit {
     ){}
 
     onModuleInit() {
+        if(process.env.EMAIL_VERIFIER_DISABLED == 'TRUE') return;
+        
         const cronExp = this.configService.get<string>('EMAIL_VERIFIER_CRON') || "*/10 * * * *";
         const job = new CronJob(cronExp, () => this.verificar());
         this.scheduleRegistry.addCronJob('emalVerifierTask', job);

@@ -1,6 +1,6 @@
 {
   "name": "tvmax-erp-backend",
-  "version": "1.14.4",
+  "version": "1.14.5",
   "description": "Backend del sistema TV Max ERP",
   "author": "Cristhian Traversi",
   "private": true,
