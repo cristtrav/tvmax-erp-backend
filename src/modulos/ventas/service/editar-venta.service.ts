@@ -42,6 +42,8 @@ export class EditarVentaService {
     ){}
 
     async edit(venta: Venta, detalleVenta: DetalleVenta[], idusuario: number) {
+        
+
         const talonarioValidacion = await this.talonarioViewRepo.findOneByOrFail({id: venta.idtalonario});
         const factElectronica = await this.facturaElectronicaRepo.findOneBy({ id: venta.iddte });
         if(
@@ -67,6 +69,11 @@ export class EditarVentaService {
         .andWhere(`venta.eliminado = FALSE`)
         .leftJoinAndSelect(`venta.detalles`, 'detalles', 'detalles.eliminado = FALSE')
         .getOne();
+
+        if(oldVenta.condicion == 'CRE') throw new HttpException({
+            message: "Función de editar facturas a crédito aún no disponible"
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+
         const oldCobro = await this.cobroRepo.findOneBy({ idventa: venta.id, eliminado: false });
 
         if(!oldVenta) throw new HttpException({

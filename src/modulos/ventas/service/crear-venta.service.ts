@@ -50,12 +50,15 @@ export class CrearVentaService {
         let idventa: number = -1;
         await this.datasource.transaction(async manager => {
             idventa = (await manager.save(venta)).id;
+            venta.pagado = venta.condicion == 'CON';
             await manager.save(EventoAuditoriaUtil.getEventoAuditoriaVenta(idusuario, 'R', null, venta));
 
-            const cobro = await this.utilVentaSrv.crearCobro(venta, idusuario);
-            await manager.save(cobro);
-            await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'R', null, cobro));
-
+            if(venta.condicion == 'CON'){
+                const cobro = await this.utilVentaSrv.crearCobro(venta, idusuario);
+                await manager.save(cobro);
+                await manager.save(EventoAuditoriaUtil.getEventoAuditoriaCobro(3, 'R', null, cobro));
+            }
+            
             talonario.ultimoNroUsado = venta.nroFactura;
             await manager.save(talonario);
             await manager.save(Talonario.getEventoAuditoria(Usuario.ID_USUARIO_SISTEMA, 'M', oldTalonario, talonario));

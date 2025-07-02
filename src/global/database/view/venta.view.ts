@@ -7,6 +7,9 @@ export class VentaView{
     id: number;
 
     @ViewColumn()
+    condicion: string;
+
+    @ViewColumn()
     fechafactura: Date;
 
     @ViewColumn()

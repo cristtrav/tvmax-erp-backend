@@ -21,7 +21,7 @@ import { Grupo } from "../database/entity/grupo.entity";
 import { Servicio } from "../database/entity/servicio.entity";
 import { Suscripcion } from "../database/entity/suscripcion.entity";
 import { Usuario } from "../database/entity/usuario.entity";
-import { Venta } from "../database/entity/venta.entity";
+import { CondicionVentaType, Venta } from "../database/entity/venta.entity";
 import { Sorteo } from "@database/entity/sorteos/sorteo.entity";
 import { Premio } from "@database/entity/sorteos/premio.entity";
 import { Material } from "@database/entity/depositos/material.entity";
@@ -144,6 +144,7 @@ export class DTOEntityUtis {
         const fechaStr = ventaDto.fechafactura;
         const venta = new Venta();
         if(ventaDto.id != null) venta.id = ventaDto.id;
+        venta.condicion = <CondicionVentaType> ventaDto.condicion;
         venta.anulado = ventaDto.anulado;
         venta.pagado = ventaDto.pagado;
         venta.eliminado = ventaDto.eliminado;

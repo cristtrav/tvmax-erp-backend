@@ -3,8 +3,12 @@ import { DetalleVenta } from "./detalle-venta.entity";
 import { Cliente } from "./cliente.entity";
 import { Talonario } from "./facturacion/talonario.entity";
 import { DTE } from "./facturacion/dte.entity";
+import { Schemas } from "@database/meta/schemas";
 
-@Entity()
+const CONDICION_VENTA = ['CON', 'CRE'] as const;
+export type CondicionVentaType = typeof CONDICION_VENTA[number];
+
+@Entity({schema: Schemas.PUBLIC, name: 'venta'})
 export class Venta {
 
     @PrimaryGeneratedColumn('identity', { generatedIdentity: "BY DEFAULT" })
@@ -98,6 +102,9 @@ export class Venta {
 
     @Column()
     iddte: number;
+
+    @Column({name: 'condicion', nullable: false, type: 'enum', enum: CONDICION_VENTA})
+    condicion: CondicionVentaType
 
     @OneToMany(() => DetalleVenta, (detalle) => detalle.venta)
     detalles: DetalleVenta[];

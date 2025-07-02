@@ -9,7 +9,6 @@ import { DTOEntityUtis } from '@globalutil/dto-entity-utils';
 import { DetalleVentaView } from '@database/view/detalle-venta.view';
 import { LoginGuard } from '@auth/guards/login.guard';
 import { FacturaElectronicaService } from '@modulos/facturacion/factura-electronica/services/factura-electronica.service';
-import { FacturaElectronicaUtilsService } from '../../sifen/sifen-utils/services/dte/factura-electronica-utils.service';
 import { AllowedIn } from '@auth/decorators/allowed-in.decorator';
 import { VentaDTO } from '@dto/venta.dto';
 import { DteView } from '@database/view/facturacion/dte.view';

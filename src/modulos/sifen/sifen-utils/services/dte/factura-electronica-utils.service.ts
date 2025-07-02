@@ -48,13 +48,17 @@ export class FacturaElectronicaUtilsService {
             cliente: await this.dteUtilsSrv.getCliente(venta.idcliente),
             factura: { presencia: 1 },
             condicion: {
-                tipo: 1,
-                entregas: [{
+                tipo: venta.condicion == 'CON' ? 1 : 2,
+                entregas: venta.condicion == 'CON' ? [{
                     tipo: 1,
                     moneda: 'PYG',
                     monto: `${venta.total}`,
                     cambio: 0
-                }]
+                }] : undefined,
+                credito: venta.condicion == 'CRE' ? {
+                    tipo: 1,
+                    plazo: "Indefinido"
+                } : undefined
             },
             items: this.getItems(detalles)
         }
