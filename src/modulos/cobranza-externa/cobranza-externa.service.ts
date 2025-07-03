@@ -277,6 +277,7 @@ export class CobranzaExternaService {
 
     private async getVenta(detalleCobranza: DetalleConsultaCobranzaExterna): Promise<Venta> {
         const venta = new Venta();
+        venta.condicion = 'CON';
         venta.anulado = false;
         venta.pagado = true;
         venta.eliminado = false;

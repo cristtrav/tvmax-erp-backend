@@ -103,7 +103,7 @@ export class Venta {
     @Column()
     iddte: number;
 
-    @Column({name: 'condicion', nullable: false, type: 'enum', enum: CONDICION_VENTA})
+    @Column({name: 'condicion', nullable: false, type: 'enum', enum: CONDICION_VENTA, default: CONDICION_VENTA[0]})
     condicion: CondicionVentaType
 
     @OneToMany(() => DetalleVenta, (detalle) => detalle.venta)
