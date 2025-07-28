@@ -132,7 +132,8 @@ export class EmailSenderTaskService implements OnModuleInit {
             subject: `${tipoDocumentoSubject} Nro ${venta.nrofactura} | ${razonSocial}`,
             text: `Estimado/a ${cliente.razonsocial}, \nAdjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE). \n¡Gracias por su preferencia!`,
             html: `<h3>Estimado/a ${cliente.razonsocial},</h3>
-            <p>Adjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE).</p>
+            <p>Adjunto encontrará su ${tipoDocumentoContent} en formato Documento Tributario Electrónico (DTE) y su versión imprimible (KuDE).</p>            
+            <p>No responder a este correo, es generado automáticamente por el sistema informático.</p>
             <p><strong>¡Gracias por su preferencia!</strong></p>`,
             attachments: [
                 {
