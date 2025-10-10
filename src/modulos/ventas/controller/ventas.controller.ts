@@ -18,6 +18,7 @@ import { CrearVentaService } from '../service/crear-venta.service';
 import { EditarVentaService } from '../service/editar-venta.service';
 import { EliminarVentaService } from '../service/eliminar-venta.service';
 import { ClientesService } from '@modulos/clientes/service/clientes.service';
+import { ExportarVentasService } from '../service/exportar-ventas.service';
 
 @Controller('ventas')
 @UseGuards(LoginGuard, AllowedInGuard)
@@ -33,7 +34,8 @@ export class VentasController {
         private crearVentaSrv: CrearVentaService,
         private editarVentaSrv: EditarVentaService,
         private eliminarVentaSrv: EliminarVentaService,
-        private clientesSrv: ClientesService
+        private clientesSrv: ClientesService,
+        private exportarVentasService: ExportarVentasService
     ) { }
 
     @Get('count')
@@ -76,6 +78,14 @@ export class VentasController {
         @Query() queries: { [name: string]: any }
     ): Promise<number> {
         return this.ventasSrv.count(queries);
+    }
+
+    @Get('exportar/xls')
+    @AllowedIn(Permissions.VENTAS.EXPORTARXLS)
+    async exportarXls(
+        @Query() queries: { [name: string ]: any }
+    ): Promise<StreamableFile>{
+        return this.exportarVentasService.exportarXlsx(queries);
     }
 
     @Get()

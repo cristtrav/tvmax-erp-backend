@@ -133,7 +133,9 @@ export class Permissions {
         ACCESOMODULO: 266,
         SINCRONIZARSIFEN: 267,
         MODIFICARMONTO: 268,
-        MODIFICARDESCRIPCION: 269
+        MODIFICARDESCRIPCION: 269,
+        MODIFICARCANTIDAD: 270,
+        EXPORTARXLS: 271
     }
 
     static readonly PERMISOS = {

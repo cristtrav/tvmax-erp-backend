@@ -42,6 +42,7 @@ import { CrearVentaService } from './service/crear-venta.service';
 import { EditarVentaService } from './service/editar-venta.service';
 import { EliminarVentaService } from './service/eliminar-venta.service';
 import { ClientesModule } from '@modulos/clientes/clientes.module';
+import { ExportarVentasService } from './service/exportar-ventas.service';
 
 @Module({
   imports: [
@@ -83,7 +84,8 @@ import { ClientesModule } from '@modulos/clientes/clientes.module';
     UtilVentaService,
     CrearVentaService,
     EditarVentaService,
-    EliminarVentaService
+    EliminarVentaService,
+    ExportarVentasService
   ],
   controllers: [
     VentasController,
