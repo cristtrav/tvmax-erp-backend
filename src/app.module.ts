@@ -54,6 +54,7 @@ import { TimbradosModule } from './modulos/facturacion/timbrados/timbrados.modul
 import { CuotasGruposModule } from './modulos/cuotas-grupos/cuotas-grupos.module';
 import { ClientesTipoModule } from '@modulos/clientes-tipo/clientes-tipo.module';
 import { AjustesExistenciasModule } from './modulos/depositos/ajustes-existencias/ajustes-existencias.module';
+import { GenerarDteLotesModule } from './modulos/generar-dte-lotes/generar-dte-lotes.module';
 
 @Module({
   imports: [
@@ -116,7 +117,8 @@ import { AjustesExistenciasModule } from './modulos/depositos/ajustes-existencia
     TimbradosModule,
     CuotasGruposModule,
     ClientesTipoModule,
-    AjustesExistenciasModule
+    AjustesExistenciasModule,
+    GenerarDteLotesModule
   ],
   controllers: [AppController],
   providers: [
