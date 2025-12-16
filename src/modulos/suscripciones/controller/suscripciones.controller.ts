@@ -35,14 +35,14 @@ export class SuscripcionesController {
     }
 
     @Get('ultimoid')
-    @AllowedIn(Permissions.SUSCRIPCIONES.ACCESOFORMULARIO)
+    @AllowedIn(Permissions.SUSCRIPCIONES.CONSULTARULTIMOID)
     getLastId(
     ): Promise<number> {
         return this.suscripcionesSrv.getLastId();
     }
 
     @Get('total')
-    @AllowedIn(Permissions.SUSCRIPCIONES.CONSULTAR)
+    @AllowedIn(Permissions.SUSCRIPCIONES.CONTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number> {
@@ -63,7 +63,7 @@ export class SuscripcionesController {
 
     @Get(':id')
     @AllowedIn(
-        Permissions.SUSCRIPCIONES.ACCESOFORMULARIO,
+        Permissions.SUSCRIPCIONES.CONSULTAR,
         Permissions.CUOTAS.ACCESOMODULO
     )
     findById(
@@ -127,7 +127,7 @@ export class SuscripcionesController {
     }
 
     @Get(':id/cuotas/servicios/total')
-    @AllowedIn(Permissions.CUOTAS.ACCESOMODULO)
+    @AllowedIn(Permissions.CUOTAS.CONSULTAR)
     countServiciosByCuotas(
         @Param('id') idsuscripcion: number,
         @Query() queries: {[name: string]: any}
