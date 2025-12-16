@@ -71,14 +71,14 @@ export class ServiciosController {
     }
 
     @Get('ultimoid')
-    @AllowedIn(Permissions.SERVICIOS.ACCESOFORMULARIO)
+    @AllowedIn(Permissions.SERVICIOS.CONSULTARULTIMOID)
     async getLastId(): Promise<number> {
         return this.serviciosSrv.getLastId();
     }
 
     @Get(':id')
     @AllowedIn(
-        Permissions.SERVICIOS.ACCESOFORMULARIO,
+        Permissions.SERVICIOS.CONSULTAR,
         Permissions.CUOTAS.ACCESOFORMULARIO
     )
     async findById(
