@@ -35,14 +35,14 @@ export class SuscripcionesController {
     }
 
     @Get('ultimoid')
-    @AllowedIn(Permissions.SUSCRIPCIONES.CONSULTARULTIMOID)
+    @AllowedIn(Permissions.SUSCRIPCIONES.CONSULTAR)
     getLastId(
     ): Promise<number> {
         return this.suscripcionesSrv.getLastId();
     }
 
     @Get('total')
-    @AllowedIn(Permissions.SUSCRIPCIONES.CONTAR)
+    @AllowedIn(Permissions.SUSCRIPCIONES.CONSULTAR)
     count(
         @Query() queries: {[name: string]: any}
     ): Promise<number> {
