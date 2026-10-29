@@ -15,6 +15,9 @@ jobs:
       key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
       port: 22
       script: |
+       export NVM_DIR="$HOME/.nvm"
+       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+       node -v
        cd ${{ secrets.PROD_DIRECTORY }}
        git reset --hard
        git pull origin master
