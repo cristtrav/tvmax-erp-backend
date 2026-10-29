@@ -146,6 +146,10 @@ DTE_XML_FOLDER=/var/lib/tvmax-erp/dte-xml
 Ubicación: `src/modulos/sifen/sifen-utils/services/dte/dte-xml-storage.service.ts`
 (se registra y exporta en `SifenUtilsModule`).
 
+**Estado: implementado (2026-10-28).** La entidad `DTE` ya mapea `cdc`; la
+propiedad `xml` se mantiene hasta adaptar los usos del código (sección 4.6).
+Pruebas unitarias en `dte-xml-storage.service.spec.ts` (16 casos).
+
 ```ts
 getRuta(cdc: string): string                 // ${DTE_XML_FOLDER}/AAAA/MM/CDC.xml
 guardar(xml: string): Promise<string>        // escribe y devuelve el CDC
@@ -164,6 +168,15 @@ Reglas de `guardar()`:
 **Respaldo de lectura durante la transición** (se elimina en la fase 4): si el
 archivo no existe, `leer()` lee `xml` de la base por `id`, escribe el archivo,
 completa `cdc` si falta y deja un aviso en el log.
+
+- Si `cdc` ya tenía un valor distinto del CDC del XML, lanza un error.
+- `cdc` se completa con `UPDATE ... FOR UPDATE SKIP LOCKED`: si la fila está
+  bloqueada por otra transacción (por ejemplo, la del propio llamador), no
+  espera. Ese `cdc` queda para la próxima lectura o para el script de exportación.
+- El archivo temporal tiene un nombre aleatorio (`{CDC}.xml.{uuid}.tmp`), así
+  que dos escrituras simultáneas del mismo CDC no chocan.
+- `onModuleInit()` valida `DTE_XML_FOLDER` con
+  `DteXmlRutaUtil.validarCarpetaBase()`: si no es usable, la aplicación no inicia.
 
 ### 4.4 Entidad `DTE`
 

@@ -25,6 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { Permiso } from '@database/entity/permiso.entity';
 import { NotaCreditoElectronicaUtilsService } from './services/dte/nota-credito-electronica-utils.service';
 import { DteXmlUtilsService } from './services/dte/dte-xml-utils.service';
+import { DteXmlStorageService } from './services/dte/dte-xml-storage.service';
 import { ConsultaDTEMessageService } from './services/consultas/consulta-dte-message.service';
 import { ConsultaLoteMessageService } from './services/consultas/consulta-lote-message.service';
 import { ConsultaRucMessageService } from './services/consultas/consulta-ruc-message.service';
@@ -71,6 +72,7 @@ import { Cliente } from '@database/entity/cliente.entity';
     ],
     providers: [
         DteXmlUtilsService,
+        DteXmlStorageService,
         SifenUtilService,
         SifenEventosUtilService,
         SifenApiUtilService,
@@ -86,6 +88,7 @@ import { Cliente } from '@database/entity/cliente.entity';
     ],
     exports: [
         DteXmlUtilsService,
+        DteXmlStorageService,
         SifenApiUtilService,
         SifenEventosUtilService,
         SifenUtilService,
