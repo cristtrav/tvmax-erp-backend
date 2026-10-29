@@ -13,9 +13,6 @@ export class DTE {
     @PrimaryGeneratedColumn('identity', {generatedIdentity: 'BY DEFAULT'})
     id: number;
 
-    @Column({name: 'xml', nullable: false, type: "xml"})
-    xml: string;
-
     //Código de Control. Referencia al archivo XML en disco (ver DteXmlStorageService)
     @Column({name: 'cdc', type: 'varchar', length: 44})
     cdc: string;

@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { SifenUtilService } from './sifen-util.service';
 import xmlgen from 'facturacionelectronicapy-xmlgen';
 import xmlsign from 'facturacionelectronicapy-xmlsign';
-import { DteXmlUtilsService } from '../dte/dte-xml-utils.service';
+import { DteXmlStorageService } from '../dte/dte-xml-storage.service';
 import { DteUtilsService } from '../dte/dte-utils.service';
 import { NotaCredito } from '@database/entity/facturacion/nota-credito.entity';
 
@@ -15,7 +15,7 @@ import { NotaCredito } from '@database/entity/facturacion/nota-credito.entity';
 export class SifenEventosUtilService {
 
     constructor(
-        private dteXmlUtils: DteXmlUtilsService,
+        private dteXmlStorageSrv: DteXmlStorageService,
         private dteUtilsSrv: DteUtilsService,
         private sifenUtilSrv: SifenUtilService,
         @InjectRepository(VentaView)
@@ -28,7 +28,7 @@ export class SifenEventosUtilService {
 
     public async getCancelacionFactura(idevento: number, factura: DTE): Promise<string>{
         const data = {
-            cdc: this.dteXmlUtils.getCDC(factura.xml),
+            cdc: await this.dteXmlStorageSrv.getCdc(factura),
             motivo: 'Cancelación de CDC'
         }
         console.log("Anulacion DATA", data);
@@ -40,7 +40,7 @@ export class SifenEventosUtilService {
 
     public async getCancelacionNotaCredito(idevento: number, dte: DTE): Promise<string>{
         const data = {
-            cdc: this.dteXmlUtils.getCDC(dte.xml),
+            cdc: await this.dteXmlStorageSrv.getCdc(dte),
             motivo: 'Cancelación de CDC'
         }
         console.log("Anulacion DATA", data);

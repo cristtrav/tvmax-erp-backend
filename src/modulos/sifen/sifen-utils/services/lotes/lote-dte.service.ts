@@ -11,7 +11,7 @@ import { LoteView } from '@database/view/facturacion/lote.view';
 import { DetalleLote } from '@database/entity/facturacion/lote-detalle.entity';
 import { LoteDetalleView } from '@database/view/facturacion/lote-detalle.view';
 import { ResultadoProcesamientoLoteType } from '../../types/lotes/resultado-procesamiento-lote.type';
-import { DteXmlUtilsService } from '../dte/dte-xml-utils.service';
+import { DteXmlStorageService } from '../dte/dte-xml-storage.service';
 import { NotaCredito } from '@database/entity/facturacion/nota-credito.entity';
 import { EventoAuditoriaUtil } from '@globalutil/evento-auditoria-util';
 import { NotaCreditoDetalle } from '@database/entity/facturacion/nota-credito-detalle.entity';
@@ -44,7 +44,7 @@ export class LoteDteService {
         private notaCreditoDetalleRepo: Repository<NotaCreditoDetalle>,
         @InjectRepository(Cuota)
         private cuotaRepo: Repository<Cuota>,
-        private dteXmlUtils: DteXmlUtilsService,
+        private dteXmlStorageSrv: DteXmlStorageService,
         private datasource: DataSource
     ){}
 
@@ -238,7 +238,8 @@ export class LoteDteService {
                     const oldDte = { ... dte };
                     console.log(`Procesar DTE ${dte.id}`);
 
-                    const resultadoProc = respuestaLote.resultados.find(r => r.cdc == this.dteXmlUtils.getCDC(dte.xml))
+                    const cdc = await this.dteXmlStorageSrv.getCdc(dte);
+                    const resultadoProc = respuestaLote.resultados.find(r => r.cdc == cdc)
                     console.log('Resultado procesamiento para factura', resultadoProc);
                     if(resultadoProc == null){
                         console.log(`No se encontró el resultado de PROC id DTE:${dte.id}, lote: ${lote.id}`);

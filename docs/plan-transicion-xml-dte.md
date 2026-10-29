@@ -197,6 +197,19 @@ confirmar la transacción:
 
 ### 4.6 Cambios en el código
 
+**Estado: implementado (2026-10-28).** La entidad `DTE` ya no tiene `xml`.
+
+Ajustes respecto a lo planeado:
+
+- Los usos que solo necesitan el CDC llaman a `DteXmlStorageService.getCdc(dte)`,
+  que devuelve `dte.cdc` sin leer archivos ni la base. Solo si `cdc` está vacío
+  (DTE creados durante el deploy) lo obtiene del XML. En la fase 4 se
+  reemplaza por `dte.cdc`.
+- El KUDE usa `getRutaArchivo(dte)`, que asegura que el archivo exista
+  (recuperándolo de la base si falta) antes de pasar la ruta al jar.
+- El email adjunta el XML con `content: await storage.leer(dte)` en lugar de
+  `path:`, para que también funcione el respaldo de transición.
+
 **Solo necesitan el CDC** (pasan a usar `dte.cdc`, sin leer archivos):
 
 | Archivo | Uso actual |
@@ -221,8 +234,8 @@ confirmar la transacción:
 |---|---|
 | `sifen/sifen-utils/services/sifen/sifen-api-util.service.ts:57` | `enviar` → `await storage.leer(dte)` |
 | `sifen/sifen-utils/services/sifen/sifen-api-util.service.ts:130` | `enviarLote` → `Promise.all(detalles.map(d => storage.leer(d.dte)))` |
-| `sifen/sifen-utils/services/kude/kude-util.service.ts:33` | pasar `storage.getRuta(cdc)` al jar y dejar de escribir el XML temporal en `tmp/` |
-| `global/tasks/email-sender-task/email-sender-task.service.ts:141` | adjunto con `path: storage.getRuta(dte.cdc)` |
+| `sifen/sifen-utils/services/kude/kude-util.service.ts:33` | pasar `await storage.getRutaArchivo(dte)` al jar y dejar de escribir y borrar el XML temporal en `tmp/` (el jar solo lee el archivo; verificado) |
+| `global/tasks/email-sender-task/email-sender-task.service.ts:141` | adjunto con `content: await storage.leer(dte)` |
 | `ventas/controller/ventas.controller.ts:143` | `await storage.leer(dte)` |
 | `facturacion/notas-credito/services/find-dte-xml-by-notacredito.service.ts:20` | `await storage.leer(dte)` |
 

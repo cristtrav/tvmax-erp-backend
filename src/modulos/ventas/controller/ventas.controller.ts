@@ -14,6 +14,7 @@ import { VentaDTO } from '@dto/venta.dto';
 import { DteView } from '@database/view/facturacion/dte.view';
 import { AllowedInGuard } from '@auth/guards/allowed-in.guard';
 import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-util.service';
+import { DteXmlStorageService } from '@modulos/sifen/sifen-utils/services/dte/dte-xml-storage.service';
 import { CrearVentaService } from '../service/crear-venta.service';
 import { EditarVentaService } from '../service/editar-venta.service';
 import { EliminarVentaService } from '../service/eliminar-venta.service';
@@ -31,6 +32,7 @@ export class VentasController {
         private facturaElectronicaSrv: FacturaElectronicaService,
         private jwtUtil: JwtUtilsService,
         private kudeFacturaUtilSrv: KudeUtilService,
+        private dteXmlStorageSrv: DteXmlStorageService,
         private crearVentaSrv: CrearVentaService,
         private editarVentaSrv: EditarVentaService,
         private eliminarVentaSrv: EliminarVentaService,
@@ -140,7 +142,7 @@ export class VentasController {
             message: 'La venta no tiene una factura electrónica asociada'
         }, HttpStatus.NOT_FOUND);
         const factElectronica = await this.facturaElectronicaSrv.findById(venta.iddte);
-        return new StreamableFile(Buffer.from(factElectronica.xml, 'utf-8'));
+        return new StreamableFile(Buffer.from(await this.dteXmlStorageSrv.leer(factElectronica), 'utf-8'));
     }
 
     @Get(':id/kude')

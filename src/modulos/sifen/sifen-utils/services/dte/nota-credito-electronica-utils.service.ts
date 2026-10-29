@@ -13,7 +13,7 @@ import xmlgen from 'facturacionelectronicapy-xmlgen';
 import { NotaCredito } from '@database/entity/facturacion/nota-credito.entity';
 import { NotaCreditoDetalle } from '@database/entity/facturacion/nota-credito-detalle.entity';
 import { DEDocumentoAsociadoInterface } from '../../interfaces/dte/de-documento-asociado.interface';
-import { DteXmlUtilsService } from './dte-xml-utils.service';
+import { DteXmlStorageService } from './dte-xml-storage.service';
 
 @Injectable()
 export class NotaCreditoElectronicaUtilsService {
@@ -26,7 +26,7 @@ export class NotaCreditoElectronicaUtilsService {
         @InjectRepository(Venta)
         private ventaRepo: Repository<Venta>,
         private dteUtilsSrv: DteUtilsService,
-        private dteXmlUtils: DteXmlUtilsService
+        private dteXmlStorageSrv: DteXmlStorageService
     ) { }
 
     public async generarDE(nota: NotaCredito, detalles: NotaCreditoDetalle[]): Promise<string> {
@@ -96,7 +96,7 @@ export class NotaCreditoElectronicaUtilsService {
         return {
             formato: 1,
             tipo: 5,
-            cdc: this.dteXmlUtils.getCDC(dteAsoc.xml),
+            cdc: await this.dteXmlStorageSrv.getCdc(dteAsoc),
             establecimiento: talonView.codestablecimiento.toString().padStart(3, '0'),
             punto: talonView.codpuntoemision.toString().padStart(3, '0'),
             numero: venta.nroFactura.toString().padStart(7,'0'),
@@ -116,7 +116,7 @@ export class NotaCreditoElectronicaUtilsService {
         const signedXmlDE = await this.dteUtilsSrv.generarDEFirmado(xmlDE);
         const signedWithQRXmlDE = await this.dteUtilsSrv.generarDEConQR(signedXmlDE);
 
-        dte.xml = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        dte.cdc = await this.dteXmlStorageSrv.guardar(signedWithQRXmlDE ?? signedXmlDE ?? xmlDE);
         dte.firmado = signedXmlDE != null;
         dte.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
         dte.fechaCambioEstadoEnvioEmaill = new Date();
@@ -125,7 +125,7 @@ export class NotaCreditoElectronicaUtilsService {
         return dte;
     }
 
-    
+
 
     /*public async regenerarDTE(nota: NotaCredito, detalles: NotaCreditoDetalle[]): Promise<DTE> {
         
@@ -139,7 +139,7 @@ export class NotaCreditoElectronicaUtilsService {
         const signedXmlDE = await this.dteUtilsSrv.generarDEFirmado(xmlDE);
         const signedWithQRXmlDE = await this.dteUtilsSrv.generarDEConQR(signedXmlDE);
 
-        dte.xml = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        dte.cdc = await this.dteXmlStorageSrv.guardar(signedWithQRXmlDE ?? signedXmlDE ?? xmlDE);
         dte.firmado = signedXmlDE != null;
         dte.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
         dte.fechaCambioEstadoEnvioEmaill = new Date();

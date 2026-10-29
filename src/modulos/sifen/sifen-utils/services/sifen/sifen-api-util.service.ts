@@ -13,13 +13,13 @@ import { ConsultaDTEResponse } from '@modulos/sifen/sifen-utils/interfaces/consu
 import { ConsultaDTEMessageService } from '@modulos/sifen/sifen-utils/services/consultas/consulta-dte-message.service';
 import { SifenUtilService } from './sifen-util.service';
 import { ResultadoProcesamientoLoteType } from '../../types/lotes/resultado-procesamiento-lote.type';
-import { DteXmlUtilsService } from '../dte/dte-xml-utils.service';
+import { DteXmlStorageService } from '../dte/dte-xml-storage.service';
 
 @Injectable()
 export class SifenApiUtilService {
 
     constructor(
-        private dteXmlUtils: DteXmlUtilsService,
+        private dteXmlStorageSrv: DteXmlStorageService,
         private sifenUtilSrv: SifenUtilService,
         private sifenLoteMessageSrv: ConsultaLoteMessageService,
         private sifenConsultaDTEMsgSrv: ConsultaDTEMessageService,
@@ -54,7 +54,7 @@ export class SifenApiUtilService {
         
         const response = await setApi.recibe(
             Number(`${factElectronica.id}${factElectronica.version}`), //Antes tenia idventa
-            factElectronica.xml,
+            await this.dteXmlStorageSrv.leer(factElectronica),
             this.sifenUtilSrv.getAmbiente(), 
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
@@ -127,7 +127,7 @@ export class SifenApiUtilService {
 
         const response = await setApi.recibeLote(
             lote.id,
-            detalles.map(dl => dl.dte.xml),
+            await Promise.all(detalles.map(dl => this.dteXmlStorageSrv.leer(dl.dte))),
             this.sifenUtilSrv.getAmbiente(),
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword
@@ -197,7 +197,7 @@ export class SifenApiUtilService {
     public async consultarDTE(factura: DTE): Promise<ConsultaDTEResponse> {
         const response = await setApi.consulta(
             new Date().getTime(),
-            this.dteXmlUtils.getCDC(factura.xml),
+            await this.dteXmlStorageSrv.getCdc(factura),
             this.sifenUtilSrv.getAmbiente(),
             this.sifenUtilSrv.getCertData().certFullPath,
             this.sifenUtilSrv.getCertData().certPassword

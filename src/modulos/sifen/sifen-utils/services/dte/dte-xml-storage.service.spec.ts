@@ -141,6 +141,34 @@ describe('DteXmlStorageService', () => {
             });
         });
 
+        it('getRutaArchivo retorna la ruta sin consultar la base de datos si el archivo existe', async () => {
+            await service.guardar(getXml(CDC));
+            expect(await service.getRutaArchivo(getDte(1, CDC))).toBe(service.getRuta(CDC));
+            expect(datasource.query).not.toHaveBeenCalled();
+        });
+
+        it('getRutaArchivo recupera el archivo desde la base de datos si falta', async () => {
+            datasource.query.mockResolvedValueOnce([{ xml: getXml(CDC) }]).mockResolvedValueOnce([[], 1]);
+            const dte = getDte(7, null);
+
+            expect(await service.getRutaArchivo(dte)).toBe(service.getRuta(CDC));
+            expect(await readFile(service.getRuta(CDC), 'utf-8')).toBe(getXml(CDC));
+            expect(dte.cdc).toBe(CDC);
+        });
+
+        it('getCdc retorna el cdc del DTE sin leer el archivo ni la base de datos', async () => {
+            expect(await service.getCdc(getDte(1, CDC))).toBe(CDC);
+            expect(datasource.query).not.toHaveBeenCalled();
+        });
+
+        it('getCdc obtiene el CDC desde el XML si la columna cdc no está completa', async () => {
+            datasource.query.mockResolvedValueOnce([{ xml: getXml(CDC) }]).mockResolvedValueOnce([[], 1]);
+            const dte = getDte(7, null);
+
+            expect(await service.getCdc(dte)).toBe(CDC);
+            expect(dte.cdc).toBe(CDC);
+        });
+
         it('propaga errores de lectura distintos a archivo inexistente', async () => {
             //La ruta del archivo es un directorio: readFile falla con EISDIR
             await mkdir(service.getRuta(CDC), { recursive: true });

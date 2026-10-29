@@ -12,6 +12,7 @@ import { DteUtilsService } from '@modulos/sifen/sifen-utils/services/dte/dte-uti
 import { DEDataInterface } from '../../interfaces/dte/de-data.interface';
 import { DEItemInterface } from '../../interfaces/dte/de-item.interface';
 import { XmlgenConfig } from 'facturacionelectronicapy-xmlgen/dist/services/type.interface.';
+import { DteXmlStorageService } from './dte-xml-storage.service';
 
 @Injectable()
 export class FacturaElectronicaUtilsService {
@@ -21,7 +22,8 @@ export class FacturaElectronicaUtilsService {
         private talonarioViewRepo: Repository<TalonarioView>,
         @InjectRepository(DTE)
         private dteRepo: Repository<DTE>,
-        private dteUtilsSrv: DteUtilsService
+        private dteUtilsSrv: DteUtilsService,
+        private dteXmlStorageSrv: DteXmlStorageService
     ) { }
 
     public async generarDE(venta: Venta, detalles: DetalleVenta[]): Promise<string> {
@@ -94,7 +96,7 @@ export class FacturaElectronicaUtilsService {
         const signedXmlDE = await this.dteUtilsSrv.generarDEFirmado(xmlDE);
         const signedWithQRXmlDE = await this.dteUtilsSrv.generarDEConQR(signedXmlDE);
 
-        dte.xml = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        dte.cdc = await this.dteXmlStorageSrv.guardar(signedWithQRXmlDE ?? signedXmlDE ?? xmlDE);
         dte.firmado = signedXmlDE != null;
         dte.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
         dte.fechaCambioEstadoEnvioEmaill = new Date();
@@ -114,7 +116,7 @@ export class FacturaElectronicaUtilsService {
         const signedXmlDE = await this.dteUtilsSrv.generarDEFirmado(xmlDE);
         const signedWithQRXmlDE = await this.dteUtilsSrv.generarDEConQR(signedXmlDE);
 
-        dte.xml = signedWithQRXmlDE ?? signedXmlDE ?? xmlDE;
+        dte.cdc = await this.dteXmlStorageSrv.guardar(signedWithQRXmlDE ?? signedXmlDE ?? xmlDE);
         dte.firmado = signedXmlDE != null;
         dte.idestadoEnvioEmail = EstadoEnvioEmail.NO_ENVIADO;
         dte.fechaCambioEstadoEnvioEmaill = new Date();

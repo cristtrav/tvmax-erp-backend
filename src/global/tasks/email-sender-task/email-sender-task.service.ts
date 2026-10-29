@@ -10,6 +10,7 @@ import { EstadoEnvioEmail } from '@database/entity/facturacion/estado-envio-emai
 import { EstadoDocumentoSifen } from '@database/entity/facturacion/estado-documento-sifen.entity';
 import { Usuario } from '@database/entity/usuario.entity';
 import { KudeUtilService } from '@modulos/sifen/sifen-utils/services/kude/kude-util.service';
+import { DteXmlStorageService } from '@modulos/sifen/sifen-utils/services/dte/dte-xml-storage.service';
 import { ClienteView } from '@database/view/cliente.view';
 import { EmailDesactivado } from '@database/entity/facturacion/email-desactivado.entity';
 import { ConfigService } from '@nestjs/config';
@@ -46,6 +47,7 @@ export class EmailSenderTaskService implements OnModuleInit {
         private emailDesactivadoRepo: Repository<EmailDesactivado>,
         private datasource: DataSource,
         private kudeFacturaUtilSrv: KudeUtilService,
+        private dteXmlStorageSrv: DteXmlStorageService,
         private schedule: SchedulerRegistry,
         private configService: ConfigService
     ){}
@@ -138,7 +140,7 @@ export class EmailSenderTaskService implements OnModuleInit {
             attachments: [
                 {
                     filename: `${nombreArchivo}.xml`,
-                    content: dte.xml,
+                    content: await this.dteXmlStorageSrv.leer(dte),
                     contentType: 'text/xml'
                 },
                 {

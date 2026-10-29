@@ -1,7 +1,7 @@
 import { DTE } from '@database/entity/facturacion/dte.entity';
 import { HttpException, HttpStatus, Injectable, Logger, LoggerService, OnModuleInit } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { mkdir, readFile, rename, unlink, writeFile } from 'fs/promises';
+import { mkdir, readFile, rename, stat, unlink, writeFile } from 'fs/promises';
 import { dirname } from 'path';
 import { DataSource } from 'typeorm';
 import { DteXmlRutaUtil } from './dte-xml-ruta.util';
@@ -75,6 +75,24 @@ export class DteXmlStorageService implements OnModuleInit {
     }
 
     /**
+     * Ruta del archivo XML del DTE, asegurando que exista en disco.
+     */
+    public async getRutaArchivo(dte: DTE): Promise<string> {
+        if(dte.cdc != null && await this.existeArchivo(this.getRuta(dte.cdc))) return this.getRuta(dte.cdc);
+        await this.recuperarDesdeBaseDatos(dte);
+        return this.getRuta(dte.cdc);
+    }
+
+    /**
+     * TRANSICIÓN: si la columna cdc aún no está completa, lo obtiene del XML.
+     * En la fase 4 (cdc NOT NULL) se reemplaza por dte.cdc.
+     */
+    public async getCdc(dte: DTE): Promise<string> {
+        if(dte.cdc == null) await this.recuperarDesdeBaseDatos(dte);
+        return dte.cdc;
+    }
+
+    /**
      * TRANSICIÓN: eliminar en la fase 4, junto con la columna facturacion.dte.xml.
      * Para DTE que aún no tienen su archivo en disco (por ej. creados durante el deploy):
      * lee el XML de la base de datos, escribe el archivo y completa la columna cdc.
@@ -113,6 +131,15 @@ export class DteXmlStorageService implements OnModuleInit {
 
     private getCarpetaBase(): string {
         return process.env.DTE_XML_FOLDER;
+    }
+
+    private async existeArchivo(ruta: string): Promise<boolean> {
+        try{
+            return (await stat(ruta)).isFile();
+        }catch(e){
+            if(e.code == 'ENOENT') return false;
+            throw e;
+        }
     }
 
     private async leerArchivo(ruta: string): Promise<Buffer | null> {

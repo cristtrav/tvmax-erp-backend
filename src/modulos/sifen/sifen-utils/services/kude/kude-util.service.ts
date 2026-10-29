@@ -2,15 +2,17 @@ import { DTE } from '@database/entity/facturacion/dte.entity';
 import { SifenUtilService } from '@modulos/sifen/sifen-utils/services/sifen/sifen-util.service';
 import { HttpException, HttpStatus, Injectable, StreamableFile } from '@nestjs/common';
 import { existsSync, mkdirSync, rmdirSync } from 'fs';
-import { writeFile, readdir, readFile, unlink} from 'fs/promises';
+import { readdir, readFile, unlink} from 'fs/promises';
 import { PDFDocument } from 'pdf-lib';
+import { DteXmlStorageService } from '../dte/dte-xml-storage.service';
 const { exec } = require("child_process");
 
 @Injectable()
 export class KudeUtilService {
 
     constructor(
-        private sifenUtilsSrv: SifenUtilService
+        private sifenUtilsSrv: SifenUtilService,
+        private dteXmlStorageSrv: DteXmlStorageService
     ){}
 
     public async generateKude(factElectronica: DTE, conDuplicado: boolean = false, direccionCliente?: string): Promise<StreamableFile>{
@@ -23,14 +25,12 @@ export class KudeUtilService {
         if(this.sifenUtilsSrv.isDisabled()) ambienteSifen = '0';
         else if(this.sifenUtilsSrv.getAmbiente() == 'test') ambienteSifen = '1';
 
-        const filename = `${timestamp}.xml`;
-        const dteFilePath = `${process.cwd()}/tmp/${filename}`;
         const kudePath = `${process.cwd()}/tmp/${timestamp}/`;
         const jasperPath = `${process.cwd()}/src/assets/facturacion-electronica/jasper/`;
         const urlLogo = `${process.cwd()}/src/assets/facturacion-electronica/img/logo-tvmax.png`;
 
-        //Escribir XML a archivo temporal (La libreria lee el archivo del disco)
-        await writeFile(dteFilePath, factElectronica.xml);
+        //La libreria lee el XML del disco: se usa directamente el archivo almacenado (solo lectura)
+        const dteFilePath = await this.dteXmlStorageSrv.getRutaArchivo(factElectronica);
 
         //Generar KUDE en PDF (La libreria genera en un archivo PDF en disco)
         let generationParams = direccionCliente != null ?
@@ -51,8 +51,7 @@ export class KudeUtilService {
         }, HttpStatus.INTERNAL_SERVER_ERROR)
         const kudePdfFile = await readFile(`${kudePath}/${filesKudeArr[0]}`);
 
-        //Eliminar archivos temporales
-        await unlink(dteFilePath);
+        //Eliminar archivos temporales (el XML almacenado no se elimina)
         await unlink(`${kudePath}/${filesKudeArr[0]}`);
         rmdirSync(kudePath);
 
